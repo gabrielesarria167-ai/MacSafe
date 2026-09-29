@@ -1,0 +1,273 @@
+import SwiftUI
+
+struct ContentView: View {
+    @Environment(Store.self) private var store
+
+    var body: some View {
+        @Bindable var store = store
+        NavigationSplitView {
+            Sidebar()
+        } detail: {
+            detail
+                .frame(minWidth: 680, minHeight: 480)
+        }
+        .overlay(alignment: .bottom) { ToastView().animation(.snappy, value: store.toast?.id) }
+        .alert(store.confirm?.title ?? "",
+               isPresented: Binding(get: { store.confirm != nil }, set: { if !$0 { store.confirm = nil } }),
+               presenting: store.confirm) { req in
+            Button(req.button, role: .destructive) { Task { await req.action() } }
+            if req.permanent {
+                Button("Cancel", role: .cancel) {}.keyboardShortcut(.defaultAction)
+            } else {
+                Button("Cancel", role: .cancel) {}
+            }
+        } message: { req in
+            Text(req.message)
+        }
+        .sheet(item: $store.uninstallTarget) { app in UninstallSheet(app: app) }
+    }
+
+    @ViewBuilder
+    private var detail: some View {
+        switch store.phase {
+        case .starting:
+            ProgressView("Starting…")
+        case .failed(let message):
+            ContentUnavailableView {
+                Label(store.needsPython ? "Python 3 is needed" : "Couldn't start the scanner",
+                      systemImage: "exclamationmark.triangle")
+            } description: {
+                Text(store.needsPython
+                     ? "Storage Monitor's scanner runs on Python 3. Install it from python.org (a free, official installer), then try again."
+                     : message)
+            } actions: {
+                if store.needsPython {
+                    Button("Download Python…") { store.openPythonDownload() }
+                        .buttonStyle(.borderedProminent)
+                }
+                Button("Try Again") { Task { await store.start() } }
+            }
+        case .ready:
+            if !store.hasData {
+                ScanningView()
+            } else {
+                switch store.pane {
+                case .overview: OverviewView()
+                case .explorer: ExplorerView()
+                case .large: LargeFilesView()
+                case .unused: UnusedView()
+                case .duplicates: DuplicatesView()
+                case .caches: CachesView()
+                case .clutter: ClutterView()
+                case .apps: AppsView()
+                }
+            }
+        }
+    }
+}
+
+struct Sidebar: View {
+    private var store: Store { .shared }
+
+    var body: some View {
+        let wins = store.overview?.wins
+        List {
+            Section("Storage") {
+                SidebarRow(pane: .overview)
+                SidebarRow(pane: .explorer)
+            }
+            Section("Find") {
+                SidebarRow(pane: .large)
+                SidebarRow(pane: .unused)
+                SidebarRow(pane: .duplicates)
+            }
+            Section("Clean Up") {
+                SidebarRow(pane: .caches, badge: wins?.caches)
+                SidebarRow(pane: .clutter, badge: wins?.clutter)
+                SidebarRow(pane: .apps)
+            }
+        }
+        .listStyle(.sidebar)
+        .navigationSplitViewColumnWidth(min: 210, ideal: 230, max: 300)
+        .safeAreaInset(edge: .bottom, spacing: 0) { DiskFooter() }
+    }
+}
+
+/// A sidebar entry. It's a plain button (not list selection) so a click always switches the pane.
+struct SidebarRow: View {
+    private var store: Store { .shared }
+    let pane: Pane
+    var badge: Int64?
+    @State private var hovering = false
+
+    var body: some View {
+        let selected = store.pane == pane
+        Button {
+            store.pane = pane
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: pane.icon)
+                    .frame(width: 20)
+                    .foregroundStyle(selected ? Color.white : Palette.accent)
+                Text(pane.title)
+                    .foregroundStyle(selected ? Color.white : Color.primary)
+                Spacer(minLength: 4)
+                if let badge, badge >= 1_000_000 {
+                    Text(Fmt.size(badge))
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(selected ? Color.white.opacity(0.85) : Color.secondary)
+                }
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(selected ? Palette.accent : (hovering ? Color.primary.opacity(0.06) : Color.clear))
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+        .listRowInsets(EdgeInsets(top: 1, leading: 6, bottom: 1, trailing: 6))
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}
+
+struct DiskFooter: View {
+    private var store: Store { .shared }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Divider().padding(.bottom, 2)
+            if let disk = store.status?.disk {
+                HStack {
+                    Image(systemName: "internaldrive")
+                    Text("Macintosh HD").fontWeight(.medium)
+                }
+                .font(.callout)
+                ProgressView(value: Double(disk.used), total: Double(max(disk.total, 1)))
+                    .tint(Double(disk.free) / Double(max(disk.total, 1)) < 0.1 ? Palette.critical : Palette.accent)
+                Text("\(Fmt.size(disk.free)) free of \(Fmt.size(disk.total))")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            if store.isScanning, let scan = store.status?.scan {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(scan.phase ?? "Scanning…").lineLimit(1)
+                        if let files = scan.files {
+                            Text("\(files.formatted()) files").foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .font(.caption)
+            } else {
+                HStack {
+                    Text("Scanned \(Fmt.ago(store.status?.scannedAt).lowercased())")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button { Task { await store.rescan() } } label: { Image(systemName: "arrow.clockwise") }
+                        .buttonStyle(.borderless)
+                        .help("Rescan (⌘R)")
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 14)
+    }
+}
+
+struct ScanningView: View {
+    @Environment(Store.self) private var store
+
+    var body: some View {
+        let scan = store.status?.scan
+        VStack(spacing: 18) {
+            Image(systemName: "internaldrive")
+                .font(.system(size: 56, weight: .light))
+                .foregroundStyle(Palette.accent)
+                .symbolEffect(.pulse, isActive: true)
+            Text("Looking through your Mac").font(.title2.weight(.semibold))
+            Text(scan?.phase ?? "Starting…").foregroundStyle(.secondary)
+            if let f = scan?.fraction {
+                ProgressView(value: f).frame(width: 320)
+            } else {
+                ProgressView().progressViewStyle(.linear).frame(width: 320)
+            }
+            HStack(spacing: 24) {
+                VStack { Text((scan?.files ?? 0).formatted()).font(.title3.monospacedDigit()); Text("files").font(.caption).foregroundStyle(.secondary) }
+                VStack { Text(Fmt.size(scan?.bytes ?? 0)).font(.title3.monospacedDigit()); Text("measured").font(.caption).foregroundStyle(.secondary) }
+            }
+            if let cur = scan?.current, !cur.isEmpty {
+                Text(cur).font(.caption).foregroundStyle(.tertiary).lineLimit(1).truncationMode(.middle).frame(maxWidth: 480)
+            }
+            if scan?.state == "error" {
+                Text("The scan failed. Details are in \(EngineClient.logURL.path).").foregroundStyle(Palette.critical)
+                Button("Try Again") { Task { await store.rescan() } }
+            }
+            Text("The first scan takes about a minute. After that, Storage Monitor opens instantly with the last results.")
+                .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center).frame(maxWidth: 420)
+                .padding(.top, 8)
+        }
+        .padding(40)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+struct UninstallSheet: View {
+    @Environment(Store.self) private var store
+    @Environment(\.dismiss) private var dismiss
+    let app: Item
+    @State private var chosen = Set<String>()
+
+    var body: some View {
+        let leftovers = app.leftovers ?? []
+        let extra = leftovers.filter { chosen.contains($0.path) }.reduce(Int64(0)) { $0 + $1.size }
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 14) {
+                FileIcon(path: app.path, size: 56)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Uninstall \(app.name)?").font(.title3.weight(.semibold))
+                    Text("The app (\(Fmt.size(app.size))) moves to the Trash, so you can still put it back.")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            if !leftovers.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Also remove its data from your Library").font(.headline)
+                    ForEach(leftovers, id: \.path) { l in
+                        Toggle(isOn: Binding(get: { chosen.contains(l.path) },
+                                             set: { if $0 { chosen.insert(l.path) } else { chosen.remove(l.path) } })) {
+                            HStack {
+                                Text(l.loc).lineLimit(1).truncationMode(.middle)
+                                Spacer()
+                                Text(Fmt.size(l.size)).monospacedDigit().foregroundStyle(.secondary)
+                            }
+                        }
+                        .toggleStyle(.checkbox)
+                    }
+                    Text("These folders hold the app's settings, caches and documents. Keep them if you might reinstall it.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                .padding(12)
+                .background(Palette.card, in: RoundedRectangle(cornerRadius: 8))
+            }
+            HStack {
+                Text("Total: \(Fmt.size(app.size + extra))").foregroundStyle(.secondary)
+                Spacer()
+                Button("Cancel", role: .cancel) { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+                Button("Move to Trash") {
+                    let paths = [app.path] + chosen.sorted()
+                    dismiss()
+                    Task { await store.trash(paths: paths) }
+                }
+                .keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding(24)
+        .frame(width: 540)
+        .onAppear { chosen = Set(leftovers.map(\.path)) }
+    }
+}

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Storage Monitor for Mac</title>
+<meta name="description" content="See what's filling up your Mac and clean it up safely. Install with one Terminal command.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;800&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one centred column; the hero pairs the install command with a disk ring like the app's own Overview. */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --fg: #161a22; --muted: #5b6474; --line: #dde2ea;
+  --accent: #1f6fd1; --accent-ink: #ffffff; --code-bg: #10141b; --code-fg: #e6ebf3; --code-dim: #7d8898;
+  --ok: #1d7f45; --warn: #9a5b00;
+  --c-system: #7474a8; --c-appdata: #b865b8; --c-apps: #2f86e0; --c-files: #e58a2e; --c-free: #cfd5de;
+  --f-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Onest", -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1216; --surface: #171b21; --fg: #e8ecf2; --muted: #98a2b3; --line: #2a3039;
+    --accent: #6db3ff; --accent-ink: #08121f; --code-bg: #080a0d; --code-fg: #e6ebf3; --code-dim: #7d8898;
+    --ok: #6fd08f; --warn: #f2c166;
+    --c-system: #8f8fc4; --c-appdata: #d787d7; --c-apps: #5fafff; --c-files: #ffaf5f; --c-free: #3a414c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1216; --surface: #171b21; --fg: #e8ecf2; --muted: #98a2b3; --line: #2a3039;
+  --accent: #6db3ff; --accent-ink: #08121f; --code-bg: #080a0d; --code-fg: #e6ebf3; --code-dim: #7d8898;
+  --ok: #6fd08f; --warn: #f2c166;
+  --c-system: #8f8fc4; --c-appdata: #d787d7; --c-apps: #5fafff; --c-files: #ffaf5f; --c-free: #3a414c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: 400 1rem/1.6 var(--f-body);
+  padding: env(safe-area-inset-top, 0px) 20px env(safe-area-inset-bottom, 0px);
+}
+.wrap { max-width: 60rem; margin: 0 auto; display: grid; gap: 4.5rem; padding-block: 1.5rem 4rem; }
+a { color: var(--accent); text-underline-offset: 0.18em; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+h1, h2 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: -0.02em; }
+h1 { font-weight: 800; font-size: clamp(2.2rem, 5.5vw, 3.4rem); line-height: 1.05; }
+h2 { font-weight: 600; font-size: 1.55rem; line-height: 1.2; }
+p { margin: 0; max-width: 65ch; }
+.muted { color: var(--muted); }
+.label { font: 600 0.75rem/1 var(--f-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.brand { display: flex; align-items: center; gap: 0.55rem; font: 600 1.05rem/1 var(--f-display); color: var(--fg); text-decoration: none; }
+.brand b { color: var(--accent); font-size: 1.1rem; }
+
+/* hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
+.hero-copy { display: grid; gap: 1.4rem; min-width: 0; }
+.lede { font-size: 1.15rem; color: var(--muted); }
+.meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; font-size: 0.9rem; color: var(--muted); }
+.meta span::before { content: "✓ "; color: var(--ok); font-weight: 600; }
+
+/* command box */
+.cmd { background: var(--code-bg); color: var(--code-fg); border-radius: 12px; display: grid; min-width: 0; }
+.cmd-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 0.7rem 0 1rem; }
+.cmd-head .label { color: var(--code-dim); }
+.cmd pre { margin: 0; padding: 0.75rem 1rem 1rem; overflow-x: auto; font: 400 0.92rem/1.5 var(--f-mono); }
+.cmd pre::before { content: "$ "; color: var(--code-dim); }
+.copy {
+  font: 600 0.8rem/1 var(--f-body); color: var(--accent-ink); background: var(--accent);
+  border: 0; border-radius: 7px; padding: 0.5rem 0.8rem; cursor: pointer; min-width: 5.2rem;
+}
+.copy:hover { filter: brightness(1.08); }
+.copy.done { background: var(--ok); }
+
+/* ring */
+.disk { display: grid; justify-items: center; gap: 1.1rem; min-width: 0; }
+.disk svg { width: min(15rem, 100%); height: auto; }
+.disk .big { font: 800 1.35rem/1 var(--f-display); fill: var(--fg); }
+.disk .small { font: 400 0.7rem/1 var(--f-body); fill: var(--muted); }
+.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; width: 100%; max-width: 17rem; font-size: 0.88rem; }
+.legend li { display: grid; grid-template-columns: 0.8rem 1fr auto; gap: 0.55rem; align-items: center; }
+.legend i { width: 0.65rem; height: 0.65rem; border-radius: 50%; }
+.legend span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
+.caption { font-size: 0.78rem; color: var(--muted); }
+
+/* sections */
+section { display: grid; gap: 1.4rem; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 0.9rem; counter-increment: s; }
+.steps li::before {
+  content: counter(s); font: 600 0.85rem/2rem var(--f-mono); text-align: center;
+  width: 2rem; height: 2rem; border-radius: 50%; border: 1.5px solid var(--line); color: var(--muted);
+}
+.steps strong { display: block; font-weight: 600; }
+.steps p { color: var(--muted); }
+code { font: 400 0.88em var(--f-mono); background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 0.05em 0.35em; }
+
+.split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem; display: grid; gap: 1rem; align-content: start; min-width: 0; }
+.panel h2 { font-size: 1.2rem; }
+.btn {
+  justify-self: start; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;
+  font: 600 0.95rem/1 var(--f-body); color: var(--fg); border: 1.5px solid var(--line); border-radius: 9px; padding: 0.7rem 1rem;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.path { font: 400 0.85rem var(--f-mono); color: var(--fg); }
+
+.finds { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.finds div { background: var(--surface); padding: 1rem 1.1rem; display: grid; gap: 0.25rem; }
+.finds strong { font-weight: 600; }
+.finds span { color: var(--muted); font-size: 0.88rem; line-height: 1.45; }
+
+.safety { display: flex; gap: 0.8rem; align-items: baseline; font-size: 0.95rem; }
+.safety b { color: var(--warn); }
+
+footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 2rem; font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 1.5rem; }
+
+@media (max-width: 760px) {
+  .hero, .split { grid-template-columns: minmax(0, 1fr); }
+  .hero { gap: 2.5rem; }
+  .finds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wrap { gap: 3.5rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .copy, .btn { transition: background-color .15s, border-color .15s, color .15s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="brand" href="./"><b>◆</b> Storage Monitor</a>
+    <a href="https://github.com/gabrielesarria167-ai/MacSafe">Source on GitHub</a>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="hero-copy">
+        <h1>See what's filling your Mac, then clean it up safely.</h1>
+        <p class="lede">A Mac app and a terminal dashboard that show where your storage went: big files, forgotten downloads, old caches and apps you never open.</p>
+
+        <div class="cmd" aria-label="Install command">
+          <div class="cmd-head">
+            <span class="label">Install · paste into Terminal</span>
+            <button class="copy" type="button" id="copy-install" data-copy="install-cmd">Copy</button>
+          </div>
+          <pre id="install-cmd">curl -fsSL https://gabrielesarria167-ai.github.io/MacSafe/install.sh | bash</pre>
+        </div>
+
+        <div class="meta"><span>Free</span><span>macOS 14 or later</span><span>Apple Silicon and Intel</span><span>No “unverified app” warning</span></div>
+      </div>
+
+      <figure class="disk" style="margin:0" aria-label="Example disk breakdown">
+        <svg viewBox="0 0 200 200" role="img" aria-labelledby="ring-title">
+          <title id="ring-title">Example: 174 GB used of a 245 GB disk</title>
+          <g transform="rotate(-90 100 100)" fill="none" stroke-width="26">
+            <!-- circumference of r=80 is 502.65; segments are shares of 245 GB -->
+            <circle cx="100" cy="100" r="80" stroke="var(--c-system)"  stroke-dasharray="202.6 502.65" stroke-dashoffset="0"/>
+            <circle cx="100" cy="100" r="80" stroke="var(--c-appdata)" stroke-dasharray="89.7 502.65"  stroke-dashoffset="-202.6"/>
+            <circle cx="100" cy="100" r="80" stroke="var(--c-apps)"    stroke-dasharray="47.7 502.65"  stroke-dashoffset="-292.3"/>
+            <circle cx="100" cy="100" r="80" stroke="var(--c-files)"   stroke-dasharray="16.0 502.65"  stroke-dashoffset="-340.0"/>
+            <circle cx="100" cy="100" r="80" stroke="var(--c-free)"    stroke-dasharray="146.6 502.65" stroke-dashoffset="-356.0"/>
+          </g>
+          <text class="big" x="100" y="99" text-anchor="middle">174 GB</text>
+          <text class="small" x="100" y="118" text-anchor="middle">of 245 GB used</text>
+        </svg>
+        <ul class="legend">
+          <li><i style="background:var(--c-system)"></i><span>macOS &amp; other</span><span>99.0 GB</span></li>
+          <li><i style="background:var(--c-appdata)"></i><span>App data &amp; caches</span><span>43.7 GB</span></li>
+          <li><i style="background:var(--c-apps)"></i><span>Applications</span><span>23.3 GB</span></li>
+          <li><i style="background:var(--c-files)"></i><span>Your files</span><span>7.8 GB</span></li>
+          <li><i style="background:var(--c-free)"></i><span>Free</span><span>71.2 GB</span></li>
+        </ul>
+        <figcaption class="caption">Example Overview. Click any slice in the app to explore it.</figcaption>
+      </figure>
+    </div>
+  </main>
+
+  <section aria-labelledby="what-h">
+    <h2 id="what-h">What the installer does</h2>
+    <ol class="steps">
+      <li><div><strong>Checks your Mac</strong><p>macOS 14 or later, Apple Silicon or Intel.</p></div></li>
+      <li><div><strong>Installs Python 3, only if it's missing</strong><p>Storage Monitor's scanner runs on Python. If your Mac doesn't have it, the installer downloads the official package from python.org, checks that it's signed by the Python Software Foundation, and asks for your password once to install it.</p></div></li>
+      <li><div><strong>Installs the app</strong><p>Downloads the latest release, checks it against its published checksum, and puts it in your Applications folder.</p></div></li>
+      <li><div><strong>Adds the <code>storagemon</code> command</strong><p>The terminal dashboard, for a quick look without leaving Terminal.</p></div></li>
+    </ol>
+    <p class="muted">Nothing else is installed: no Homebrew, no background services. Run it again any time to update.</p>
+  </section>
+
+  <section aria-labelledby="finds-h">
+    <h2 id="finds-h">What it finds</h2>
+    <div class="finds">
+      <div><strong>Large files</strong><span>Anything over 100 MB, biggest first.</span></div>
+      <div><strong>Unused</strong><span>Files and folders untouched for months.</span></div>
+      <div><strong>Caches</strong><span>Marked safe to clear or review first.</span></div>
+      <div><strong>Clutter</strong><span>Old downloads, installers, node_modules, iPhone backups.</span></div>
+      <div><strong>Apps</strong><span>When you last opened each one, and what it left in Library.</span></div>
+      <div><strong>Duplicates</strong><span>Byte-for-byte identical copies.</span></div>
+      <div><strong>Explorer</strong><span>Drill into any folder by size.</span></div>
+      <div><strong>Outside your home</strong><span>What makes up “macOS &amp; other”.</span></div>
+    </div>
+    <p class="safety"><b>⚠</b><span>Moving to the Trash can be undone. Deleting permanently always shows a warning first, and system folders can't be removed at all.</span></p>
+  </section>
+
+  <div class="split">
+    <section class="panel" aria-labelledby="zip-h">
+      <h2 id="zip-h">Prefer a regular download?</h2>
+      <p class="muted">The app isn't notarized by Apple, so a file downloaded in a browser gets macOS's “could not verify” warning the first time. The Terminal install above avoids it. To open the download anyway:</p>
+      <ol class="steps">
+        <li><div><p>Unzip it, drag <span class="path">Storage Monitor.app</span> to Applications and open it. Click <strong style="display:inline">Done</strong> on the warning.</p></div></li>
+        <li><div><p>Open <strong style="display:inline">System Settings › Privacy &amp; Security</strong> and scroll down.</p></div></li>
+        <li><div><p>Click <strong style="display:inline">Open Anyway</strong> next to Storage Monitor and confirm. macOS remembers the choice.</p></div></li>
+      </ol>
+      <p class="muted">You'll need Python 3 from <a href="https://www.python.org/downloads/macos/">python.org</a> if the app says it's missing.</p>
+      <a class="btn" href="https://github.com/gabrielesarria167-ai/MacSafe/releases/latest/download/StorageMonitor.zip">↓ Download StorageMonitor.zip</a>
+    </section>
+
+    <section class="panel" aria-labelledby="fda-h">
+      <h2 id="fda-h">After installing</h2>
+      <p class="muted">For complete results, let Storage Monitor read every folder. Without this, macOS hides some folders from it and the totals come out low.</p>
+      <ol class="steps">
+        <li><div><p>Open <strong style="display:inline">System Settings › Privacy &amp; Security › Full Disk Access</strong>.</p></div></li>
+        <li><div><p>Turn on <strong style="display:inline">Storage Monitor</strong>. For the <code>storagemon</code> command, also turn on <strong style="display:inline">Terminal</strong>.</p></div></li>
+      </ol>
+      <div class="cmd" aria-label="Uninstall command">
+        <div class="cmd-head">
+          <span class="label">Uninstall</span>
+          <button class="copy" type="button" id="copy-uninstall" data-copy="uninstall-cmd">Copy</button>
+        </div>
+        <pre id="uninstall-cmd">curl -fsSL https://gabrielesarria167-ai.github.io/MacSafe/install.sh | bash -s -- --uninstall</pre>
+      </div>
+      <p class="muted">Removes the app, the command and their caches. Python stays.</p>
+    </section>
+  </div>
+
+  <footer>
+    <span>Storage Monitor · runs entirely on your Mac, nothing is uploaded.</span>
+    <a href="https://github.com/gabrielesarria167-ai/MacSafe">github.com/gabrielesarria167-ai/MacSafe</a>
+  </footer>
+</div>
+
+<script>
+document.querySelectorAll(".copy").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    var pre = document.getElementById(btn.dataset.copy);
+    var text = pre.textContent;
+    function done(label) {
+      btn.textContent = label;
+      btn.classList.toggle("done", label === "Copied");
+      setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1800);
+    }
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(pre);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      done("Press ⌘C");
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { done("Copied"); }, selectIt);
+    } catch (e) { selectIt(); }
+  });
+});
+</script>
+</body>
+</html>
