@@ -269,7 +269,9 @@ struct ClutterView: View {
                     Label(title, systemImage: icon)
                     accessory()
                     Spacer()
-                    Text("\(items.count) · \(Fmt.size(items.reduce(0) { $0 + $1.size }))").monospacedDigit()
+                    if !items.isEmpty {
+                        Text("\(Fmt.count(items.count, "item")) · \(Fmt.size(items.reduce(0) { $0 + $1.size }))").monospacedDigit()
+                    }
                 }
                 Text(caption).font(.caption).foregroundStyle(.secondary).textCase(nil)
             }

@@ -169,3 +169,13 @@ struct RestoreResponse: Decodable {
 }
 
 struct OKResponse: Decodable { var ok: Bool? }
+
+/// engine.update_status(): the installed version, the newest release on GitHub and any update in progress.
+struct UpdateInfo: Decodable, Equatable {
+    let current: String?
+    let latest: String?
+    let available: Bool
+    let state: String          // idle | installing | failed
+    let error: String?
+    let releases: String?
+}

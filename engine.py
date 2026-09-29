@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-Storage Monitor engine — scans your Mac's storage and removes things safely.
+MacSafe engine — scans your Mac's storage and removes things safely.
 
 Shared by both front-ends:
   • the Mac app runs `engine.py serve` and talks to it over a private localhost
     JSON API (random port, per-launch token, Host check; exits with the app);
   • the terminal dashboard (smcli.py) imports it directly.
 
-Each finished scan is saved to ~/Library/Caches/StorageMonitor/snapshot.json so
-both open instantly with the last results while a fresh scan runs.
+Each finished scan is saved to ~/Library/Caches/MacSafe/snapshot.json so
+both open instantly with the last results while a fresh scan runs. Both also update
+themselves through the same installer (see "updates" below).
 Only the Python standard library is used.
 """
 import argparse
@@ -17,6 +18,7 @@ import hashlib
 import json
 import os
 import plistlib
+import re
 import secrets
 import shutil
 import stat
@@ -361,7 +363,7 @@ def trash_paths(paths):
 # ───────────────────────────── index ──────────────────────────────
 
 MARKERS = ("node_modules", "venv", "appcache", "package")
-SNAP_DIR = H("Library", "Caches", "StorageMonitor")
+SNAP_DIR = H("Library", "Caches", "MacSafe")
 SNAP_FILE = os.path.join(SNAP_DIR, "snapshot.json")
 SNAP_VERSION = 1
 
@@ -809,7 +811,7 @@ class Engine:
             add(H(rel), name, group, note, safety, action)
         for p in idx.children.get(H("Library", "Caches"), ()):
             bid = os.path.basename(p)
-            if bid in ("com.apple.bird", "StorageMonitor") or p in seen:
+            if bid in ("com.apple.bird", "MacSafe", "StorageMonitor") or p in seen:
                 continue
             system = bid.startswith("com.apple.")
             add(p, pretty_bundle(bid, idx.bundle_names), "macOS caches" if system else "App caches",
@@ -839,7 +841,9 @@ class Engine:
 
     def clutter(self):
         idx = self.idx
-        downloads = sorted((self.item(p) for p in idx.children.get(DOWNLOADS, ()) if p in idx.entries),
+        # .localized and .DS_Store are Finder's own markers, not downloads anyone wants to review.
+        downloads = sorted((self.item(p) for p in idx.children.get(DOWNLOADS, ())
+                            if p in idx.entries and os.path.basename(p) not in (".localized", ".DS_Store")),
                            key=lambda x: -x["size"])
         installers = sorted((self.item(p) for p, e in idx.entries.items()
                              if not e["dir"] and ext_of(p) in INSTALLER_EXTS and self.visible(e, False)),
@@ -1219,13 +1223,119 @@ def reveal(path):
         subprocess.Popen(["open", "-R", path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+# ───────────────────────────── updates ──────────────────────────────
+# Both front-ends update the same way: ask GitHub for the latest release and, when it's newer than
+# the app this file ships in, run the same install.sh a new user pastes into Terminal, with --update.
+
+REPO = "gabrielesarria167-ai/MacSafe"
+INSTALL_URL = "https://gabrielesarria167-ai.github.io/MacSafe/install.sh"
+RELEASES_URL = "https://github.com/%s/releases" % REPO
+UPDATE_FILE = os.path.join(SNAP_DIR, "update.json")
+UPDATE_LOG = H("Library", "Logs", "MacSafe", "update.log")
+UPDATE_EVERY = 12 * 3600
+_update = {"state": "idle"}   # the install this engine started: idle | installing | failed
+
+
+def app_version():
+    """Version of the MacSafe.app this file ships in, or None when it runs from a source checkout."""
+    plist = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Info.plist")
+    try:
+        with open(plist, "rb") as fh:
+            return plistlib.load(fh).get("CFBundleShortVersionString")
+    except (OSError, ValueError, plistlib.InvalidFileException):
+        return None
+
+
+def version_key(v):
+    return tuple(int(n) for n in re.findall(r"\d+", v or ""))
+
+
+def latest_release(timeout=6):
+    """Newest published version on GitHub, e.g. "1.2". Goes through curl, which trusts the macOS
+    keychain: python.org's Python has no certificates until its Install Certificates script runs."""
+    try:
+        out = subprocess.run(["curl", "-fsSL", "--max-time", str(timeout), "-H", "Accept: application/vnd.github+json",
+                              "https://api.github.com/repos/%s/releases/latest" % REPO],
+                             capture_output=True, timeout=timeout + 2).stdout
+        tag = (json.loads(out.decode("utf-8")) or {}).get("tag_name") or ""
+    except (OSError, subprocess.SubprocessError, ValueError, AttributeError):
+        return None
+    tag = tag.lstrip("vV")
+    return tag if version_key(tag) else None
+
+
+def update_status(force=False, timeout=6):
+    """What the Update button and the `macsafe` command act on. Asks GitHub at most every 12 hours
+    unless forced (Check for Updates…), and never from a source checkout."""
+    current = app_version()
+    try:
+        with open(UPDATE_FILE, encoding="utf-8") as fh:
+            saved = json.load(fh)
+    except (OSError, ValueError):
+        saved = {}
+    latest, checked, error = saved.get("latest"), saved.get("checked", 0), None
+    if current and (force or time.time() - checked > UPDATE_EVERY):
+        found = latest_release(timeout)
+        checked = time.time()
+        if found:
+            latest = found
+        else:
+            error = "Couldn't reach GitHub to check for updates."
+        try:
+            os.makedirs(SNAP_DIR, exist_ok=True)
+            with open(UPDATE_FILE, "w", encoding="utf-8") as fh:
+                json.dump({"latest": latest, "checked": checked}, fh)
+        except OSError:
+            pass
+    available = bool(current and latest and version_key(latest) > version_key(current))
+    return dict(_update, current=current, latest=latest, available=available, checked=checked or None,
+                error=error or _update.get("error"), releases=RELEASES_URL)
+
+
+def _last_line(path):
+    try:
+        with open(path, "rb") as fh:
+            fh.seek(max(0, os.path.getsize(path) - 4096))
+            lines = [l.strip() for l in fh.read().decode("utf-8", "replace").splitlines() if l.strip()]
+    except OSError:
+        return ""
+    return lines[-1].lstrip("✗ ").strip() if lines else ""
+
+
+def install_update(wait=False):
+    """Run install.sh --update. The terminal command waits and shows its progress (wait=True).
+    The Mac app can't wait: the installer quits the app once the download checks out, swaps in
+    the new version and reopens it, so it runs detached and outlives this engine."""
+    cmd = ["/bin/bash", "-c", 'set -o pipefail; curl -fsSL "$1" | bash -s -- --update', "macsafe-update", INSTALL_URL]
+    if wait:
+        return subprocess.call(cmd)
+    if _update.get("state") == "installing":
+        return None
+    os.makedirs(os.path.dirname(UPDATE_LOG), exist_ok=True)
+    with open(UPDATE_LOG, "ab") as log:
+        proc = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
+                                start_new_session=True, close_fds=True)
+    _update.clear()
+    _update["state"] = "installing"
+
+    def watch():
+        code = proc.wait()   # only returns while the app is still open, i.e. the update stopped early
+        _update.clear()
+        if code == 0:
+            _update["state"] = "idle"
+        else:
+            _update.update(state="failed", error=_last_line(UPDATE_LOG) or "The update didn't install.")
+    threading.Thread(target=watch, daemon=True).start()
+    return None
+
+
 # ───────────────────────────── HTTP (used by the Mac app) ──────────────────────────────
 
 ENGINE = None
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "StorageMonitor/1.0"
+    server_version = "MacSafe"
 
     def log_message(self, fmt, *args):
         pass
@@ -1254,6 +1364,8 @@ class Handler(BaseHTTPRequestHandler):
         route = u.path[len("/api/"):] if u.path.startswith("/api/") else ""
         if route == "status":
             return self._send(200, e.status())
+        if route == "update":
+            return self._send(200, update_status(force=q.get("force") == "1"))
         if e.idx is None:
             return self._send(409, {"error": "The first scan hasn't finished yet"})
 
@@ -1305,6 +1417,11 @@ class Handler(BaseHTTPRequestHandler):
         if route == "duplicates":
             e.start_dups()
             return self._send(200, {"ok": True})
+        if route == "update":
+            if not update_status()["available"]:
+                return self._send(409, {"error": "MacSafe is already up to date."})
+            install_update()
+            return self._send(200, {"ok": True})
         return self._send(404, {"error": "unknown endpoint"})
 
 
@@ -1332,7 +1449,7 @@ def serve(rescan_after):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Storage Monitor engine")
+    ap = argparse.ArgumentParser(description="MacSafe engine")
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("serve", help="JSON API for the Mac app (handshake on stdout)")
     s.add_argument("--rescan-after", type=float, default=15 * 60, help="seconds before a snapshot is considered stale")

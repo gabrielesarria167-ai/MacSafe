@@ -34,7 +34,7 @@ final class EngineClient: @unchecked Sendable {
     private let decoder: JSONDecoder
 
     static let logURL = FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent("Library/Logs/StorageMonitor/engine.log")
+        .appendingPathComponent("Library/Logs/MacSafe/engine.log")
 
     init() {
         let cfg = URLSessionConfiguration.ephemeral

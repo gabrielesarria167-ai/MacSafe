@@ -99,59 +99,85 @@ private struct QuickWins: View {
     let wins: Wins
 
     var body: some View {
+        let cards = self.cards
+        // Up to four cards share one row; more wrap into rows of three, so no card is left alone on a row.
+        let perRow = cards.count <= 4 ? max(cards.count, 1) : 3
+        let rows = stride(from: 0, to: cards.count, by: perRow).map { Array(cards[$0..<min($0 + perRow, cards.count)]) }
         VStack(alignment: .leading, spacing: 10) {
             Text("Quick wins").font(.headline)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 230), spacing: 12)], spacing: 12) {
-                WinCard(icon: "trash", title: "Trash", size: wins.trash,
-                        detail: "Deleted files still take space until you empty the Trash.",
-                        button: "Empty Trash…", enabled: wins.trash > 0) { store.askEmptyTrash() }
-                WinCard(icon: "archivebox", title: "Caches", size: wins.caches,
-                        detail: "Safe to clear; apps rebuild them as needed.",
-                        button: "Review Caches") { store.pane = .caches }
-                if wins.downloads > 0 {
-                    WinCard(icon: "arrow.down.circle", title: "Old downloads", size: wins.downloads,
-                            detail: "Downloads you haven't touched in 3+ months.", button: "Review") { store.pane = .clutter }
-                }
-                if wins.installers > 0 {
-                    WinCard(icon: "externaldrive", title: "Installers", size: wins.installers,
-                            detail: "Disk images and packages you've probably already installed.", button: "Review") { store.pane = .clutter }
-                }
-                if wins.dev > 0 {
-                    WinCard(icon: "hammer", title: "Developer leftovers", size: wins.dev,
-                            detail: "node_modules and virtualenvs; reinstall them any time.", button: "Review") { store.pane = .clutter }
-                }
-                if wins.backups > 0 {
-                    WinCard(icon: "iphone", title: "Device backups", size: wins.backups,
-                            detail: "Local iPhone and iPad backups.", button: "Review") { store.pane = .clutter }
+            Grid(horizontalSpacing: 12, verticalSpacing: 12) {
+                ForEach(rows.indices, id: \.self) { r in
+                    GridRow {
+                        ForEach(rows[r]) { card in WinCard(win: card) }
+                        // Keep a short last row on the same column widths as the rows above it.
+                        ForEach(0..<(perRow - rows[r].count), id: \.self) { _ in Color.clear.gridCellUnsizedAxes(.vertical) }
+                    }
                 }
             }
         }
     }
+
+    private var cards: [Win] {
+        var list = [
+            Win(icon: "trash", title: "Trash", size: wins.trash,
+                detail: "Deleted files still take space until you empty the Trash.",
+                button: "Empty Trash…", emptyText: "Empty", disableWhenEmpty: true) { store.askEmptyTrash() },
+            Win(icon: "archivebox", title: "Caches", size: wins.caches,
+                detail: "Safe to clear; apps rebuild them as needed.",
+                button: "Review Caches", emptyText: "Nothing to clear") { store.pane = .caches },
+        ]
+        if wins.downloads > 0 {
+            list.append(Win(icon: "arrow.down.circle", title: "Old downloads", size: wins.downloads,
+                            detail: "Downloads you haven't touched in 3+ months.", button: "Review") { store.pane = .clutter })
+        }
+        if wins.installers > 0 {
+            list.append(Win(icon: "externaldrive", title: "Installers", size: wins.installers,
+                            detail: "Disk images and packages you've probably already installed.", button: "Review") { store.pane = .clutter })
+        }
+        if wins.dev > 0 {
+            list.append(Win(icon: "hammer", title: "Developer leftovers", size: wins.dev,
+                            detail: "node_modules and virtualenvs; reinstall them any time.", button: "Review") { store.pane = .clutter })
+        }
+        if wins.backups > 0 {
+            list.append(Win(icon: "iphone", title: "Device backups", size: wins.backups,
+                            detail: "Local iPhone and iPad backups.", button: "Review") { store.pane = .clutter })
+        }
+        return list
+    }
 }
 
-private struct WinCard: View {
+private struct Win: Identifiable {
     let icon: String
     let title: String
     let size: Int64
     let detail: String
     let button: String
-    var enabled = true
+    var emptyText: String?
+    var disableWhenEmpty = false
     let action: () -> Void
+    var id: String { title }
+}
+
+private struct WinCard: View {
+    let win: Win
 
     var body: some View {
+        let empty = win.size == 0
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Image(systemName: icon).foregroundStyle(Palette.accent)
-                Text(title).fontWeight(.medium)
+                Image(systemName: win.icon).foregroundStyle(empty ? Color.secondary : Palette.accent)
+                Text(win.title).fontWeight(.medium)
                 Spacer()
             }
-            Text(Fmt.size(size)).font(.title2.weight(.semibold)).monospacedDigit()
-            Text(detail).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            Text(empty ? (win.emptyText ?? Fmt.size(0)) : Fmt.size(win.size))
+                .font(.title2.weight(.semibold)).monospacedDigit()
+                .foregroundStyle(empty ? .secondary : .primary)
+            Text(win.detail).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
-            Button(button, action: action).controlSize(.small).disabled(!enabled)
+            Button(win.button, action: win.action).controlSize(.small).disabled(empty && win.disableWhenEmpty)
         }
         .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 150, alignment: .topLeading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Palette.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(.separator.opacity(0.6)))
     }
@@ -222,7 +248,7 @@ private struct OutsideHome: View {
 
     var body: some View {
         Card(title: "Outside your home folder",
-             subtitle: "Part of “macOS & other”. Managed by macOS or other tools, so Storage Monitor only shows them.") {
+             subtitle: "Part of “macOS & other”. Managed by macOS or other tools, so MacSafe only shows them.") {
             VStack(spacing: 6) {
                 ForEach(items) { x in
                     HStack(alignment: .firstTextBaseline, spacing: 10) {

@@ -24,16 +24,16 @@ struct RowActions: View {
     private func button(for action: RowAction) -> some View {
         switch action {
         case .drill:
-            Button { store.explore(item.path) } label: { icon("chevron.right.circle") }
+            Button { store.explore(item.path) } label: { RowIcon(name: "chevron.right.circle") }
                 .help("Open in Explorer")
         case .reveal:
-            Button { store.reveal(item) } label: { icon("magnifyingglass") }
+            Button { store.reveal(item) } label: { RowIcon(name: "magnifyingglass") }
                 .help("Show in Finder")
         case .trash:
-            Button { store.trash([item]) } label: { icon("trash") }
+            Button { store.trash([item]) } label: { RowIcon(name: "trash") }
                 .help("Move to Trash (⌘⌫)")
         case .delete:
-            Button { store.askDelete([item]) } label: { icon("xmark.bin").foregroundStyle(Palette.critical) }
+            Button { store.askDelete([item]) } label: { RowIcon(name: "xmark.bin", hoverColor: Palette.critical) }
                 .help("Delete Permanently…")
         case .clear:
             Button("Clear") { store.askClear([item]) }
@@ -46,9 +46,24 @@ struct RowActions: View {
                 .controlSize(.small)
         }
     }
+}
 
-    private func icon(_ name: String) -> some View {
-        Image(systemName: name).frame(width: 22, height: 20).contentShape(Rectangle())
+/// A row action glyph: quiet at rest so a long list doesn't shout, full strength under the pointer.
+/// Destructive actions only turn red on hover.
+private struct RowIcon: View {
+    let name: String
+    var hoverColor: Color = .primary
+    @State private var hovering = false
+    @Environment(\.isEnabled) private var isEnabled
+
+    var body: some View {
+        Image(systemName: name)
+            .foregroundStyle(hovering && isEnabled ? hoverColor : Color.secondary)
+            .frame(width: 24, height: 22)
+            .background(hovering && isEnabled ? Color.primary.opacity(0.08) : .clear,
+                        in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .contentShape(Rectangle())
+            .onHover { hovering = $0 }
     }
 }
 
@@ -210,7 +225,7 @@ struct ItemRow: View {
                     Text(title ?? item.name).lineLimit(1).truncationMode(.middle)
                     if let badge { Tag(text: badge, color: badgeColor) }
                 }
-                if let sub = subtitle ?? item.loc, !sub.isEmpty {
+                if let sub = subtitle ?? item.loc, !sub.isEmpty, sub != (title ?? item.name) {
                     Text(sub).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.head)
                 }
                 if let note {
@@ -311,7 +326,7 @@ struct FullDiskAccessBanner: View {
             Image(systemName: "lock.shield").font(.title2).foregroundStyle(Palette.warning)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Some folders couldn't be read").fontWeight(.semibold)
-                Text("Give Storage Monitor Full Disk Access so it can measure Mail, Messages, Safari and other protected data. Rescan afterwards.")
+                Text("Give MacSafe Full Disk Access so it can measure Mail, Messages, Safari and other protected data. Rescan afterwards.")
                     .font(.callout).foregroundStyle(.secondary)
             }
             Spacer()

@@ -34,8 +34,15 @@ enum Palette {
 }
 
 enum Fmt {
+    private static let bytes: ByteCountFormatter = {
+        let f = ByteCountFormatter()
+        f.countStyle = .file  // decimal units, like Finder
+        f.allowsNonnumericFormatting = false  // "0 bytes", not "Zero KB"
+        return f
+    }()
+
     static func size(_ bytes: Int64) -> String {
-        ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)  // decimal units, like Finder
+        Self.bytes.string(fromByteCount: bytes)
     }
 
     private static let relative: RelativeDateTimeFormatter = {

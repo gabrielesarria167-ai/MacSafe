@@ -15,7 +15,11 @@ struct ContentView: View {
         .alert(store.confirm?.title ?? "",
                isPresented: Binding(get: { store.confirm != nil }, set: { if !$0 { store.confirm = nil } }),
                presenting: store.confirm) { req in
-            Button(req.button, role: .destructive) { Task { await req.action() } }
+            if req.destructive {
+                Button(req.button, role: .destructive) { Task { await req.action() } }
+            } else {
+                Button(req.button) { Task { await req.action() } }.keyboardShortcut(.defaultAction)
+            }
             if req.permanent {
                 Button("Cancel", role: .cancel) {}.keyboardShortcut(.defaultAction)
             } else {
@@ -38,7 +42,7 @@ struct ContentView: View {
                       systemImage: "exclamationmark.triangle")
             } description: {
                 Text(store.needsPython
-                     ? "Storage Monitor's scanner runs on Python 3. Install it from python.org (a free, official installer), then try again."
+                     ? "MacSafe's scanner runs on Python 3. Install it from python.org (a free, official installer), then try again."
                      : message)
             } actions: {
                 if store.needsPython {
@@ -139,6 +143,7 @@ struct DiskFooter: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            UpdateRow().padding(.bottom, 4)
             Divider().padding(.bottom, 2)
             if let disk = store.status?.disk {
                 HStack {
@@ -178,6 +183,39 @@ struct DiskFooter: View {
     }
 }
 
+/// Appears above the disk footer when a newer MacSafe is on GitHub, and while it installs.
+struct UpdateRow: View {
+    private var store: Store { .shared }
+
+    var body: some View {
+        if let u = store.update, let latest = u.latest, u.available || u.state == "installing" {
+            let installing = u.state == "installing"
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Image(systemName: "arrow.down.circle.fill").foregroundStyle(Palette.accent)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(installing ? "Installing MacSafe \(latest)…" : "MacSafe \(latest) is available")
+                            .fontWeight(.medium)
+                        Text(installing ? "MacSafe reopens when it's done." : "You have \(u.current ?? "an older version").")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                if installing {
+                    ProgressView().progressViewStyle(.linear).controlSize(.small)
+                } else {
+                    Button("Update Now") { store.askInstallUpdate() }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                }
+            }
+            .font(.callout)
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Palette.accent.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+    }
+}
+
 struct ScanningView: View {
     @Environment(Store.self) private var store
 
@@ -206,7 +244,7 @@ struct ScanningView: View {
                 Text("The scan failed. Details are in \(EngineClient.logURL.path).").foregroundStyle(Palette.critical)
                 Button("Try Again") { Task { await store.rescan() } }
             }
-            Text("The first scan takes about a minute. After that, Storage Monitor opens instantly with the last results.")
+            Text("The first scan takes about a minute. After that, MacSafe opens instantly with the last results.")
                 .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center).frame(maxWidth: 420)
                 .padding(.top, 8)
         }

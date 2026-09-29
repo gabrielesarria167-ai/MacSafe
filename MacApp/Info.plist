@@ -2,22 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleName</key><string>Storage Monitor</string>
-	<key>CFBundleDisplayName</key><string>Storage Monitor</string>
-	<key>CFBundleIdentifier</key><string>local.storagemonitor</string>
-	<key>CFBundleExecutable</key><string>StorageMonitor</string>
+	<key>CFBundleName</key><string>MacSafe</string>
+	<key>CFBundleDisplayName</key><string>MacSafe</string>
+	<key>CFBundleIdentifier</key><string>io.github.gabrielesarria167-ai.macsafe</string>
+	<key>CFBundleExecutable</key><string>MacSafe</string>
 	<key>CFBundleIconFile</key><string>AppIcon</string>
 	<key>CFBundlePackageType</key><string>APPL</string>
-	<key>CFBundleShortVersionString</key><string>1.0</string>
-	<key>CFBundleVersion</key><string>1</string>
+	<key>CFBundleShortVersionString</key><string>1.1</string>
+	<key>CFBundleVersion</key><string>2</string>
 	<key>LSMinimumSystemVersion</key><string>14.0</string>
 	<key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
 	<key>NSHighResolutionCapable</key><true/>
-	<key>NSDesktopFolderUsageDescription</key><string>Storage Monitor measures your Desktop to show what takes up space.</string>
-	<key>NSDocumentsFolderUsageDescription</key><string>Storage Monitor measures your Documents to show what takes up space.</string>
-	<key>NSDownloadsFolderUsageDescription</key><string>Storage Monitor measures your Downloads to find old files and installers.</string>
-	<key>NSRemovableVolumesUsageDescription</key><string>Storage Monitor measures storage to show what takes up space.</string>
-	<key>NSNetworkVolumesUsageDescription</key><string>Storage Monitor measures storage to show what takes up space.</string>
-	<key>NSAppleEventsUsageDescription</key><string>Storage Monitor asks Finder to move apps owned by the system to the Trash.</string>
+	<key>NSDesktopFolderUsageDescription</key><string>MacSafe measures your Desktop to show what takes up space.</string>
+	<key>NSDocumentsFolderUsageDescription</key><string>MacSafe measures your Documents to show what takes up space.</string>
+	<key>NSDownloadsFolderUsageDescription</key><string>MacSafe measures your Downloads to find old files and installers.</string>
+	<key>NSRemovableVolumesUsageDescription</key><string>MacSafe measures storage to show what takes up space.</string>
+	<key>NSNetworkVolumesUsageDescription</key><string>MacSafe measures storage to show what takes up space.</string>
+	<key>NSAppleEventsUsageDescription</key><string>MacSafe asks Finder to move apps owned by the system to the Trash.</string>
 </dict>
 </plist>

@@ -48,6 +48,8 @@ struct ConfirmRequest: Identifiable {
     let button: String
     /// Deleting for good: the alert warns loudly and Cancel is the default button, so Return never erases.
     var permanent = false
+    /// False for a confirmation that isn't about removing anything (installing an update): a normal default button.
+    var destructive = true
     let action: () async -> Void
 }
 
@@ -76,6 +78,7 @@ final class Store {
     var dataVersion = 0
     var busy = false
     var needsPython = false
+    var update: UpdateInfo?
     private var started = false
 
     var home: String { status?.home ?? NSHomeDirectory() }
@@ -102,6 +105,7 @@ final class Store {
         await refreshStatus()
         if hasData { await loadOverview() }
         Task { await pollLoop() }
+        Task { await checkForUpdates(userInitiated: false) }
     }
 
     private func pollLoop() async {
@@ -291,6 +295,55 @@ final class Store {
         }
     }
 
+    // MARK: updates
+
+    /// Asks the engine, which asks GitHub (at most every 12 hours unless the user asked).
+    func checkForUpdates(userInitiated: Bool) async {
+        do {
+            let info: UpdateInfo = try await engine.get("update", userInitiated ? ["force": "1"] : [:])
+            update = info
+            guard userInitiated else { return }
+            if info.available {
+                askInstallUpdate()
+            } else if let error = info.error {
+                show(error, error: true)
+            } else {
+                show("You're up to date: MacSafe \(info.current ?? "") is the latest version.")
+            }
+        } catch {
+            if userInitiated { show("Couldn't check for updates: \(error.localizedDescription)", error: true) }
+        }
+    }
+
+    func askInstallUpdate() {
+        guard let info = update, info.available, let latest = info.latest else { return }
+        confirm = ConfirmRequest(
+            title: "Update to MacSafe \(latest)?",
+            message: "You have \(info.current ?? "an older version"). MacSafe quits, installs the update and opens again in a few seconds. Your settings and last scan are kept.",
+            button: "Update",
+            destructive: false
+        ) { [weak self] in await self?.installUpdate() }
+    }
+
+    /// Starts install.sh --update. When it succeeds the installer quits this app and reopens the new
+    /// version, so only a failure ever comes back here.
+    func installUpdate() async {
+        do {
+            let _: OKResponse = try await engine.post("update")
+            update = try? await engine.get("update")
+            while update?.state == "installing" {
+                try? await Task.sleep(for: .seconds(1))
+                if let info: UpdateInfo = try? await engine.get("update") { update = info }
+            }
+            if update?.state == "failed" {
+                show("The update didn't install: \(update?.error ?? "unknown error"). Details are in ~/Library/Logs/MacSafe/update.log.",
+                     error: true)
+            }
+        } catch {
+            show("Couldn't start the update: \(error.localizedDescription)", error: true)
+        }
+    }
+
     func show(_ text: String, error: Bool = false) {
         toast = Toast(text: text, isError: error)
     }
@@ -308,7 +361,7 @@ final class Store {
     }
 
     func openTerminalDashboard() {
-        guard let cmd = Bundle.main.path(forResource: "storagemon", ofType: "command") else { return }
+        guard let cmd = Bundle.main.path(forResource: "macsafe", ofType: "command") else { return }
         let terminal = URL(fileURLWithPath: "/System/Applications/Utilities/Terminal.app")
         NSWorkspace.shared.open([URL(fileURLWithPath: cmd)], withApplicationAt: terminal,
                                 configuration: NSWorkspace.OpenConfiguration())

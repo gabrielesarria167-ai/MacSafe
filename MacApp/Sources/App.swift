@@ -2,12 +2,12 @@ import AppKit
 import SwiftUI
 
 @main
-struct StorageMonitorApp: App {
+struct MacSafeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var store = Store.shared
 
     var body: some Scene {
-        Window("Storage Monitor", id: "main") {
+        Window("MacSafe", id: "main") {
             ContentView()
                 .environment(store)
                 .frame(minWidth: 960, minHeight: 620)
@@ -20,6 +20,10 @@ struct StorageMonitorApp: App {
         .windowToolbarStyle(.unified)
         .commands {
             CommandGroup(replacing: .newItem) {}
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") { Task { await store.checkForUpdates(userInitiated: true) } }
+                    .disabled(store.phase != .ready || store.update?.state == "installing")
+            }
             CommandMenu("Storage") {
                 Button("Rescan") { Task { await store.rescan() } }
                     .keyboardShortcut("r")

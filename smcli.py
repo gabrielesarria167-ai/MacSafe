@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """
-Storage Monitor — terminal dashboard.
+MacSafe — terminal dashboard.
 
-    storagemon             open the dashboard (instant: shows the last scan, rescans in the background)
-    storagemon --report    print a one-shot summary and exit
-    storagemon --app       open the Mac app instead
-    storagemon --light     force colours for a light terminal (--dark for a dark one; default: auto-detect)
-    storagemon --no-mouse  keep mouse clicks for the terminal (e.g. to select text)
+    macsafe             open the dashboard (instant: shows the last scan, rescans in the background)
+    macsafe --report    print a one-shot summary and exit
+    macsafe --app       open the Mac app instead
+    macsafe --update    install the latest version now
+    macsafe --light     force colours for a light terminal (--dark for a dark one; default: auto-detect)
+    macsafe --no-mouse  keep mouse clicks for the terminal (e.g. to select text)
+
+Every 12 hours at most, opening the dashboard checks for a newer MacSafe and installs it first.
+--no-update (or MACSAFE_NO_UPDATE=1) skips that.
 
 Keys are listed at the bottom of the screen; press ? for the full list.
 """
@@ -1019,7 +1023,7 @@ class Dashboard:
     def draw_header(self, w, st):
         t = self.t
         self.put(0, 1, "◆", t.accent, bold=True)
-        self.put(0, 3, "Storage Monitor", t.text, bold=True)
+        self.put(0, 3, "MacSafe", t.text, bold=True)
         right, fg = self.header_status(st, w - 22)
         if right:
             self.put(0, w - 1 - dwidth(right), right, fg)
@@ -1711,7 +1715,7 @@ def ensure_utf8():
 
 def light_background():
     """Ask the terminal for its background colour (OSC 11); a DA1 query after it guarantees an answer."""
-    env = os.environ.get("STORAGEMON_THEME", "").lower()
+    env = os.environ.get("MACSAFE_THEME", "").lower()
     if env in ("light", "dark"):
         return env == "light"
     fgbg = os.environ.get("COLORFGBG", "")
@@ -1779,11 +1783,35 @@ def report(engine):
     print("\nLargest files")
     for it in o["large"]:
         print("  %10s  %s/%s" % (fmt_size(it["size"]), it["loc"], it["name"]))
-    print("\nRun `storagemon` to clean up interactively (scanned %s)." % fmt_ago(engine.idx.scanned_at))
+    print("\nRun `macsafe` to clean up interactively (scanned %s)." % fmt_ago(engine.idx.scanned_at))
+
+
+# ───────────────────────────── updates ──────────────────────────────
+
+def update(force):
+    """Install a newer MacSafe if there is one: "updated", "current" or "failed".
+    The check is the same one the Mac app's Update button uses (engine.update_status)."""
+    st = E.update_status(force=force, timeout=6 if force else 3)
+    if not st["current"]:
+        if force:
+            print("Updates only work for an installed MacSafe; this copy runs from source.")
+        return "current"
+    if not st["available"]:
+        if force:
+            print(st["error"] or "MacSafe %s is the latest version." % st["current"])
+        return "failed" if st["error"] else "current"
+    print("MacSafe %s is available (you have %s). Installing it now…" % (st["latest"], st["current"]))
+    if E.install_update(wait=True) != 0:
+        print("\nThe update didn't install, so this is still MacSafe %s. Try again with `macsafe --update`."
+              % st["current"])
+        if not force:
+            input("Press Return to open the dashboard. ")
+        return "failed"
+    return "updated"
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Storage Monitor — terminal dashboard")
+    ap = argparse.ArgumentParser(description="MacSafe — terminal dashboard")
     ap.add_argument("--report", action="store_true", help="print a summary and exit")
     ap.add_argument("--app", action="store_true", help="open the Mac app")
     ap.add_argument("--rescan", action="store_true", help="always start a fresh scan")
@@ -1791,9 +1819,17 @@ def main():
     theme.add_argument("--light", action="store_true", help="colours for a light terminal background")
     theme.add_argument("--dark", action="store_true", help="colours for a dark terminal background")
     ap.add_argument("--no-mouse", action="store_true", help="leave the mouse to the terminal (for selecting text)")
+    ap.add_argument("--update", action="store_true", help="install the latest version now, then exit")
+    ap.add_argument("--no-update", action="store_true", help="don't check for a newer version this time")
     args = ap.parse_args()
     if args.app:
-        sys.exit(subprocess.call(["open", "-a", "Storage Monitor"]))
+        sys.exit(subprocess.call(["open", "-a", "MacSafe"]))
+    if args.update:
+        sys.exit(1 if update(force=True) == "failed" else 0)
+    auto = not (args.report or args.no_update or os.environ.get("MACSAFE_NO_UPDATE")) and sys.stdout.isatty()
+    if auto and update(force=False) == "updated":
+        # install.sh replaced this script: start over on the new version, without checking again.
+        os.execv(sys.executable, [sys.executable, os.path.realpath(__file__)] + sys.argv[1:] + ["--no-update"])
     ensure_utf8()
     sys.setrecursionlimit(20000)
     engine = E.Engine()

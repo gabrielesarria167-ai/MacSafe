@@ -1,0 +1,558 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T19:52:30+00:00",
+  "title": "Design System: MacSafe",
+  "extensions": {
+    "colorMeta": {
+      "data-blue": {
+        "role": "primary",
+        "displayName": "Disk Blue",
+        "canonical": "#3987e5",
+        "tonalRamp": [
+          "oklch(15% 0.070 255)",
+          "oklch(26% 0.092 255)",
+          "oklch(38% 0.114 255)",
+          "oklch(49% 0.136 255)",
+          "oklch(61% 0.158 255)",
+          "oklch(72% 0.142 255)",
+          "oklch(84% 0.120 255)",
+          "oklch(95% 0.098 255)"
+        ],
+        "source": "MacApp/Sources/Theme.swift Palette.series[0] / Palette.accent (dark); light step #2a78d6"
+      },
+      "data-orange": {
+        "role": "secondary",
+        "displayName": "Kiln Orange",
+        "canonical": "#d95926",
+        "tonalRamp": [
+          "oklch(15% 0.075 40)",
+          "oklch(26% 0.098 40)",
+          "oklch(38% 0.122 40)",
+          "oklch(49% 0.146 40)",
+          "oklch(61% 0.169 40)",
+          "oklch(72% 0.152 40)",
+          "oklch(84% 0.128 40)",
+          "oklch(95% 0.105 40)"
+        ],
+        "source": "Theme.swift Palette.series[1] (dark); light step #eb6834"
+      },
+      "data-aqua": {
+        "role": "secondary",
+        "displayName": "Mint Aqua",
+        "canonical": "#199e70",
+        "tonalRamp": [
+          "oklch(15% 0.056 163)",
+          "oklch(26% 0.073 163)",
+          "oklch(38% 0.091 163)",
+          "oklch(49% 0.109 163)",
+          "oklch(61% 0.126 163)",
+          "oklch(72% 0.113 163)",
+          "oklch(84% 0.095 163)",
+          "oklch(95% 0.078 163)"
+        ],
+        "source": "Theme.swift Palette.series[2] (dark); light step #1baf7a"
+      },
+      "data-yellow": {
+        "role": "secondary",
+        "displayName": "Amber Yellow",
+        "canonical": "#c98500",
+        "tonalRamp": [
+          "oklch(15% 0.054 73)",
+          "oklch(26% 0.073 73)",
+          "oklch(38% 0.093 73)",
+          "oklch(49% 0.112 73)",
+          "oklch(61% 0.132 73)",
+          "oklch(72% 0.134 73)",
+          "oklch(84% 0.114 73)",
+          "oklch(95% 0.095 73)"
+        ],
+        "source": "Theme.swift Palette.series[3] (dark); light step #eda100"
+      },
+      "data-track": {
+        "role": "secondary",
+        "displayName": "Free-space Track",
+        "canonical": "#2c2c2a",
+        "tonalRamp": [
+          "oklch(15% 0.003 107)",
+          "oklch(26% 0.003 107)",
+          "oklch(38% 0.003 107)",
+          "oklch(49% 0.003 107)",
+          "oklch(61% 0.002 107)",
+          "oklch(72% 0.002 107)",
+          "oklch(84% 0.001 107)",
+          "oklch(95% 0.001 107)"
+        ],
+        "source": "Theme.swift Palette.track (dark)"
+      },
+      "status-good": {
+        "role": "tertiary",
+        "displayName": "Status Green",
+        "canonical": "#3fb950",
+        "tonalRamp": [
+          "oklch(15% 0.063 146)",
+          "oklch(26% 0.087 146)",
+          "oklch(38% 0.112 146)",
+          "oklch(49% 0.137 146)",
+          "oklch(61% 0.162 146)",
+          "oklch(72% 0.175 146)",
+          "oklch(84% 0.150 146)",
+          "oklch(95% 0.126 146)"
+        ]
+      },
+      "status-warn": {
+        "role": "tertiary",
+        "displayName": "Status Amber",
+        "canonical": "#e3a008",
+        "tonalRamp": [
+          "oklch(15% 0.043 78)",
+          "oklch(26% 0.064 78)",
+          "oklch(38% 0.086 78)",
+          "oklch(49% 0.107 78)",
+          "oklch(61% 0.128 78)",
+          "oklch(72% 0.150 78)",
+          "oklch(84% 0.139 78)",
+          "oklch(95% 0.118 78)"
+        ]
+      },
+      "status-bad": {
+        "role": "tertiary",
+        "displayName": "Status Coral",
+        "canonical": "#f0645a",
+        "tonalRamp": [
+          "oklch(15% 0.064 27)",
+          "oklch(26% 0.088 27)",
+          "oklch(38% 0.112 27)",
+          "oklch(49% 0.136 27)",
+          "oklch(61% 0.160 27)",
+          "oklch(72% 0.166 27)",
+          "oklch(84% 0.142 27)",
+          "oklch(95% 0.118 27)"
+        ]
+      },
+      "graphite-ground": {
+        "role": "neutral",
+        "displayName": "Graphite Ground",
+        "canonical": "#0a0b0d",
+        "tonalRamp": [
+          "oklch(15% 0.005 264)",
+          "oklch(26% 0.004 264)",
+          "oklch(38% 0.003 264)",
+          "oklch(49% 0.003 264)",
+          "oklch(61% 0.002 264)",
+          "oklch(72% 0.001 264)",
+          "oklch(84% 0.001 264)",
+          "oklch(95% 0.001 264)"
+        ]
+      },
+      "graphite-surface": {
+        "role": "neutral",
+        "displayName": "Graphite Surface",
+        "canonical": "#111316",
+        "tonalRamp": [
+          "oklch(15% 0.007 258)",
+          "oklch(26% 0.006 258)",
+          "oklch(38% 0.005 258)",
+          "oklch(49% 0.004 258)",
+          "oklch(61% 0.003 258)",
+          "oklch(72% 0.002 258)",
+          "oklch(84% 0.002 258)",
+          "oklch(95% 0.002 258)"
+        ]
+      },
+      "graphite-raise": {
+        "role": "neutral",
+        "displayName": "Graphite Raise",
+        "canonical": "#16191d",
+        "tonalRamp": [
+          "oklch(15% 0.008 256)",
+          "oklch(26% 0.009 256)",
+          "oklch(38% 0.007 256)",
+          "oklch(49% 0.006 256)",
+          "oklch(61% 0.005 256)",
+          "oklch(72% 0.004 256)",
+          "oklch(84% 0.002 256)",
+          "oklch(95% 0.002 256)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#22262c",
+        "tonalRamp": [
+          "oklch(15% 0.011 258)",
+          "oklch(26% 0.013 258)",
+          "oklch(38% 0.011 258)",
+          "oklch(49% 0.009 258)",
+          "oklch(61% 0.007 258)",
+          "oklch(72% 0.006 258)",
+          "oklch(84% 0.004 258)",
+          "oklch(95% 0.003 258)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#eceef1",
+        "tonalRamp": [
+          "oklch(15% 0.001 258)",
+          "oklch(26% 0.001 258)",
+          "oklch(38% 0.001 258)",
+          "oklch(49% 0.002 258)",
+          "oklch(61% 0.003 258)",
+          "oklch(72% 0.003 258)",
+          "oklch(84% 0.004 258)",
+          "oklch(95% 0.005 258)"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "canonical": "#8d939c",
+        "tonalRamp": [
+          "oklch(15% 0.006 258)",
+          "oklch(26% 0.008 258)",
+          "oklch(38% 0.010 258)",
+          "oklch(49% 0.012 258)",
+          "oklch(61% 0.014 258)",
+          "oklch(72% 0.014 258)",
+          "oklch(84% 0.012 258)",
+          "oklch(95% 0.010 258)"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Ink Faint",
+        "canonical": "#7c838e",
+        "tonalRamp": [
+          "oklch(15% 0.008 259)",
+          "oklch(26% 0.011 259)",
+          "oklch(38% 0.013 259)",
+          "oklch(49% 0.016 259)",
+          "oklch(61% 0.019 259)",
+          "oklch(72% 0.016 259)",
+          "oklch(84% 0.014 259)",
+          "oklch(95% 0.011 259)"
+        ]
+      },
+      "terminal-ground": {
+        "role": "neutral",
+        "displayName": "Terminal Ground",
+        "canonical": "#0e1014",
+        "tonalRamp": [
+          "oklch(15% 0.009 264)",
+          "oklch(26% 0.008 264)",
+          "oklch(38% 0.007 264)",
+          "oklch(49% 0.006 264)",
+          "oklch(61% 0.004 264)",
+          "oklch(72% 0.003 264)",
+          "oklch(84% 0.002 264)",
+          "oklch(95% 0.002 264)"
+        ]
+      },
+      "terminal-rule": {
+        "role": "neutral",
+        "displayName": "Terminal Rule",
+        "canonical": "#2a2f37",
+        "tonalRamp": [
+          "oklch(15% 0.013 260)",
+          "oklch(26% 0.015 260)",
+          "oklch(38% 0.015 260)",
+          "oklch(49% 0.012 260)",
+          "oklch(61% 0.010 260)",
+          "oklch(72% 0.008 260)",
+          "oklch(84% 0.006 260)",
+          "oklch(95% 0.004 260)"
+        ]
+      },
+      "terminal-titlebar": {
+        "role": "neutral",
+        "displayName": "Terminal Titlebar",
+        "canonical": "#1a1d22",
+        "tonalRamp": [
+          "oklch(15% 0.010 261)",
+          "oklch(26% 0.010 261)",
+          "oklch(38% 0.009 261)",
+          "oklch(49% 0.007 261)",
+          "oklch(61% 0.006 261)",
+          "oklch(72% 0.004 261)",
+          "oklch(84% 0.003 261)",
+          "oklch(95% 0.003 261)"
+        ]
+      },
+      "window-ground": {
+        "role": "neutral",
+        "displayName": "Window Ground (app mock)",
+        "canonical": "#1f1f21",
+        "tonalRamp": [
+          "oklch(15% 0.003 286)",
+          "oklch(26% 0.004 286)",
+          "oklch(38% 0.003 286)",
+          "oklch(49% 0.003 286)",
+          "oklch(61% 0.002 286)",
+          "oklch(72% 0.002 286)",
+          "oklch(84% 0.001 286)",
+          "oklch(95% 0.001 286)"
+        ]
+      },
+      "window-sidebar": {
+        "role": "neutral",
+        "displayName": "Window Sidebar (app mock)",
+        "canonical": "#2a292d",
+        "tonalRamp": [
+          "oklch(15% 0.006 297)",
+          "oklch(26% 0.007 297)",
+          "oklch(38% 0.007 297)",
+          "oklch(49% 0.006 297)",
+          "oklch(61% 0.004 297)",
+          "oklch(72% 0.003 297)",
+          "oklch(84% 0.002 297)",
+          "oklch(95% 0.002 297)"
+        ]
+      },
+      "window-card": {
+        "role": "neutral",
+        "displayName": "Window Card (app mock)",
+        "canonical": "#28282b",
+        "tonalRamp": [
+          "oklch(15% 0.005 286)",
+          "oklch(26% 0.005 286)",
+          "oklch(38% 0.005 286)",
+          "oklch(49% 0.004 286)",
+          "oklch(61% 0.003 286)",
+          "oklch(72% 0.003 286)",
+          "oklch(84% 0.002 286)",
+          "oklch(95% 0.001 286)"
+        ]
+      },
+      "window-line": {
+        "role": "neutral",
+        "displayName": "Window Line (app mock)",
+        "canonical": "#38383c",
+        "tonalRamp": [
+          "oklch(15% 0.005 286)",
+          "oklch(26% 0.006 286)",
+          "oklch(38% 0.007 286)",
+          "oklch(49% 0.006 286)",
+          "oklch(61% 0.005 286)",
+          "oklch(72% 0.004 286)",
+          "oklch(84% 0.003 286)",
+          "oklch(95% 0.002 286)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The single hero headline, left-aligned, max 15ch. font-stretch 112%."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles in the left label column; sentence-case statements ending with a full stop. font-stretch 106%."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel and card headings, 1.1-1.15rem."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Hero lede in Ink Muted, max 40rem, one bold phrase lifted to Ink 500."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Descriptions inside panels, lists and cards (0.92-0.95rem), Ink Muted."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Nav links, facts row, definition lists, download button."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Figure captions and footer."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Install/uninstall commands and inline code only (Fragment Mono)."
+      }
+    },
+    "shadows": [
+      {
+        "name": "app-window",
+        "value": "0 2.4em 5em -1.8em rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.1)",
+        "purpose": "The app-window mock only: long soft drop plus light edge ring."
+      },
+      {
+        "name": "terminal-window",
+        "value": "0 16px 32px -14px rgba(0,0,0,.75)",
+        "purpose": "The terminal render only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-settle",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "The disk-bar settle, the page's single authored motion."
+      },
+      {
+        "name": "bar-settle",
+        "value": "1.1s, scaleX(.45) to 1, stagger .06s per segment",
+        "purpose": "App-mock disk-bar segments on load; removed under prefers-reduced-motion."
+      },
+      {
+        "name": "copy-confirm",
+        "value": "1.8s",
+        "purpose": "How long the Copy button shows Copied before reverting."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stack",
+        "value": "900px",
+        "purpose": "Label column stacks above evidence; nav keeps brand and GitHub only."
+      },
+      {
+        "name": "single",
+        "value": "640px",
+        "purpose": "Two-up forms go single column; table becomes stacked rows; facts-row separators removed."
+      },
+      {
+        "name": "mock-compact",
+        "value": "620px (container)",
+        "purpose": "App mock drops its sidebar."
+      }
+    ],
+    "knownDebt": [
+      "At 390px the hero install command wraps after the hyphen in \"gabrielesarria167-\" rather than at a <wbr> point.",
+      "Safety-table column headers use uppercase tracked Fragment Mono and step counters use mono numerals, contrary to the Mono Means Code Rule.",
+      "Definition-list terms and kbd chips use ui-monospace rather than Fragment Mono.",
+      "Stylesheet header comment still says \"hairline-grid hero\"; there is no grid."
+    ]
+  },
+  "components": [
+    {
+      "name": "Copy Button",
+      "kind": "button",
+      "refersTo": "button-copy",
+      "description": "The single primary action: off-white on graphite, Copied state on green.",
+      "html": "<button class=\"ds-copy\" type=\"button\"><svg viewBox=\"0 0 24 24\"><rect x=\"8\" y=\"8\" width=\"12\" height=\"12\" rx=\"2\"/><path d=\"M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2\"/></svg><span>Copy</span></button>",
+      "css": ".ds-copy{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-width:5.4rem;font:500 .82rem/1 \"Mona Sans\",\"Helvetica Neue\",Arial,sans-serif;color:#0a0b0d;background:#eceef1;border:0;border-radius:7px;padding:.55rem .8rem;cursor:pointer}.ds-copy svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ds-copy:hover{background:#fff}.ds-copy:focus-visible{outline:2px solid #3987e5;outline-offset:3px}.ds-copy.done{background:#3fb950}"
+    },
+    {
+      "name": "Download Button",
+      "kind": "button",
+      "refersTo": "button-download",
+      "description": "Secondary action on a raised graphite chip.",
+      "html": "<a class=\"ds-dl\" href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 4v11\"/><path d=\"m7 10.5 5 5 5-5\"/><path d=\"M5 20h14\"/></svg>MacSafe.zip</a>",
+      "css": ".ds-dl{display:inline-flex;align-items:center;gap:.5rem;font:500 .88rem/1.4 \"Mona Sans\",\"Helvetica Neue\",Arial,sans-serif;color:#eceef1;text-decoration:none;border:1px solid #22262c;background:#16191d;border-radius:8px;padding:.55rem .9rem}.ds-dl svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ds-dl:hover{border-color:#7c838e}.ds-dl:focus-visible{outline:2px solid #3987e5;outline-offset:3px}"
+    },
+    {
+      "name": "Command Bar",
+      "kind": "custom",
+      "refersTo": "command-bar",
+      "description": "Signature: a pasteable command in Fragment Mono with a $ prompt and Copy button flush right.",
+      "html": "<div class=\"ds-cmd\"><pre>curl -fsSL https://<wbr>gabrielesarria167-ai.github.io<wbr>/MacSafe/install.sh | bash</pre><button class=\"ds-cmd-copy\" type=\"button\">Copy</button></div>",
+      "css": ".ds-cmd{display:flex;align-items:center;gap:.8rem;max-width:48rem;background:#111316;border:1px solid #22262c;border-radius:10px;padding:.45rem .45rem .45rem 1rem}.ds-cmd pre{flex:1;min-width:0;margin:0;font:400 .82rem/1.5 \"Fragment Mono\",ui-monospace,Menlo,monospace;color:#eceef1;white-space:pre-wrap;overflow-wrap:normal;word-break:normal;padding-block:.35rem}.ds-cmd pre::before{content:\"$ \";color:#7c838e}.ds-cmd-copy{font:500 .82rem/1 \"Mona Sans\",Arial,sans-serif;color:#0a0b0d;background:#eceef1;border:0;border-radius:7px;padding:.55rem .8rem;min-width:5.4rem;cursor:pointer}.ds-cmd-copy:hover{background:#fff}.ds-cmd-copy:focus-visible{outline:2px solid #3987e5;outline-offset:3px}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Hairline-underlined bar: mark and name left, muted links right.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-brand\" href=\"#\"><span class=\"ds-mark\"><i></i></span>MacSafe</a><a href=\"#\">App &amp; CLI</a><a href=\"#\">Safety</a><a href=\"#\">Install</a><a href=\"#\">GitHub</a></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:1.6rem;height:3.6rem;padding-inline:16px;font:400 .88rem/1.4 \"Mona Sans\",Arial,sans-serif;border-bottom:1px solid #22262c;background:#0a0b0d}.ds-nav a{color:#8d939c;text-decoration:none}.ds-nav a:hover{color:#eceef1}.ds-nav a:focus-visible{outline:2px solid #3987e5;outline-offset:3px;border-radius:4px}.ds-nav .ds-brand{color:#eceef1;font-weight:600;font-size:1rem;margin-right:auto;display:flex;align-items:center;gap:.55rem;letter-spacing:-.01em}.ds-mark{width:1.15em;height:1.15em;border-radius:28%;background:linear-gradient(#171c29,#29334a);display:grid;place-items:center}.ds-mark i{width:66%;height:66%;border-radius:50%;background:conic-gradient(#2a78d6 0 20%,#eb6834 0 34%,#1baf7a 0 58%,#eda100 0 76%,rgba(255,255,255,.14) 0);-webkit-mask:radial-gradient(circle,transparent 38%,#000 40%);mask:radial-gradient(circle,transparent 38%,#000 40%)}"
+    },
+    {
+      "name": "Panel Pair",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Two panels sharing one hairline border, divided by a hairline.",
+      "html": "<div class=\"ds-duo\"><div><h3>Mac app</h3><p>For browsing, sorting and bulk cleanup.</p></div><div><h3><code>macsafe</code></h3><p>A quick check without leaving Terminal.</p></div></div>",
+      "css": ".ds-duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #22262c;border-radius:12px;overflow:hidden;font-family:\"Mona Sans\",Arial,sans-serif}.ds-duo>div{padding:1.6rem;display:grid;gap:.7rem;align-content:start;background:#111316}.ds-duo>div+div{border-left:1px solid #22262c}.ds-duo h3{margin:0;font-size:1.15rem;font-weight:600;letter-spacing:-.02em;font-stretch:106%;color:#eceef1}.ds-duo p{margin:0;color:#8d939c;font-size:.95rem;line-height:1.6}.ds-duo code{font:400 1em \"Fragment Mono\",ui-monospace,monospace}"
+    },
+    {
+      "name": "Status Dot",
+      "kind": "chip",
+      "refersTo": "status-good",
+      "description": "Status as dot plus word, never colour alone.",
+      "html": "<span class=\"ds-st ds-g\">Yes, with Undo</span> <span class=\"ds-st ds-w\">No</span> <span class=\"ds-st ds-r\">Refused</span>",
+      "css": ".ds-st{display:inline-flex;align-items:center;gap:.45rem;color:#8d939c;white-space:nowrap;margin-right:1rem;font:400 .92rem/1.5 \"Mona Sans\",Arial,sans-serif}.ds-st::before{content:\"\";width:.5rem;height:.5rem;border-radius:50%;background:var(--dot)}.ds-g{--dot:#3fb950}.ds-w{--dot:#e3a008}.ds-r{--dot:#f0645a}"
+    },
+    {
+      "name": "Inline Code",
+      "kind": "chip",
+      "refersTo": "code-inline",
+      "description": "Paths, flags and commands inside prose.",
+      "html": "<p class=\"ds-p\">Into <code class=\"ds-code\">~/.local/bin</code>.</p>",
+      "css": ".ds-p{color:#8d939c;font:400 .94rem/1.6 \"Mona Sans\",Arial,sans-serif}.ds-code{font:400 .86em \"Fragment Mono\",ui-monospace,Menlo,monospace;color:#eceef1;background:#16191d;border:1px solid #22262c;border-radius:5px;padding:.05rem .35rem}"
+    },
+    {
+      "name": "Disk Bar",
+      "kind": "custom",
+      "refersTo": "data-blue",
+      "description": "Signature data form: series segments in fixed order with a track for free space; settles on load.",
+      "html": "<div class=\"ds-bar\"><i style=\"flex:23.3;background:#3987e5\"></i><i style=\"flex:7.8;background:#d95926\"></i><i style=\"flex:43.7;background:#199e70\"></i><i style=\"flex:99;background:#c98500\"></i><i style=\"flex:71.2;background:#2c2c2a\"></i></div>",
+      "css": ".ds-bar{display:flex;gap:2px;height:24px;background:#1f1f21;padding:12px;border-radius:11px}.ds-bar i{border-radius:4px;min-width:2px;transform-origin:left center;animation:ds-bar-in 1.1s cubic-bezier(.16,1,.3,1) backwards}.ds-bar i:nth-child(2){animation-delay:.06s}.ds-bar i:nth-child(3){animation-delay:.12s}.ds-bar i:nth-child(4){animation-delay:.18s}.ds-bar i:nth-child(5){animation-delay:.24s}@keyframes ds-bar-in{from{transform:scaleX(.45)}}@media (prefers-reduced-motion:reduce){.ds-bar i{animation:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Instrument Panel",
+    "overview": "The MacSafe site is a quiet graphite panel with the product mounted in it. The chrome is dark neutral, near-black, and has no hue of its own. It is drawn with 1px hairlines rather than fills or shadows, so the eye goes to the two real renders it frames: the Overview window of the Mac app and the `macsafe` terminal dashboard. The only saturated colour anywhere is the product's own data palette. When blue, orange, aqua or yellow appears, it is measuring a disk.\n\nThe register is serious and professional, at the level of Raycast, Linear, Tailscale and Apple's macOS pages. The user rejected playful and illustrative directions (cardboard boxes, food labels, sci-fi consoles) as childish. Density is moderate: a left label column carries each section title and a one-line gloss, and the right column carries the evidence as tables, hairline lists, numbered steps and command bars. Type does the hierarchy work. Mona Sans runs slightly wide on headings, and Fragment Mono appears only where something could be pasted or typed.\n\nThe page has no grid background, no gradient washes and no decorative art. It has one motion moment, when the disk bar in the app mock settles into its proportions on load.",
+    "keyCharacteristics": [
+      "Graphite ground (#0a0b0d) with hairline (#22262c) structure. Surfaces are separated by tone and rule, not by shadow.",
+      "All colour comes from the app's data palette (blue, orange, aqua, yellow) plus three status dots.",
+      "The primary action is an off-white button on graphite, not a coloured one.",
+      "Mona Sans at 600 with its width axis opened to 106–112% on headings. Fragment Mono only for code and commands.",
+      "The product renders are the only raised, shadowed objects on the page.",
+      "One authored motion: the disk-bar segments settle on load."
+    ],
+    "rules": [
+      {
+        "name": "The Data Is the Colour Rule",
+        "body": "Chromatic hues on this site mean data. Blue, orange, aqua and yellow appear only as disk categories, in their fixed series order (blue Applications, orange Your files, aqua App data & caches, yellow macOS & other). The one exception is Disk Blue as the interaction accent. No section tint, no brand gradient, no coloured headline.",
+        "section": "colors"
+      },
+      {
+        "name": "The Theme.swift Is the Source Rule",
+        "body": "The data colours and app-window colours are reproductions. If the app's palette changes, change `Theme.swift` first and then carry the values here. Never tune a mock colour away from the shipping app.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Means Code Rule",
+        "body": "Monospace marks something you could paste or type: commands, paths, flags, key names, and the terminal render. Facts, labels, headers and metadata are set in Mona Sans. The facts row under the hero is deliberately not mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Wide Headline Rule",
+        "body": "Headings are Mona Sans 600 with the width axis opened to 106%, and 112% for the hero. Body text stays at the default width. Don't use the width axis on running text.",
+        "section": "typography"
+      },
+      {
+        "name": "The Product Casts the Only Shadow Rule",
+        "body": "Panels, cards, tables, command bars and buttons have no shadow. They are defined by tone and hairline. A shadow on this page means \"this is a real window from the product.\"",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** draw structure with 1px Hairline borders and the Ground / Surface / Raise tonal steps.",
+      "**Do** keep the series colours in their fixed category order and pull them from `MacApp/Sources/Theme.swift`.",
+      "**Do** make the single primary action an Ink-filled button on graphite, with a Copied state on Status Green.",
+      "**Do** pair every status colour with a word, as in the dot-plus-label pattern in the safety table.",
+      "**Do** set headings in Mona Sans 600 at width 106% (112% for the hero) with balanced wrapping and negative tracking.",
+      "**Do** show the real product (the app window, the terminal output) as the page's imagery, labelled as example data.",
+      "**Do** break long commands only at explicit `<wbr>` points."
+    ],
+    "donts": [
+      "**Don't** add a grid, dot or noise background behind the page or hero.",
+      "**Don't** set facts, labels, table headers or metadata in monospace. Mono is for code, commands and the terminal render.",
+      "**Don't** introduce a brand colour, gradient or tinted section outside the app's data palette.",
+      "**Don't** put shadows on page panels, cards or buttons. Only product renders are lifted.",
+      "**Don't** add more motion than the disk-bar settle. No scroll reveals and no hover lifts.",
+      "**Don't** use white small text on Disk Blue in page UI. That pairing belongs to the faithful app reproduction only.",
+      "**Don't** use illustrative or playful metaphors (boxes, labels, consoles) or centred-column download-page tropes like checkmark feature lists.",
+      "**Don't** use text lighter than Ink Faint on the graphite ground."
+    ]
+  }
+}
