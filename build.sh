@@ -51,7 +51,12 @@ if [[ "$MODE" == "--release" ]]; then
   rm -rf "$DIST" && mkdir -p "$DIST"
   # The zip is what install.sh and the Update button download; people downloading in a browser get
   # the disk image, whose window shows them to drag the app into Applications.
-  ditto -c -k --norsrc --noextattr --noqtn --keepParent "$APP" "$DIST/MacSafe.zip"
+  # The zip holds the app plus a README; unzipping it in Finder gives a "MacSafe" folder with both.
+  ZIPDIR="$ROOT/build/zip"
+  rm -rf "$ZIPDIR" && mkdir -p "$ZIPDIR"
+  ditto "$APP" "$ZIPDIR/MacSafe.app"
+  sed "s/{{VERSION}}/$VERSION/g" MacApp/README.txt > "$ZIPDIR/README.txt"
+  ditto -c -k --norsrc --noextattr --noqtn "$ZIPDIR" "$DIST/MacSafe.zip"
 
   echo "→ disk image"
   VOLNAME="MacSafe installer"   # the window title; the Finder script below names it too

@@ -36,8 +36,10 @@ The download page is [gabrielesarria167-ai.github.io/MacSafe](https://gabrielesa
 Both front-ends check GitHub for a newer release at most every 12 hours and update through the same
 installer, run with `--update`:
 
-* **Mac app:** an **Update Now** button appears at the bottom of the sidebar when a new version is out,
-  and **MacSafe › Check for Updates…** checks right away. The app quits, installs the update and reopens.
+* **Mac app:** the version at the top right of the window turns into an **Update** button when a new
+  version is out, and **MacSafe › Check for Updates…** checks right away. The app quits, installs the
+  update and reopens.
+* **Terminal dashboard:** the header shows the version, or an **Update to x.y** chip (click it or press `U`).
 * **Terminal:** `macsafe` installs a newer version on its own before the dashboard opens, then restarts
   on it. `macsafe --update` updates right away; `macsafe --no-update` (or `MACSAFE_NO_UPDATE=1`) skips
   the check.
@@ -77,7 +79,7 @@ installers, node_modules/venvs, iPhone backups) · Applications (last opened, le
 ```sh
 ./build.sh             # build for this Mac into build/
 ./build.sh --install   # … and install it into /Applications with the macsafe command
-./build.sh --release   # universal build → dist/MacSafe.dmg + MacSafe.zip, each with a .sha256
+./build.sh --release   # universal build → dist/MacSafe.dmg + MacSafe.zip (app + README.txt), each with a .sha256
 ```
 
 ### Releasing
