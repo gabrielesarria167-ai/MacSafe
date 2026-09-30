@@ -13,7 +13,7 @@ struct FirstLaunchView: View {
 
     var body: some View {
         ZStack {
-            Glows()
+            Glows(green: false)
             current
         }
         .animation(stepAnimation, value: step.key)
@@ -77,23 +77,8 @@ enum Motion {
 
 /// The shield icon's storage colours, brighter than the in-app category palette.
 enum Brand {
-    static let storage: [Color] = [0x4da3ff, 0xff7a45, 0x2fd49a, 0xffc233].map { Color(nsColor: NSColor(hex: $0)) }
+    static let storage: [Color] = Tint.categories.map(\.top)
     static let blue = Color(nsColor: NSColor(hex: 0x3566e8))
-}
-
-private struct Glows: View {
-    var body: some View {
-        GeometryReader { geo in
-            ZStack {
-                Circle().fill(Brand.blue.opacity(0.28)).frame(width: 460, height: 460)
-                    .blur(radius: 110).position(x: geo.size.width * 0.18, y: geo.size.height * 0.85)
-                Circle().fill(Color.purple.opacity(0.16)).frame(width: 420, height: 420)
-                    .blur(radius: 110).position(x: geo.size.width * 0.85, y: geo.size.height * 0.1)
-            }
-        }
-        .allowsHitTesting(false)
-        .ignoresSafeArea()
-    }
 }
 
 /// Four arcs in the storage colours, filled clockwise from 12 o'clock up to `progress`.
@@ -415,16 +400,18 @@ private struct ScanDiscStyle: ButtonStyle {
     }
 }
 
-/// Quiet secondary actions on the first-launch steps: a capsule that brightens as a whole on hover.
+/// Quiet secondary actions (first launch, Overview rows): a capsule that brightens as a whole on hover.
 struct PillButtonStyle: ButtonStyle {
+    /// Smaller, for buttons at the end of a list row.
+    var compact = false
     @State private var hovering = false
 
     func makeBody(configuration: Configuration) -> some View {
         let pressed = configuration.isPressed
         configuration.label
             .font(.callout.weight(.medium))
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.horizontal, compact ? 12 : 16)
+            .padding(.vertical, compact ? 4 : 8)
             .background(Capsule().fill(Color.primary.opacity(pressed ? 0.18 : hovering ? 0.13 : 0.07)))
             .overlay(Capsule().strokeBorder(Color.primary.opacity(hovering ? 0.24 : 0.12)))
             .contentShape(Capsule())

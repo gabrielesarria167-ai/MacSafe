@@ -120,43 +120,45 @@ struct CachesView: View {
         let safe = items.filter { $0.safety == "safe" && $0.isClearable && $0.path != store.trashPath }
         let safeTotal = safe.reduce(Int64(0)) { $0 + $1.size }
         let groups = Dictionary(grouping: items) { $0.group ?? "Other" }
+        let top = Double(max(items.map(\.size).max() ?? 1, 1))
         VStack(spacing: 0) {
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("\(Fmt.size(safeTotal)) can be cleared safely").font(.title3.weight(.semibold))
-                    Text("Caches are temporary copies apps keep to go faster. They're rebuilt on demand; quit an app before clearing its cache.")
-                        .font(.callout).foregroundStyle(.secondary)
-                }
-                Spacer()
-                Button { store.askClear(safe) } label: { Label("Clear All Safe Caches…", systemImage: "sparkles") }
-                    .buttonStyle(.borderedProminent).controlSize(.large)
-                    .disabled(safe.isEmpty || store.busy)
-            }
-            .padding(16)
-            .background(.bar)
-            .overlay(alignment: .bottom) { Divider() }
-
+            header(safe: safe, total: safeTotal)
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+                .padding(.bottom, 6)
             List(selection: $selection) {
                 ForEach(order.filter { groups[$0] != nil }, id: \.self) { g in
                     let rows = groups[g] ?? []
+                    let group = CacheGroup(rows)
                     Section {
                         ForEach(rows) { c in
-                            ItemRow(item: c, title: c.name, subtitle: c.sub, note: c.note,
-                                    detail: nil, badge: c.safety == "safe" ? "Safe to clear" : "Review first",
+                            // The group's header already says how safe it is and what these are: rows only repeat it when they differ.
+                            ItemRow(item: c, title: c.name, subtitle: c.sub, note: c.note == group.note ? nil : c.note,
+                                    detail: nil, fraction: Double(c.size) / top,
+                                    badge: c.safety == group.safety ? nil : (c.safety == "safe" ? "Safe to clear" : "Review first"),
                                     badgeColor: c.safety == "safe" ? Palette.good : Palette.warning,
+                                    barTint: c.safety == "safe" ? .green : .yellow,
                                     actions: actions(for: c))
                                 .tag(c.id)
                                 .selectionDisabled(c.action == "none")
                         }
                     } header: {
-                        HStack {
-                            Text(g)
-                            Spacer()
-                            Text(Fmt.size(rows.reduce(0) { $0 + $1.size })).monospacedDigit()
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack(spacing: 8) {
+                                Text(g)
+                                if let safety = group.safety { SafetyBadge(safe: safety == "safe") }
+                                Spacer()
+                                Text(Fmt.size(rows.reduce(0) { $0 + $1.size })).monospacedDigit()
+                            }
+                            if let note = group.note {
+                                Text(note).font(.caption).foregroundStyle(.secondary).textCase(nil)
+                            }
                         }
+                        .padding(.top, 8)
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
             .contextMenu(forSelectionType: String.self) { ids in
                 ItemMenu(items: items.filter { ids.contains($0.id) }, allowDelete: false)
             } primaryAction: { ids in
@@ -187,12 +189,63 @@ struct CachesView: View {
         }
     }
 
+    private func header(safe: [Item], total: Int64) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 18, style: .continuous)
+        return HStack(spacing: 18) {
+            ColorTile(tint: .green, symbol: "sparkles", size: 48)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(safe.isEmpty ? "Nothing to clear right now" : "\(Fmt.size(total)) can be cleared safely")
+                    .font(.title2.weight(.bold))
+                    .contentTransition(.numericText())
+                Text("Caches are temporary copies apps keep to go faster. They're rebuilt on demand; quit an app before clearing its cache.")
+                    .font(.callout).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 12)
+            Button { store.askClear(safe) } label: { Label("Clear \(Fmt.size(total))…", systemImage: "sparkles") }
+                .buttonStyle(GlossyButtonStyle(large: true))
+                .disabled(safe.isEmpty || store.busy)
+        }
+        .padding(.horizontal, 22)
+        .padding(.vertical, 18)
+        .background(shape.fill(LinearGradient(colors: [Tint.green.top.opacity(0.2), Tint.blue.top.opacity(0.08), Palette.glass],
+                                               startPoint: .topLeading, endPoint: .bottomTrailing)))
+        .overlay(shape.strokeBorder(Tint.green.top.opacity(0.3)))
+    }
+
     private func actions(for c: Item) -> [RowAction] {
         switch c.action {
         case "clear": return [.reveal, .clear]
         case "trash": return [.reveal, .trash]
         default: return [.reveal]
         }
+    }
+}
+
+/// What a group of caches has in common: its safety when every row shares it, and its most common note.
+private struct CacheGroup {
+    let safety: String?
+    let note: String?
+
+    init(_ rows: [Item]) {
+        let safeties = Set(rows.map { $0.safety == "safe" ? "safe" : "review" })
+        safety = safeties.count == 1 ? safeties.first : nil
+        let notes = Dictionary(grouping: rows.compactMap(\.note), by: { $0 }).mapValues(\.count)
+        note = notes.max { $0.value < $1.value || ($0.value == $1.value && $0.key > $1.key) }?.key
+    }
+}
+
+private struct SafetyBadge: View {
+    let safe: Bool
+
+    var body: some View {
+        Label(safe ? "Safe to clear" : "Review first", systemImage: safe ? "checkmark" : "exclamationmark")
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(safe ? Palette.freeable : Palette.warning)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .background((safe ? Tint.green.top : Tint.yellow.top).opacity(0.15), in: Capsule())
+            .textCase(nil)
     }
 }
 
@@ -233,6 +286,7 @@ struct ClutterView: View {
                         detail: "Backed up \(Fmt.ago(item.activity).lowercased())")
             }
         }
+        .scrollContentBackground(.hidden)
         .contextMenu(forSelectionType: String.self) { ids in
             ItemMenu(items: all.filter { ids.contains($0.id) })
         } primaryAction: { ids in
@@ -322,6 +376,7 @@ struct DuplicatesView: View {
                             }
                         }
                     }
+                    .scrollContentBackground(.hidden)
                     .contextMenu(forSelectionType: String.self) { ids in
                         ItemMenu(items: all.filter { ids.contains($0.id) })
                     } primaryAction: { ids in
@@ -427,6 +482,7 @@ struct AppsView: View {
                 TableColumn("") { app in RowActions(item: app, actions: [.reveal, .uninstall]) }
                     .width(min: 110, ideal: 120)
             }
+            .scrollContentBackground(.hidden)
             .contextMenu(forSelectionType: String.self) { ids in
                 ItemMenu(items: apps.filter { ids.contains($0.id) }, allowDelete: false)
             } primaryAction: { ids in
@@ -496,6 +552,7 @@ struct ExplorerView: View {
                         .selectionDisabled()
                     }
                 }
+                .scrollContentBackground(.hidden)
                 .contextMenu(forSelectionType: String.self) { ids in
                     ItemMenu(items: data.items.filter { ids.contains($0.id) })
                 } primaryAction: { ids in

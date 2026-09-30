@@ -14,6 +14,7 @@ struct ContentView: View {
                 } detail: {
                     detail
                         .frame(minWidth: 680, minHeight: 480)
+                        .background { Glows() }
                         .toolbar { VersionToolbarItem() }
                 }
             }
@@ -104,6 +105,36 @@ struct Sidebar: View {
     }
 }
 
+extension Pane {
+    /// Each section's tile colour in the sidebar.
+    var tint: Tint {
+        switch self {
+        case .overview: return .blue
+        case .explorer: return .teal
+        case .large: return .orange
+        case .unused: return .yellow
+        case .duplicates: return .pink
+        case .caches: return .green
+        case .clutter: return .purple
+        case .apps: return .blue
+        }
+    }
+
+    /// The filled symbol drawn on that tile.
+    var tileSymbol: String {
+        switch self {
+        case .overview: return "chart.pie.fill"
+        case .explorer: return "folder.fill"
+        case .large: return "doc.fill"
+        case .unused: return "clock.fill"
+        case .duplicates: return "doc.on.doc.fill"
+        case .caches: return "archivebox.fill"
+        case .clutter: return "tray.full.fill"
+        case .apps: return "square.grid.2x2.fill"
+        }
+    }
+}
+
 /// A sidebar entry. It's a plain button (not list selection) so a click always switches the pane.
 struct SidebarRow: View {
     private var store: Store { .shared }
@@ -113,33 +144,42 @@ struct SidebarRow: View {
 
     var body: some View {
         let selected = store.pane == pane
+        let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
         Button {
             store.pane = pane
         } label: {
-            HStack(spacing: 8) {
-                Image(systemName: pane.icon)
-                    .frame(width: 20)
-                    .foregroundStyle(selected ? Color.white : Palette.accent)
+            HStack(spacing: 9) {
+                ColorTile(tint: pane.tint, symbol: pane.tileSymbol, size: 20)
                 Text(pane.title)
-                    .foregroundStyle(selected ? Color.white : Color.primary)
+                    .fontWeight(selected ? .semibold : .regular)
+                    .foregroundStyle(Color.primary)
                 Spacer(minLength: 4)
                 if let badge, badge >= 1_000_000 {
                     Text(Fmt.size(badge))
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(selected ? Color.white.opacity(0.85) : Color.secondary)
+                        .font(.caption2.weight(.semibold).monospacedDigit())
+                        .foregroundStyle(Palette.freeable)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 1)
+                        .background(Tint.green.top.opacity(0.16), in: Capsule())
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(selected ? Palette.accent : (hovering ? Color.primary.opacity(0.06) : Color.clear))
-            )
+            .background {
+                if selected {
+                    shape.fill(LinearGradient(colors: [Tint.blue.top.opacity(0.32), Tint.blue.top.opacity(0.14)],
+                                              startPoint: .leading, endPoint: .trailing))
+                        .overlay(shape.strokeBorder(Tint.blue.top.opacity(0.4)))
+                } else {
+                    shape.fill(Color.primary.opacity(hovering ? 0.06 : 0))
+                }
+            }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
+        .animation(.easeOut(duration: 0.12), value: hovering)
         .listRowInsets(EdgeInsets(top: 1, leading: 6, bottom: 1, trailing: 6))
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
@@ -151,15 +191,17 @@ struct DiskFooter: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let disk = store.status?.disk {
-                HStack {
-                    Image(systemName: "internaldrive")
+                let low = Double(disk.free) / Double(max(disk.total, 1)) < 0.1
+                HStack(spacing: 6) {
+                    Image(systemName: "internaldrive").foregroundStyle(.secondary)
                     Text("Macintosh HD").fontWeight(.medium)
                 }
                 .font(.callout)
-                ProgressView(value: Double(disk.used), total: Double(max(disk.total, 1)))
-                    .tint(Double(disk.free) / Double(max(disk.total, 1)) < 0.1 ? Palette.critical : Palette.accent)
+                StorageStrip(disk: disk, breakdown: store.overview?.breakdown ?? [])
+                    .frame(height: 6)
                 Text("\(Fmt.size(disk.free)) free of \(Fmt.size(disk.total))")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).monospacedDigit()
+                    .foregroundStyle(low ? Palette.critical : .secondary)
             }
             if store.isScanning, let scan = store.status?.scan {
                 HStack(spacing: 6) {
@@ -175,7 +217,7 @@ struct DiskFooter: View {
             } else {
                 HStack {
                     Text("Scanned \(Fmt.ago(store.status?.scannedAt).lowercased())")
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(.caption).foregroundStyle(.tertiary)
                     Spacer()
                     Button { Task { await store.rescan() } } label: { Image(systemName: "arrow.clockwise") }
                         .buttonStyle(.borderless)
@@ -185,6 +227,29 @@ struct DiskFooter: View {
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 14)
+    }
+}
+
+/// The disk in one thin bar: the storage categories in their colours, free space as the track.
+/// Before the breakdown has loaded it shows used space in one colour.
+struct StorageStrip: View {
+    let disk: Disk
+    let breakdown: [Segment]
+
+    var body: some View {
+        let total = Double(max(disk.total, 1))
+        GeometryReader { geo in
+            let parts = breakdown.isEmpty ? [disk.used] : breakdown.map(\.size)
+            let width = max(0, geo.size.width - CGFloat(parts.count) * 1.5)
+            HStack(spacing: 1.5) {
+                ForEach(parts.indices, id: \.self) { i in
+                    Capsule().fill(Tint.categories[i % Tint.categories.count].gradient)
+                        .frame(width: max(2, width * CGFloat(Double(parts[i]) / total)))
+                }
+                Capsule().fill(Palette.track)
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 

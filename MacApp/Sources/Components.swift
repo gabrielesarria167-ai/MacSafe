@@ -132,10 +132,14 @@ struct BulkBar: View {
             }
         }
         .disabled(store.busy)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(.bar)
-        .overlay(alignment: .top) { Divider() }
+        .padding(.leading, 20)
+        .padding(.trailing, 10)
+        .padding(.vertical, 8)
+        .background(.regularMaterial, in: Capsule())
+        .overlay(Capsule().strokeBorder(Palette.glassEdge))
+        .shadow(color: .black.opacity(0.25), radius: 16, y: 8)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 14)
     }
 }
 
@@ -191,6 +195,7 @@ struct ItemsTable: View {
             }
             .width(min: 76, ideal: 100, max: 110)
         }
+        .scrollContentBackground(.hidden)
         .contextMenu(forSelectionType: Item.ID.self) { ids in
             ItemMenu(items: items.filter { ids.contains($0.id) })
         } primaryAction: { ids in
@@ -215,6 +220,7 @@ struct ItemRow: View {
     var fraction: Double?
     var badge: String?
     var badgeColor: Color = .secondary
+    var barTint: Tint?
     var actions: [RowAction] = [.reveal, .trash, .delete]
 
     var body: some View {
@@ -232,7 +238,7 @@ struct ItemRow: View {
                     Text(note).font(.caption).foregroundStyle(.tertiary).lineLimit(2)
                 }
                 if let fraction {
-                    SizeBar(fraction: fraction).frame(maxWidth: 260).padding(.top, 2)
+                    SizeBar(fraction: fraction, tint: barTint).frame(maxWidth: 260).padding(.top, 2)
                 }
             }
             Spacer(minLength: 12)
