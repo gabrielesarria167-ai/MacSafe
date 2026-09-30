@@ -88,11 +88,13 @@ final class EngineClient: @unchecked Sendable {
         process?.terminate()
     }
 
+    /// Appends (the engine also writes its own errors here), so earlier failures survive a relaunch.
     private static func openLog() -> FileHandle? {
         let dir = logURL.deletingLastPathComponent()
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        FileManager.default.createFile(atPath: logURL.path, contents: nil)
-        return FileHandle(forWritingAtPath: logURL.path)
+        let size = (try? FileManager.default.attributesOfItem(atPath: logURL.path)[.size] as? Int) ?? 0
+        let fd = open(logURL.path, O_WRONLY | O_CREAT | O_APPEND | (size > 1_000_000 ? O_TRUNC : 0), 0o644)
+        return fd < 0 ? nil : FileHandle(fileDescriptor: fd, closeOnDealloc: true)
     }
 
     private static func readLine(_ fh: FileHandle) async throws -> String {

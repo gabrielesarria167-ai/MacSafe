@@ -47,6 +47,21 @@ def H(*parts):
     return os.path.join(HOME, *parts)
 
 
+LOG_FILE = H("Library", "Logs", "MacSafe", "engine.log")
+SF_RESTRICTED = 0x80000  # SIP-protected file flag (stat.SF_RESTRICTED only exists in Python 3.13+)
+
+
+def log_error(what):
+    """Append the current exception to engine.log. Both front-ends only show a short message."""
+    try:
+        os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+        with open(LOG_FILE, "a", encoding="utf-8") as fh:
+            fh.write("%s  %s (Python %s)\n%s\n" % (datetime.now().isoformat(" ", "seconds"), what,
+                                                     sys.version.split()[0], traceback.format_exc()))
+    except OSError:
+        pass
+
+
 LIBRARY = H("Library")
 TRASH = H(".Trash")
 DOWNLOADS = H("Downloads")
@@ -602,6 +617,7 @@ class Engine:
                 self.scan = {"state": "done", "started": t0, "finished": time.time()}
             self.save_snapshot()
         except Exception:  # noqa: BLE001
+            log_error("Scan failed")
             self.scan = {"state": "error", "error": traceback.format_exc()}
 
     def _scan_apps(self, idx):
@@ -627,7 +643,7 @@ class Engine:
                     st = os.lstat(p)
                 except OSError:
                     continue
-                if stat.S_ISLNK(st.st_mode) or (getattr(st, "st_flags", 0) & stat.SF_RESTRICTED):
+                if stat.S_ISLNK(st.st_mode) or (getattr(st, "st_flags", 0) & SF_RESTRICTED):
                     continue  # symlink or SIP-protected system app
                 info = read_plist(os.path.join(p, "Contents", "Info.plist"))
                 name = clean_text(info.get("CFBundleDisplayName") or info.get("CFBundleName") or os.path.basename(p)[:-4])
@@ -993,6 +1009,7 @@ class Engine:
             result.sort(key=lambda g: -g["size"] * (len(g["paths"]) - 1))
             self.dups = {"state": "done", "groups": result, "finished": time.time()}
         except Exception:  # noqa: BLE001
+            log_error("Duplicate search failed")
             self.dups = {"state": "error", "error": traceback.format_exc()}
 
     def dup_view(self):

@@ -326,7 +326,7 @@ struct FullDiskAccessBanner: View {
             Image(systemName: "lock.shield").font(.title2).foregroundStyle(Palette.warning)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Some folders couldn't be read").fontWeight(.semibold)
-                Text("Give MacSafe Full Disk Access so it can measure Mail, Messages, Safari and other protected data. Rescan afterwards.")
+                Text("Give MacSafe Full Disk Access so it can measure Mail, Messages, Safari and other protected data. If MacSafe isn't in the list, click + and choose it. Rescan afterwards.")
                     .font(.callout).foregroundStyle(.secondary)
             }
             Spacer()

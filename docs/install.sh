@@ -169,6 +169,10 @@ quit_app
 rm -rf "${DEST:?}/$APP_NAME"
 ditto "$TMP/unzipped/$APP_NAME" "$DEST/$APP_NAME"
 xattr -dr com.apple.quarantine "$DEST/$APP_NAME" 2>/dev/null || true
+# Same path, new bundle: macOS keeps showing the old icon until the app is re-registered.
+touch "$DEST/$APP_NAME"
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+  -f "$DEST/$APP_NAME" >/dev/null 2>&1 || true
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$DEST/$APP_NAME/Contents/Info.plist" 2>/dev/null || true)"
 ok "Installed MacSafe ${VERSION:+$VERSION }in $DEST"
 
@@ -220,7 +224,11 @@ printf '\n%sAll set.%s Open MacSafe from Launchpad or Spotlight, or type %smacsa
 note "For complete results, give MacSafe (and Terminal, for the macsafe command) Full Disk Access:"
 note "System Settings › Privacy & Security › Full Disk Access."
 if ask "Open Full Disk Access settings now?"; then
+  # A new app isn't in that list yet: show it in Finder too, so it can be dragged in.
+  open -R "$DEST/$APP_NAME" || true
   open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles" || true
+  note "MacSafe won't be listed yet: drag it from the Finder window into the list (or click + and"
+  note "choose it), then turn it on. Do the same for Terminal to use the macsafe command."
 fi
 if [[ $WAS_RUNNING == 1 ]]; then
   open "$DEST/$APP_NAME" || true
