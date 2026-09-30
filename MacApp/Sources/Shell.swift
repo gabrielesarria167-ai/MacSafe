@@ -5,12 +5,18 @@ struct ContentView: View {
 
     var body: some View {
         @Bindable var store = store
-        NavigationSplitView {
-            Sidebar()
-        } detail: {
-            detail
-                .frame(minWidth: 680, minHeight: 480)
-                .toolbar { VersionToolbarItem() }
+        Group {
+            if store.phase == .ready && store.showsFirstLaunch {
+                FirstLaunchView()
+            } else {
+                NavigationSplitView {
+                    Sidebar()
+                } detail: {
+                    detail
+                        .frame(minWidth: 680, minHeight: 480)
+                        .toolbar { VersionToolbarItem() }
+                }
+            }
         }
         .overlay(alignment: .bottom) { ToastView().animation(.snappy, value: store.toast?.id) }
         .alert(store.confirm?.title ?? "",
@@ -54,7 +60,7 @@ struct ContentView: View {
             }
         case .ready:
             if !store.hasData {
-                ScanningView()
+                ProgressView()  // only until the first status arrives; FirstLaunchView covers "no scan yet"
             } else {
                 switch store.pane {
                 case .overview: OverviewView()
@@ -244,43 +250,6 @@ struct VersionBadge: View {
                 .foregroundStyle(.tertiary)
                 .help("Check for Updates… is in the MacSafe menu.")
         }
-    }
-}
-
-struct ScanningView: View {
-    @Environment(Store.self) private var store
-
-    var body: some View {
-        let scan = store.status?.scan
-        VStack(spacing: 18) {
-            Image(systemName: "internaldrive")
-                .font(.system(size: 56, weight: .light))
-                .foregroundStyle(Palette.accent)
-                .symbolEffect(.pulse, isActive: true)
-            Text("Looking through your Mac").font(.title2.weight(.semibold))
-            Text(scan?.phase ?? "Starting…").foregroundStyle(.secondary)
-            if let f = scan?.fraction {
-                ProgressView(value: f).frame(width: 320)
-            } else {
-                ProgressView().progressViewStyle(.linear).frame(width: 320)
-            }
-            HStack(spacing: 24) {
-                VStack { Text((scan?.files ?? 0).formatted()).font(.title3.monospacedDigit()); Text("files").font(.caption).foregroundStyle(.secondary) }
-                VStack { Text(Fmt.size(scan?.bytes ?? 0)).font(.title3.monospacedDigit()); Text("measured").font(.caption).foregroundStyle(.secondary) }
-            }
-            if let cur = scan?.current, !cur.isEmpty {
-                Text(cur).font(.caption).foregroundStyle(.tertiary).lineLimit(1).truncationMode(.middle).frame(maxWidth: 480)
-            }
-            if scan?.state == "error" {
-                Text("The scan failed. Details are in \(EngineClient.logURL.path).").foregroundStyle(Palette.critical)
-                Button("Try Again") { Task { await store.rescan() } }
-            }
-            Text("The first scan takes about a minute. After that, MacSafe opens instantly with the last results.")
-                .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center).frame(maxWidth: 420)
-                .padding(.top, 8)
-        }
-        .padding(40)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

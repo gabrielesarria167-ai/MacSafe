@@ -2,11 +2,16 @@ import AppKit
 import SwiftUI
 
 /// Development aid: `SM_SHOTS=/some/dir` makes the app save a PNG of its window for every pane, then quit.
+/// `SM_FIRST_SHOTS=/some/dir` does the same for each first-launch step (run it with a HOME that has no scan).
 enum DebugShots {
     @MainActor
     static func runIfRequested(store: Store) async {
         if let out = ProcessInfo.processInfo.environment["SM_CLICKTEST"] {
             await clickTest(store: store, out: out)
+            return
+        }
+        if let dir = ProcessInfo.processInfo.environment["SM_FIRST_SHOTS"] {
+            await firstLaunchShots(store: store, dir: dir)
             return
         }
         guard let dir = ProcessInfo.processInfo.environment["SM_SHOTS"] else { return }
@@ -23,6 +28,31 @@ enum DebugShots {
             try? rep.representation(using: .png, properties: [:])?
                 .write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(pane.rawValue).png"))
         }
+        NSApp.terminate(nil)
+    }
+
+    @MainActor
+    static func firstLaunchShots(store: Store, dir: String) async {
+        func shot(_ name: String) async {
+            try? await Task.sleep(for: .seconds(1.2))
+            guard let window = NSApp.windows.first(where: { $0.isVisible }),
+                  let view = window.contentView?.superview ?? window.contentView,
+                  let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return }
+            view.cacheDisplay(in: view.bounds, to: rep)
+            try? rep.representation(using: .png, properties: [:])?
+                .write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+        while store.status == nil { try? await Task.sleep(for: .milliseconds(200)) }
+        let skipped = store.accessSkipped
+        store.accessSkipped = false
+        await shot("1-access")
+        store.accessSkipped = true
+        await shot("2-ready")
+        await store.startFirstScan()
+        await shot("3-scanning")
+        while !store.firstScanResults { try? await Task.sleep(for: .milliseconds(300)) }
+        await shot("4-results")
+        store.accessSkipped = skipped  // shares the real app's settings: leave them as they were
         NSApp.terminate(nil)
     }
 

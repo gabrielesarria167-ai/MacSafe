@@ -81,10 +81,24 @@ final class Store {
     var update: UpdateInfo?
     private var started = false
 
+    // First launch: Full Disk Access, then Scan, then the results of that first scan.
+    /// Remembered so a later launch without a scan goes straight to the Scan button.
+    var accessSkipped = UserDefaults.standard.bool(forKey: "accessSkipped") {
+        didSet { UserDefaults.standard.set(accessSkipped, forKey: "accessSkipped") }
+    }
+    var openedAccessSettings = false
+    /// The first scan just finished: show its summary before the normal window.
+    var firstScanResults = false
+    private(set) var firstScanRunning = false
+    /// Stop was pressed and the engine is winding the scan down.
+    private(set) var stoppingScan = false
+
     var home: String { status?.home ?? NSHomeDirectory() }
     var trashPath: String { home + "/.Trash" }
     var isScanning: Bool { status?.scan.state == "scanning" }
     var hasData: Bool { status?.hasData == true }
+    /// Until there is a first scan (and while its summary is up), the window shows the first-launch flow.
+    var showsFirstLaunch: Bool { status != nil && (!hasData || firstScanResults) }
 
     // MARK: lifecycle
 
@@ -111,15 +125,23 @@ final class Store {
     private func pollLoop() async {
         var wasScanning = isScanning
         while !Task.isCancelled {
-            try? await Task.sleep(for: .milliseconds(wasScanning ? 400 : 2000))
+            try? await Task.sleep(for: .milliseconds(wasScanning || firstScanRunning ? 400 : 2000))
             await refreshStatus()
             let scanning = isScanning
-            if wasScanning && !scanning {
+            // A small first scan can finish between two checks, so it counts as ended without being seen running.
+            if !scanning && (wasScanning || firstScanRunning) {
+                let firstScanDone = firstScanRunning && status?.scan.state == "done"
                 if status?.scan.state == "error" {
                     show("The scan failed. Details are in \(EngineClient.logURL.path).", error: true)
                 }
                 await dataChanged()
+                if firstScanRunning {
+                    // Together, once the overview is loaded: the view goes from scanning straight to results.
+                    firstScanResults = firstScanDone
+                    firstScanRunning = false
+                }
             }
+            if !scanning { stoppingScan = false }
             wasScanning = scanning
         }
     }
@@ -144,6 +166,36 @@ final class Store {
     func rescan() async {
         let _: OKResponse? = try? await engine.post("scan")
         await refreshStatus()
+    }
+
+    // MARK: first launch
+
+    func startFirstScan() async {
+        firstScanRunning = true
+        await rescan()
+    }
+
+    func stopScan() async {
+        stoppingScan = true
+        let _: OKResponse? = try? await engine.post("stop_scan")
+        firstScanRunning = false
+        await refreshStatus()
+        if !isScanning { stoppingScan = false }
+    }
+
+    /// Leaves the first-scan summary for the normal window, on the given view.
+    func finishFirstLaunch(showing pane: Pane) {
+        self.pane = pane
+        firstScanResults = false
+    }
+
+    /// Full Disk Access sometimes only applies after the app restarts: reopen once this copy has quit.
+    func relaunch() {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/bin/sh")
+        p.arguments = ["-c", "sleep 1; /usr/bin/open \"$0\"", Bundle.main.bundlePath]
+        try? p.run()
+        NSApp.terminate(nil)
     }
 
     // MARK: navigation
@@ -355,6 +407,7 @@ final class Store {
     }
 
     func openFullDiskAccessSettings() {
+        openedAccessSettings = true
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") {
             NSWorkspace.shared.open(url)
         }

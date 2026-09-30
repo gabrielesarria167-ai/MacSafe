@@ -91,6 +91,8 @@ struct Wins: Decodable {
     let installers: Int64
     let dev: Int64
     let backups: Int64
+    /// Everything above with overlaps counted once (older engines don't send it).
+    var total: Int64?
     var clutter: Int64 { downloads + installers + dev + backups }
 }
 

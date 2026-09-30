@@ -220,8 +220,9 @@ def own_flags(parent_flags, name, path):
     return f
 
 
-def du(path, same_dev=True):
-    """Allocated bytes under `path` (no bookkeeping). Doesn't cross into other volumes."""
+def du(path, same_dev=True, stop=None):
+    """Allocated bytes under `path` (no bookkeeping). Doesn't cross into other volumes.
+    `stop` is checked per folder; when it returns true the scan ends (ScanStopped)."""
     try:
         st = os.lstat(path)
     except OSError:
@@ -231,6 +232,8 @@ def du(path, same_dev=True):
     dev = st.st_dev if same_dev else None
     total, stack = 0, [path]
     while stack:
+        if stop and stop():
+            raise ScanStopped()
         d = stack.pop()
         try:
             it = os.scandir(d)
@@ -253,13 +256,26 @@ def du(path, same_dev=True):
     return total
 
 
-def spotlight_last_used(root):
-    """{path: timestamp} for everything under root that Spotlight saw being opened."""
+def spotlight_last_used(root, stop=None):
+    """{path: timestamp} for everything under root that Spotlight saw being opened.
+    The query can take a while; `stop` returning true ends it (ScanStopped)."""
     try:
-        out = subprocess.run(["mdfind", "-onlyin", root, "-attr", "kMDItemLastUsedDate", "kMDItemLastUsedDate = *"],
-                             capture_output=True, timeout=180).stdout.decode("utf-8", "replace")
-    except (OSError, subprocess.SubprocessError):
+        proc = subprocess.Popen(["mdfind", "-onlyin", root, "-attr", "kMDItemLastUsedDate", "kMDItemLastUsedDate = *"],
+                                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    except OSError:
         return {}
+    deadline = time.time() + 180
+    while True:
+        try:
+            out = proc.communicate(timeout=0.3)[0].decode("utf-8", "replace")
+            break
+        except subprocess.TimeoutExpired:
+            if (stop and stop()) or time.time() > deadline:
+                proc.kill()
+                proc.communicate()
+                if stop and stop():
+                    raise ScanStopped()
+                return {}
     res = {}
     marker = " kMDItemLastUsedDate = "
     for line in out.splitlines():
@@ -420,6 +436,10 @@ class Index:
         return idx
 
 
+class ScanStopped(Exception):
+    """Raised inside a scan once Engine.stop_scan() asks it to end."""
+
+
 class Walker:
     """Measures folders recursively and records what's worth remembering into an Index."""
 
@@ -458,6 +478,8 @@ class Walker:
                     break
                 except OSError:  # e.g. a network-backed folder timing out mid-listing
                     break
+                if prog.get("stop"):
+                    raise ScanStopped()
                 try:
                     st = e.stat(follow_symlinks=False)
                 except OSError:
@@ -571,6 +593,17 @@ class Engine:
                 threading.stack_size(0)
             return True
 
+    def stop_scan(self):
+        """Ends a running scan without touching the last complete one (the first-launch Stop button)."""
+        self.progress["stop"] = True
+
+    def _stopping(self):
+        return bool(self.progress.get("stop"))
+
+    def _check_stop(self):
+        if self._stopping():
+            raise ScanStopped()
+
     def status(self):
         s = dict(self.scan)
         if s.get("state") == "scanning":
@@ -593,13 +626,16 @@ class Engine:
             size, n, newest = w.walk(HOME, st.st_dev, 0)
             idx.entries[HOME] = Walker.dir_entry(st, size, n, newest, 0)
             self.scan["phase"] = "Reading “last opened” dates from Spotlight"
-            for p, ts in spotlight_last_used(HOME).items():
+            for p, ts in spotlight_last_used(HOME, stop=self._stopping).items():
                 e = idx.entries.get(p)
                 if e is not None:
                     e["used"] = ts
+            self._check_stop()
             self.scan["phase"] = "Measuring applications"
             self._scan_apps(idx)
+            self._check_stop()
             self._scan_outside(idx)
+            self._check_stop()
             idx.scanned_at = time.time()
             idx.files, idx.bytes = self.progress["files"], self.progress["bytes"]
             with self.lock:
@@ -616,12 +652,14 @@ class Engine:
                 self.left_sizes = {}
                 self.scan = {"state": "done", "started": t0, "finished": time.time()}
             self.save_snapshot()
+        except ScanStopped:
+            self.scan = {"state": "stopped"}
         except Exception:  # noqa: BLE001
             log_error("Scan failed")
             self.scan = {"state": "error", "error": traceback.format_exc()}
 
     def _scan_apps(self, idx):
-        used = spotlight_last_used("/Applications")
+        used = spotlight_last_used("/Applications", stop=self._stopping)
         apps = {}
         for root in ("/Applications", H("Applications")):
             try:
@@ -639,6 +677,7 @@ class Engine:
                     except OSError:
                         pass
             for p in cands:
+                self._check_stop()
                 try:
                     st = os.lstat(p)
                 except OSError:
@@ -652,7 +691,7 @@ class Engine:
                     idx.bundle_names[bid] = name
                 e = idx.entries.get(p)
                 self.scan["phase"] = "Measuring applications · " + name
-                apps[p] = {"size": e["size"] if e else du(p), "name": name, "bid": bid,
+                apps[p] = {"size": e["size"] if e else du(p, stop=self._stopping), "name": name, "bid": bid,
                            "version": str(info.get("CFBundleShortVersionString", "")),
                            "used": used.get(p) or (e or {}).get("used"), "mtime": st.st_mtime,
                            "btime": getattr(st, "st_birthtime", 0),
@@ -678,8 +717,9 @@ class Engine:
         for p, name, note in locs:
             if not p or not os.path.isdir(p):
                 continue
+            self._check_stop()
             self.scan["phase"] = "Measuring " + name
-            size = du(p)
+            size = du(p, stop=self._stopping)
             if size >= 20 * MB:
                 out.append({"path": p, "name": name, "note": note, "size": size})
         idx.outside = sorted(out, key=lambda x: -x["size"])
@@ -724,6 +764,16 @@ class Engine:
 
     # ── views (call with self.lock held or via the HTTP layer) ──
     @staticmethod
+    def _distinct_size(items):
+        """Total size of items, each path once and nothing already inside another listed folder."""
+        sizes = {i["path"]: i["size"] for i in items}
+        kept = []
+        for p in sorted(sizes, key=len):
+            if not any(p.startswith(k + "/") for k in kept):
+                kept.append(p)
+        return sum(sizes[p] for p in kept)
+
+    @staticmethod
     def disk():
         d = shutil.disk_usage(HOME)
         return {"total": d.total, "free": d.free, "used": d.total - d.free}
@@ -742,6 +792,9 @@ class Engine:
         caches = self.caches()
         clutter = self.clutter()
         old = time.time() - 90 * DAY
+        old_downloads = [i for i in clutter["downloads"] if i["activity"] < old]
+        safe_caches = [c for c in caches if c["safety"] == "safe" and c["action"] == "clear" and c["path"] != TRASH]
+        trash = idx.entries.get(TRASH, {"size": 0})["size"]
         return {
             "disk": disk,
             "breakdown": [
@@ -753,12 +806,15 @@ class Engine:
             "home": home,
             "top": top,
             "wins": {
-                "trash": idx.entries.get(TRASH, {"size": 0})["size"],
-                "caches": sum(c["size"] for c in caches if c["safety"] == "safe" and c["action"] == "clear" and c["path"] != TRASH),
-                "downloads": sum(i["size"] for i in clutter["downloads"] if i["activity"] < old),
+                "trash": trash,
+                "caches": sum(c["size"] for c in safe_caches),
+                "downloads": sum(i["size"] for i in old_downloads),
                 "installers": sum(i["size"] for i in clutter["installers"]),
                 "dev": sum(i["size"] for i in clutter["dev"]),
                 "backups": sum(i["size"] for i in clutter["backups"]),
+                # The groups overlap (an old .dmg in Downloads is also an installer): count each item once.
+                "total": trash + self._distinct_size(safe_caches + old_downloads + clutter["installers"]
+                                                     + clutter["dev"] + clutter["backups"]),
             },
             "large": self.large(min_mb=200, include_appdata=False, limit=8),
             "outside": idx.outside,
@@ -1424,6 +1480,9 @@ class Handler(BaseHTTPRequestHandler):
         if route == "scan":
             e.start_scan()
             return self._send(200, {"ok": True})
+        if route == "stop_scan":
+            e.stop_scan()
+            return self._send(200, {"ok": True})
         if route == "delete":
             paths = body.get("paths") or []
             if not isinstance(paths, list) or len(paths) > 5000:
@@ -1450,7 +1509,8 @@ def serve(rescan_after):
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     server.daemon_threads = True
     PORT = server.server_address[1]
-    if ENGINE.idx is None or ENGINE.age > rescan_after:
+    # Refresh a stale scan on its own; the very first one waits for the app's Scan button.
+    if ENGINE.idx is not None and ENGINE.age > rescan_after:
         ENGINE.start_scan()
     print(json.dumps({"port": PORT, "token": TOKEN, "pid": os.getpid()}), flush=True)
 
