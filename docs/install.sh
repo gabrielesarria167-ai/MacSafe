@@ -192,7 +192,13 @@ cat > "$BIN_DIR/macsafe" <<SH
 # MacSafe terminal dashboard (installed by install.sh)
 PY="$PY"
 [[ -x "\$PY" ]] || PY="\$(command -v python3)"
-exec "\$PY" "$DEST/$APP_NAME/Contents/Resources/smcli.py" "\$@"
+CLI="$DEST/$APP_NAME/Contents/Resources/smcli.py"
+if [[ ! -f "\$CLI" ]]; then
+  echo "MacSafe isn't in $DEST any more (moved or deleted?). To reinstall it, run:" >&2
+  echo "  curl -fsSL https://gabrielesarria167-ai.github.io/MacSafe/install.sh | bash" >&2
+  exit 1
+fi
+exec "\$PY" "\$CLI" "\$@"
 SH
 chmod +x "$BIN_DIR/macsafe"
 ok "Installed the macsafe command ($BIN_DIR/macsafe)"

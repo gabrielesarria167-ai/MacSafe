@@ -21,8 +21,9 @@ with curl aren't quarantined, so macOS opens the app without the "could not veri
 Requires macOS 14 or later, Apple Silicon or Intel. It replaces Storage Monitor.app and the
 `storagemon` command, the names MacSafe had before version 1.1.
 
-* **Regular download:** [MacSafe.zip](https://github.com/gabrielesarria167-ai/MacSafe/releases/latest/download/MacSafe.zip).
-  The app isn't notarized, so the first launch needs System Settings › Privacy & Security › **Open Anyway**.
+* **Regular download:** [MacSafe.dmg](https://github.com/gabrielesarria167-ai/MacSafe/releases/latest/download/MacSafe.dmg):
+  open it and drag MacSafe into Applications. The app isn't notarized, so the first launch needs
+  System Settings › Privacy & Security › **Open Anyway**.
 * **Uninstall:** `curl -fsSL https://gabrielesarria167-ai.github.io/MacSafe/install.sh | bash -s -- --uninstall`
   (Python is left in place).
 * **Full Disk Access:** for complete results, turn it on for MacSafe (and Terminal, for
@@ -76,13 +77,15 @@ installers, node_modules/venvs, iPhone backups) · Applications (last opened, le
 ```sh
 ./build.sh             # build for this Mac into build/
 ./build.sh --install   # … and install it into /Applications with the macsafe command
-./build.sh --release   # universal build → dist/MacSafe.zip + .sha256
+./build.sh --release   # universal build → dist/MacSafe.dmg + MacSafe.zip, each with a .sha256
 ```
 
 ### Releasing
 1. Bump `CFBundleShortVersionString` in `MacApp/Info.plist`.
 2. `./build.sh --release`
-3. `gh release create v<version> dist/MacSafe.zip dist/MacSafe.zip.sha256`
+3. `gh release create v<version> dist/*` (the .dmg is the site's download; the .zip is what
+   `install.sh` and the Update button fetch). The disk image's window layout comes from Finder, so the
+   first release build asks to let Terminal control Finder.
    — the installer always fetches the latest release, and the update check compares the release tag
    (`v1.2` → 1.2) with the installed app's version, so tag every release `v<CFBundleShortVersionString>`.
 4. Push `main` (the site and `install.sh`) after the release exists: the installer downloads

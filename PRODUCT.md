@@ -18,7 +18,7 @@ Leads with *seeing where the space went*: a single breakdown of the disk (macOS 
 ## Operating Context
 - Two front-ends on one engine: a SwiftUI Mac app (MacSafe.app) and a `macsafe` terminal dashboard.
 - Install: `curl -fsSL https://gabrielesarria167-ai.github.io/MacSafe/install.sh | bash` (installs app, `macsafe`, and Python 3 from python.org only if missing, signature-checked). Re-run to update.
-- Regular zip download exists but is not notarized, so first launch needs System Settings › Privacy & Security › Open Anyway.
+- Regular download is a disk image (MacSafe.dmg: drag the app into Applications). Not notarized, so first launch needs System Settings › Privacy & Security › Open Anyway. MacSafe.zip stays in each release for install.sh and in-app updates.
 - Full Disk Access recommended for complete totals (MacSafe, and Terminal for `macsafe`).
 - Uninstall via the same script with `--uninstall`; Python stays.
 

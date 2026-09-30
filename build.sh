@@ -2,7 +2,7 @@
 # Builds "MacSafe.app".
 #   ./build.sh             build for this Mac into build/
 #   ./build.sh --install   … and put it in /Applications, plus the `macsafe` command in ~/.local/bin
-#   ./build.sh --release   universal (Apple Silicon + Intel) build, zipped into dist/ for a GitHub Release
+#   ./build.sh --release   universal (Apple Silicon + Intel) build: dist/MacSafe.dmg + MacSafe.zip for a GitHub Release
 set -euo pipefail
 cd "$(dirname "$0")"
 ROOT="$(pwd)"
@@ -49,13 +49,65 @@ echo "Built $APP ($VERSION)"
 if [[ "$MODE" == "--release" ]]; then
   DIST="$ROOT/dist"
   rm -rf "$DIST" && mkdir -p "$DIST"
+  # The zip is what install.sh and the Update button download; people downloading in a browser get
+  # the disk image, whose window shows them to drag the app into Applications.
   ditto -c -k --norsrc --noextattr --noqtn --keepParent "$APP" "$DIST/MacSafe.zip"
-  (cd "$DIST" && shasum -a 256 MacSafe.zip > MacSafe.zip.sha256)
+
+  echo "→ disk image"
+  VOLNAME="MacSafe installer"   # the window title; the Finder script below names it too
+  VOL="/Volumes/$VOLNAME"
+  [[ -d "$VOL" ]] && hdiutil detach "$VOL" -quiet -force
+  STAGE="$ROOT/build/dmg"
+  rm -rf "$STAGE" && mkdir -p "$STAGE/.background"
+  ditto "$APP" "$STAGE/MacSafe.app"
+  ln -s /Applications "$STAGE/Applications"
+  swift MacApp/make_dmg_background.swift "$ROOT/build/dmg_bg.png" 1
+  swift MacApp/make_dmg_background.swift "$ROOT/build/dmg_bg@2x.png" 2
+  tiffutil -cathidpicheck "$ROOT/build/dmg_bg.png" "$ROOT/build/dmg_bg@2x.png" -out "$ROOT/build/dmg_bg.tiff" 2>/dev/null
+  tiffutil -lzw "$ROOT/build/dmg_bg.tiff" -out "$STAGE/.background/background.tiff" >/dev/null 2>&1
+  cp "$APP/Contents/Resources/AppIcon.icns" "$STAGE/.VolumeIcon.icns"
+  rm -f "$ROOT/build/rw.dmg"
+  hdiutil create -quiet -volname "$VOLNAME" -srcfolder "$STAGE" -fs HFS+ -format UDRW -ov "$ROOT/build/rw.dmg"
+  hdiutil attach -quiet -readwrite -noverify -noautoopen "$ROOT/build/rw.dmg"
+  SetFile -a C "$VOL"
+  # Window layout is stored by Finder, so it has to be asked to make it (needs Automation access for
+  # Terminal the first time). Without it the image still works, just with Finder's default layout.
+  if ! osascript <<'OSA' >/dev/null
+tell application "Finder"
+  tell disk "MacSafe installer"
+    open
+    set current view of container window to icon view
+    set toolbar visible of container window to false
+    set statusbar visible of container window to false
+    set bounds of container window to {200, 120, 800, 520}
+    set opts to icon view options of container window
+    set arrangement of opts to not arranged
+    set icon size of opts to 112
+    set text size of opts to 13
+    set background picture of opts to file ".background:background.tiff"
+    set position of item "MacSafe.app" of container window to {160, 200}
+    set position of item "Applications" of container window to {440, 200}
+    update without registering applications
+    delay 1
+    close
+  end tell
+end tell
+OSA
+  then
+    echo "  (couldn't lay out the window: allow Terminal to control Finder, then build again)"
+  fi
+  chmod -Rf go-w "$VOL" 2>/dev/null || true
+  sync
+  hdiutil detach "$VOL" -quiet || hdiutil detach "$VOL" -quiet -force
+  hdiutil convert -quiet "$ROOT/build/rw.dmg" -format UDZO -imagekey zlib-level=9 -o "$DIST/MacSafe.dmg"
+  rm -f "$ROOT/build/rw.dmg"
+
+  (cd "$DIST" && shasum -a 256 MacSafe.zip > MacSafe.zip.sha256 && shasum -a 256 MacSafe.dmg > MacSafe.dmg.sha256)
   echo "Release $VERSION:"
-  echo "  $DIST/MacSafe.zip"
-  echo "  $DIST/MacSafe.zip.sha256"
-  echo "Upload both to a GitHub Release, e.g.:"
-  echo "  gh release create v$VERSION dist/MacSafe.zip dist/MacSafe.zip.sha256 --title \"MacSafe $VERSION\""
+  echo "  $DIST/MacSafe.dmg   (browser download)"
+  echo "  $DIST/MacSafe.zip   (install.sh and the Update button)"
+  echo "Upload them with their .sha256 files to a GitHub Release, e.g.:"
+  echo "  gh release create v$VERSION dist/* --title \"MacSafe $VERSION\""
 fi
 
 if [[ "$MODE" == "--install" ]]; then
