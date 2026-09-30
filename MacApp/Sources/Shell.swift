@@ -10,6 +10,7 @@ struct ContentView: View {
         } detail: {
             detail
                 .frame(minWidth: 680, minHeight: 480)
+                .toolbar { VersionToolbarItem() }
         }
         .overlay(alignment: .bottom) { ToastView().animation(.snappy, value: store.toast?.id) }
         .alert(store.confirm?.title ?? "",
@@ -143,8 +144,6 @@ struct DiskFooter: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            UpdateRow().padding(.bottom, 4)
-            Divider().padding(.bottom, 2)
             if let disk = store.status?.disk {
                 HStack {
                     Image(systemName: "internaldrive")
@@ -183,35 +182,67 @@ struct DiskFooter: View {
     }
 }
 
-/// Appears above the disk footer when a newer MacSafe is on GitHub, and while it installs.
-struct UpdateRow: View {
+/// Top right of the window: "MacSafe 1.2", which turns into an Update button when GitHub has a newer
+/// version, and into a progress indicator while it installs.
+struct VersionToolbarItem: ToolbarContent {
+    var body: some ToolbarContent {
+        // The badge draws its own capsule, so the toolbar's glass bubble would only double it up.
+        if #available(macOS 26, *) {
+            ToolbarItem(placement: .primaryAction) { VersionBadge() }.sharedBackgroundVisibility(.hidden)
+        } else {
+            ToolbarItem(placement: .primaryAction) { VersionBadge() }
+        }
+    }
+}
+
+/// One accent capsule that highlights as a whole on hover (the toolbar's own button styling only
+/// highlights the title).
+struct UpdatePillStyle: ButtonStyle {
+    @State private var hovering = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(Palette.accent))
+            .overlay(Capsule().fill(Color.white.opacity(configuration.isPressed ? 0 : hovering ? 0.16 : 0)))
+            .overlay(Capsule().fill(Color.black.opacity(configuration.isPressed ? 0.18 : 0)))
+            .contentShape(Capsule())
+            .onHover { hovering = $0 }
+            .animation(.easeOut(duration: 0.12), value: hovering)
+    }
+}
+
+struct VersionBadge: View {
     private var store: Store { .shared }
+    private static let bundled = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
 
     var body: some View {
-        if let u = store.update, let latest = u.latest, u.available || u.state == "installing" {
-            let installing = u.state == "installing"
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Image(systemName: "arrow.down.circle.fill").foregroundStyle(Palette.accent)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(installing ? "Installing MacSafe \(latest)…" : "MacSafe \(latest) is available")
-                            .fontWeight(.medium)
-                        Text(installing ? "MacSafe reopens when it's done." : "You have \(u.current ?? "an older version").")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-                if installing {
-                    ProgressView().progressViewStyle(.linear).controlSize(.small)
-                } else {
-                    Button("Update Now") { store.askInstallUpdate() }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
+        let u = store.update
+        if let u, let latest = u.latest, u.state == "installing" {
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.small)
+                Text("Installing MacSafe \(latest)…")
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .help("MacSafe reopens when it's done.")
+        } else if let u, let latest = u.latest, u.available {
+            Button { store.askInstallUpdate() } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "arrow.down.circle.fill")
+                    Text("Update to \(latest)")
                 }
             }
-            .font(.callout)
-            .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Palette.accent.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .buttonStyle(UpdatePillStyle())
+            .help("You have MacSafe \(u.current ?? "an older version"). MacSafe \(latest) is available.")
+        } else if let version = u?.current ?? Self.bundled {
+            Text("MacSafe \(version)")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+                .help("Check for Updates… is in the MacSafe menu.")
         }
     }
 }

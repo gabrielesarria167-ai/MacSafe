@@ -23,6 +23,7 @@ import re
 import select
 import subprocess
 import sys
+import threading
 import time
 import unicodedata
 from types import SimpleNamespace
@@ -271,6 +272,9 @@ class Dashboard:
         self.show_help = False
         self.help_top = 0
         self.was_scanning = engine.scanning
+        self.update = None           # engine.update_status(): fills in shortly after start
+        self.want_update = False     # set when the user confirms; main() installs once curses is gone
+        threading.Thread(target=self._check_update, daemon=True).start()
         self.cv = None
         self.row_bg = None
         self._pairs = {}
@@ -1020,11 +1024,33 @@ class Dashboard:
                 return s, fg
         return "", fg
 
+    def _check_update(self):
+        try:
+            self.update = E.update_status(timeout=3)
+        except Exception:  # noqa: BLE001  never let an update check take the dashboard down
+            pass
+
+    def ask_update(self):
+        u = self.update or {}
+        if not u.get("available"):
+            return
+        self.confirm("Update to MacSafe %s? The dashboard closes, installs it and reopens." % u["latest"],
+                     lambda: setattr(self, "want_update", True), yes="update")
+
     def draw_header(self, w, st):
         t = self.t
         self.put(0, 1, "◆", t.accent, bold=True)
-        self.put(0, 3, "MacSafe", t.text, bold=True)
-        right, fg = self.header_status(st, w - 22)
+        x = self.put(0, 3, "MacSafe", t.text, bold=True)
+        u = self.update or {}
+        if u.get("available") and w >= 48:
+            label = " ↑ Update to %s " % u["latest"]
+            x0 = x + 2
+            x = self.put(0, x0, label, t.on_accent, t.accent, bold=True)
+            self.hit(0, x0, x, ("update",), lambda kind, mx, my: self.ask_update())
+            x = self.put(0, x + 1, "U", t.faint)
+        elif u.get("current"):
+            x = self.put(0, x + 1, u["current"], t.faint)
+        right, fg = self.header_status(st, w - x - 3)
         if right:
             self.put(0, w - 1 - dwidth(right), right, fg)
         n = len(VIEWS)
@@ -1173,7 +1199,8 @@ class Dashboard:
         ("Filters", [("f", "minimum size"), ("p", "period / age"), ("a", "include app data"),
                      ("s", "sort: size · age · name")]),
         ("Other", [("r", "rescan"), ("F", "find duplicates"), ("K", "select extra copies"),
-                   ("ctrl-L", "redraw the screen"), ("q", "quit")]),
+                   ("U", "install an update (when the header offers one)"), ("ctrl-L", "redraw the screen"),
+                   ("q", "quit")]),
         ("Mouse", [("click", "select a row or a donut slice"), ("double-click", "open (same as ⏎)"),
                    ("right-click", "select for cleanup"), ("tabs, keys", "click to use them"),
                    ("headers", "click to sort by that column"), ("wheel", "scroll")]),
@@ -1633,6 +1660,8 @@ class Dashboard:
             self.do_empty_trash()
         elif k == ord("u"):
             self.do_undo()
+        elif k == ord("U"):
+            self.ask_update()
         elif k == ord("o"):
             self.reveal()
         elif k == ord("r"):
@@ -1694,7 +1723,7 @@ class Dashboard:
             k = self.scr.getch()
             if k == -1:
                 continue
-            if not self.handle(k):
+            if not self.handle(k) or self.want_update:
                 break
 
 
@@ -1839,7 +1868,10 @@ def main():
     if args.rescan or engine.idx is None or engine.age > RESCAN_AFTER:
         engine.start_scan()
     os.environ.setdefault("ESCDELAY", "25")
-    curses.wrapper(lambda scr: Dashboard(scr, engine, light, not args.no_mouse).loop())
+    dash = []
+    curses.wrapper(lambda scr: (dash.append(Dashboard(scr, engine, light, not args.no_mouse)), dash[0].loop()))
+    if dash and dash[0].want_update and update(force=True) == "updated":
+        os.execv(sys.executable, [sys.executable, os.path.realpath(__file__)] + sys.argv[1:] + ["--no-update"])
 
 
 if __name__ == "__main__":
