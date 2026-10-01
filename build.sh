@@ -125,6 +125,8 @@ OSA
   echo "  $DIST/MacSafe.zip   (install.sh and the Update button)"
   echo "Upload them with their .sha256 files to a GitHub Release, e.g.:"
   echo "  gh release create v$VERSION dist/* --title \"MacSafe $VERSION\""
+  echo "and end the notes with the download page:"
+  echo "  **Download page:** [gabrielesarria167-ai.github.io/MacSafe](https://gabrielesarria167-ai.github.io/MacSafe/)"
 fi
 
 if [[ "$MODE" == "--install" ]]; then

@@ -95,6 +95,8 @@ build without it.
 3. `gh release create v<version> dist/*` (the .dmg is the site's download; the .zip is what
    `install.sh` and the Update button fetch). The disk image's window layout comes from Finder, so the
    first release build asks to let Terminal control Finder.
+   End the release notes with the download page:
+   `**Download page:** [gabrielesarria167-ai.github.io/MacSafe](https://gabrielesarria167-ai.github.io/MacSafe/)`
    — the installer always fetches the latest release, and the update check compares the release tag
    (`v1.2` → 1.2) with the installed app's version, so tag every release `v<CFBundleShortVersionString>`.
 4. Push `main` (the site and `install.sh`) after the release exists: the installer downloads
