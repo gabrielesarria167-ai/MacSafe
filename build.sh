@@ -41,9 +41,21 @@ iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
 echo "→ bundle"
 cp MacApp/Info.plist "$APP/Contents/Info.plist"
 cp engine.py smcli.py MacApp/macsafe.command "$APP/Contents/Resources/"
-# Ad-hoc signature (required on Apple Silicon). It isn't notarized, so install.sh fetches it with curl,
-# which doesn't quarantine it; a browser download needs System Settings › Privacy & Security › Open Anyway.
-codesign --force --sign - "$APP" >/dev/null 2>&1
+# Signed with the same certificate every time (MacApp/make_signing_identity.sh makes it), so macOS sees
+# an update as the same app and it keeps Full Disk Access; an ad-hoc signature is new on every build.
+# It isn't notarized, so install.sh fetches it with curl, which doesn't quarantine it; a browser
+# download needs System Settings › Privacy & Security › Open Anyway.
+SIGN_ID="MacSafe Signing"
+if security find-certificate -c "$SIGN_ID" >/dev/null 2>&1; then
+  codesign --force --sign "$SIGN_ID" "$APP" >/dev/null
+elif [[ "$MODE" == "--release" ]]; then
+  echo "No \"$SIGN_ID\" certificate: a release signed without it makes everyone turn Full Disk Access" >&2
+  echo "back on. Import the backup from ~/Library/$SIGN_ID, or run MacApp/make_signing_identity.sh." >&2
+  exit 1
+else
+  echo "  (no \"$SIGN_ID\" certificate: signing ad hoc, so Full Disk Access won't survive a rebuild)"
+  codesign --force --sign - "$APP" >/dev/null 2>&1
+fi
 echo "Built $APP ($VERSION)"
 
 if [[ "$MODE" == "--release" ]]; then

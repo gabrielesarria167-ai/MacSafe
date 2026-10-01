@@ -83,6 +83,13 @@ installers, node_modules/venvs, iPhone backups) · Applications (last opened, le
 ```
 
 ### Releasing
+Releases are signed with the self-signed "MacSafe Signing" certificate, so an update keeps Full Disk
+Access (macOS ties it to the signature; an ad-hoc one changes with every build). Make it once with
+`MacApp/make_signing_identity.sh`, and back up `~/Library/MacSafe Signing`: on another Mac, import
+`identity.p12` (password `macsafe`) into the login keychain instead of making a new one. A different
+certificate means everyone turns Full Disk Access on again, once. `./build.sh --release` refuses to
+build without it.
+
 1. Bump `CFBundleShortVersionString` in `MacApp/Info.plist`.
 2. `./build.sh --release`
 3. `gh release create v<version> dist/*` (the .dmg is the site's download; the .zip is what
@@ -100,4 +107,5 @@ The site is served by GitHub Pages from the `docs/` folder on `main`
 Notarizing removes the warning for browser downloads too: sign with
 `codesign --force --options runtime --timestamp --sign "Developer ID Application: …"`, zip, then
 `xcrun notarytool submit MacSafe.zip --keychain-profile … --wait` and
-`xcrun stapler staple "MacSafe.app"` before re-zipping.
+`xcrun stapler staple "MacSafe.app"` before re-zipping. Switching to it changes the signature, so
+users turn Full Disk Access on again that one time.
