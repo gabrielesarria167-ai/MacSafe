@@ -2,11 +2,11 @@
 name: MacSafe
 description: Download site for a free Mac disk-space app and terminal dashboard; graphite developer-tool chrome around the product's own data colours.
 colors:
-  data-blue: "#3987e5"
-  data-orange: "#d95926"
-  data-aqua: "#199e70"
-  data-yellow: "#c98500"
-  data-track: "#2c2c2a"
+  data-blue: "#4da3ff"
+  data-orange: "#ff7a45"
+  data-aqua: "#2fd49a"
+  data-yellow: "#ffc233"
+  data-track: "rgba(255,255,255,.08)"
   status-good: "#3fb950"
   status-warn: "#e3a008"
   status-bad: "#f0645a"
@@ -145,7 +145,7 @@ The MacSafe site is a quiet graphite panel with the product mounted in it. The c
 
 The register is serious and professional, at the level of Raycast, Linear, Tailscale and Apple's macOS pages. The user rejected playful and illustrative directions (cardboard boxes, food labels, sci-fi consoles) as childish. Density is moderate: a left label column carries each section title and a one-line gloss, and the right column carries the evidence as tables, hairline lists, numbered steps and command bars. Type does the hierarchy work. Mona Sans runs slightly wide on headings, and Fragment Mono appears only where something could be pasted or typed.
 
-The page has no grid background, no gradient washes and no decorative art. It has one motion moment, when the disk bar in the app mock settles into its proportions on load.
+The page has no grid background, no gradient washes and no decorative art. It has one motion moment, when the ring's arcs in the app mock draw in on load, as they do in the app.
 
 **Key Characteristics:**
 - Graphite ground (#0a0b0d) with hairline (#22262c) structure. Surfaces are separated by tone and rule, not by shadow.
@@ -271,10 +271,10 @@ A 3.6rem bar with a Hairline underline. The brand mark and "MacSafe" (600) sit l
 Line icons on a 24px grid with 1.7–1.8 stroke and round caps and joins, inlined as SVG symbols and coloured with `currentColor`. They are muted in lists and Disk Blue inside the app mock.
 
 ### App Window Mock (signature)
-The app's Overview screen rebuilt in HTML, in the macOS dark appearance, using the system font stack (it is the app, not the site). It contains traffic lights, sidebar navigation with the selected row in Disk Blue with white text, the segmented disk bar, a legend with tabular figures, quick-win cards and size bars. The white-on-Disk-Blue selected row is deliberately faithful to the shipping app. That pairing belongs to product reproductions only. The whole mock is one `role="img"` with a full text description.
+The app's Overview screen rebuilt in HTML, in the macOS dark appearance, using the system font stack (it is the app, not the site). It follows the 1.3 app: traffic lights, a sidebar of colour tiles under Storage, Find and Clean Up with the selected row tinted blue, the disk ring with what you could free beside it, a glass legend with tabular figures, the Free up space list sorted by size, and the app's soft glows. The tiles, glows and tile colours (purple, pink, teal) are deliberately faithful to the shipping app and belong to product reproductions only. The whole mock is one `role="img"` with a full text description.
 
 ### Terminal Render
-The `macsafe` dashboard as real preformatted text in a system monospace (chosen for accurate box-drawing metrics) inside a window with traffic lights and a Terminal Titlebar. The donut chart is made of background-coloured character cells in the series colours. Rules and borders use the dim terminal rule colour. It is also a single `role="img"` with a description.
+The `macsafe` dashboard as real preformatted text in a system monospace (chosen for accurate box-drawing metrics) inside a window with traffic lights and a Terminal Titlebar. The ring is generated from the CLI's own `donut_cells` geometry: each cell is painted with its top and bottom halves' colours, in the terminal's 256-colour palette (lavender macOS & other, pink app data, blue applications, orange your files). Rules and borders use the dim terminal rule colour. It is also a single `role="img"` with a description.
 
 ### Motion
 The single authored moment is the app mock's disk-bar segments, which grow from 45% to full width over 1.1s on `cubic-bezier(.16, 1, .3, 1)`, staggered 0.06s per segment. It is fully disabled under `prefers-reduced-motion`. State changes (hover colours) are instant, with no transitions.
