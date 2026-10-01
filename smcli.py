@@ -167,7 +167,10 @@ _DONUTS = {}
 
 def donut_cells(W, H, segs, hole=0.6):
     """A ring drawn with half blocks: every cell holds two square pixels (▀ = top in fg, bottom in bg).
-    segs is a tuple of (fraction, colour) clockwise from 12 o'clock; a colour of None leaves a gap."""
+    segs is a tuple of (fraction, colour) clockwise from 12 o'clock; a colour of None leaves a gap.
+    Cells are (char, fg, bg, reverse). Colour goes in the cell background wherever it can, because
+    background always fills the whole cell while block glyphs can come up short (fonts, line spacing)
+    and leave stripes; a half-empty cell is the coloured background with the empty half drawn reversed."""
     key = (W, H, segs, hole)
     if key in _DONUTS:
         return _DONUTS[key]
@@ -196,13 +199,13 @@ def donut_cells(W, H, segs, hole=0.6):
             if top is None and bot is None:
                 cells.append(None)
             elif top == bot:
-                cells.append(("█", top, None))
+                cells.append((" ", -1, top, False))
             elif top is None:
-                cells.append(("▄", bot, None))
+                cells.append(("▀", bot, -1, True))
             elif bot is None:
-                cells.append(("▀", top, None))
+                cells.append(("▄", top, -1, True))
             else:
-                cells.append(("▀", top, bot))
+                cells.append(("▀", top, bot, False))
         rows.append(cells)
     _DONUTS[key] = rows
     return rows
@@ -229,7 +232,7 @@ class Canvas:
 
     def __init__(self, w, h):
         self.w, self.h = w, h
-        blank = (" ", -1, None, False)
+        blank = (" ", -1, None, False, False)
         self.cells = [[blank] * w for _ in range(h)]
 
 
@@ -302,8 +305,8 @@ class Dashboard:
             t.update({k + "_dim": t[k] for k in CATS})
         self.t = SimpleNamespace(**t)
 
-    def attr(self, fg, bg, bold):
-        key = (fg, bg, bold)
+    def attr(self, fg, bg, bold, rev=False):
+        key = (fg, bg, bold, rev)
         a = self._attrs.get(key)
         if a is None:
             f = -1 if fg is None else fg
@@ -319,12 +322,12 @@ class Dashboard:
                 except (curses.error, ValueError, OverflowError):
                     p = 0
                 self._pairs[(f, b)] = p
-            a = curses.color_pair(p) | (curses.A_BOLD if bold else 0)
+            a = curses.color_pair(p) | (curses.A_BOLD if bold else 0) | (curses.A_REVERSE if rev else 0)
             self._attrs[key] = a
         return a
 
     # ── painting ──
-    def put(self, y, x, text, fg=-1, bg=None, bold=False):
+    def put(self, y, x, text, fg=-1, bg=None, bold=False, rev=False):
         cv = self.cv
         if y < 0 or y >= cv.h:
             return x
@@ -338,9 +341,9 @@ class Dashboard:
             if 0 <= x < cv.w:
                 if cw == 2 and x + 1 >= cv.w:
                     ch, cw = " ", 1
-                row[x] = (ch, fg, bg, bold)
+                row[x] = (ch, fg, bg, bold, rev)
                 if cw == 2:
-                    row[x + 1] = ("", fg, bg, bold)
+                    row[x + 1] = ("", fg, bg, bold, rev)
             x += cw
         return x
 
@@ -378,7 +381,10 @@ class Dashboard:
             rem = 1
         for i in range(w):
             if i < full:
-                self.put(y, x + i, "█", fg, track)
+                if fg in (None, -1):    # no colour to paint the background with (8-colour terminals)
+                    self.put(y, x + i, "█", fg, track)
+                else:                   # background fills the whole cell; █ can fall short of it
+                    self.put(y, x + i, " ", fg, fg)
             elif i == full and rem:
                 self.put(y, x + i, BLOCKS[rem], fg, track)
             else:
@@ -578,7 +584,8 @@ class Dashboard:
                     segs = tuple((f, getattr(t, k if on in (None, k) else k + "_dim")) for f, (k, _, _) in zip(fracs, cats))
                     for c, cell in enumerate(donut_cells(W, H, segs)[dr]):
                         if cell:
-                            self.put(y, x + dcol + c, cell[0], cell[1], -1 if cell[2] is None else cell[2])
+                            ch, fg, bg, rev = cell
+                            self.put(y, x + dcol + c, ch, fg, bg, rev=rev)
                     self.hit(y, x + dcol, x + dcol + W, ("donut", r),
                              lambda kind, mx, my: click(kind, mx, x, dr))
                 k = r - cy
