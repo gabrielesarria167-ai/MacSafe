@@ -62,10 +62,12 @@ WAS_RUNNING=0
 quit_app() {  # quits MacSafe (or the old Storage Monitor) and remembers whether it was open
   [[ $TESTING == 1 ]] && return 0
   local pat
+  # -a: the Update button runs this from inside the app (app → engine → installer), and without it
+  # pgrep and pkill skip their own ancestors, so the app would never be found or quit.
   for pat in "$APP_NAME/Contents/MacOS/MacSafe" "$OLD_APP/Contents/MacOS/StorageMonitor"; do
-    if pgrep -f "$pat" >/dev/null 2>&1; then
+    if pgrep -af "$pat" >/dev/null 2>&1; then
       WAS_RUNNING=1
-      pkill -f "$pat" 2>/dev/null || true
+      pkill -af "$pat" 2>/dev/null || true
     fi
   done
   [[ $WAS_RUNNING == 1 ]] && sleep 1
