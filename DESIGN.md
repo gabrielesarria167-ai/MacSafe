@@ -1,307 +1,415 @@
 ---
 name: MacSafe
-description: Download site for a free Mac disk-space app and terminal dashboard; graphite developer-tool chrome around the product's own data colours.
+description: A free Mac disk-space app and terminal dashboard, drawn as one scientific cross-section of the disk; journal-figure calm on deep navy, carried in the app's own vibrant category colours.
 colors:
-  data-blue: "#4da3ff"
-  data-orange: "#ff7a45"
-  data-aqua: "#2fd49a"
-  data-yellow: "#ffc233"
-  data-track: "rgba(255,255,255,.08)"
-  status-good: "#3fb950"
-  status-warn: "#e3a008"
-  status-bad: "#f0645a"
-  graphite-ground: "#0a0b0d"
-  graphite-surface: "#111316"
-  graphite-raise: "#16191d"
-  hairline: "#22262c"
-  ink: "#eceef1"
-  ink-muted: "#8d939c"
-  ink-faint: "#7c838e"
-  terminal-ground: "#0e1014"
-  terminal-rule: "#2a2f37"
-  terminal-titlebar: "#1a1d22"
-  window-ground: "#1f1f21"
-  window-sidebar: "#2a292d"
-  window-card: "#28282b"
-  window-line: "#38383c"
+  apps-blue: "#4da3ff"
+  apps-blue-deep: "#2f6fe8"
+  files-orange: "#ff7a45"
+  files-orange-deep: "#e8502a"
+  appdata-green: "#2fd49a"
+  appdata-green-deep: "#14a877"
+  system-yellow: "#ffc233"
+  system-yellow-deep: "#f09a12"
+  track: "rgba(255,255,255,.09)"
+  glossy-top: "#5b97ff"
+  glossy-deep: "#2f5fe0"
+  glossy-shadow: "#3264f0"
+  glow-blue: "#3566e8"
+  tile-purple: "#9b7bff"
+  tile-purple-deep: "#6a4ae0"
+  tile-pink: "#ff5c8a"
+  tile-pink-deep: "#e0346a"
+  tile-teal: "#3ccfe0"
+  tile-teal-deep: "#1596b8"
+  tile-gray: "#9a9aa1"
+  tile-gray-deep: "#66666d"
+  ground: "#0c1220"
+  ground-2: "#111a2b"
+  ground-3: "#162238"
+  desk-ground: "#0a0f1b"
+  terminal-ground: "#090e19"
+  hair: "#1d2940"
+  hair-2: "#2a3a58"
+  steel: "#5b77a3"
+  figure-hair: "rgba(160,176,205,.28)"
+  leader: "rgba(190,200,218,.7)"
+  ink: "#eef1f6"
+  ink-2: "#b4bfd1"
+  ink-3: "#97a3b8"
+  focus: "#8cc2ff"
+  app-accent: "#3987e5"
+  app-accent-light: "#2a78d6"
+  app-freeable: "#2fd49a"
+  app-freeable-light: "#0f8a61"
+  app-good: "#0ca30c"
+  app-warning: "#fab219"
+  app-critical: "#d03b3b"
+  app-glass: "rgba(255,255,255,.045)"
+  app-glass-light: "rgba(255,255,255,.62)"
+  app-glass-edge: "rgba(255,255,255,.09)"
 typography:
   display:
-    fontFamily: "Mona Sans, Helvetica Neue, Arial, sans-serif"
-    fontSize: "clamp(2.6rem, 6vw, 4.6rem)"
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "clamp(2.5rem, 4.1vw, 3.6rem)"
     fontWeight: 600
-    lineHeight: 1.02
-    letterSpacing: "-0.035em"
-    fontVariation: "'wdth' 112"
+    lineHeight: 1.04
+    letterSpacing: "-0.03em"
   headline:
-    fontFamily: "Mona Sans, Helvetica Neue, Arial, sans-serif"
-    fontSize: "clamp(1.6rem, 2.8vw, 2.1rem)"
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "clamp(1.85rem, 3vw, 2.5rem)"
     fontWeight: 600
     lineHeight: 1.1
     letterSpacing: "-0.025em"
-    fontVariation: "'wdth' 106"
   title:
-    fontFamily: "Mona Sans, Helvetica Neue, Arial, sans-serif"
-    fontSize: "1.1rem"
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "19px"
     fontWeight: 600
-    lineHeight: 1.6
-    letterSpacing: "-0.02em"
-    fontVariation: "'wdth' 106"
+    lineHeight: 1.3
+    letterSpacing: "-0.01em"
   lede:
-    fontFamily: "Mona Sans, Helvetica Neue, Arial, sans-serif"
-    fontSize: "clamp(1.05rem, 1.5vw, 1.2rem)"
-    fontWeight: 400
-    lineHeight: 1.55
-  body:
-    fontFamily: "Mona Sans, Helvetica Neue, Arial, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 400
-    lineHeight: 1.6
-  body-small:
-    fontFamily: "Mona Sans, Helvetica Neue, Arial, sans-serif"
-    fontSize: "0.93rem"
-    fontWeight: 400
-    lineHeight: 1.6
-  label:
-    fontFamily: "Mona Sans, Helvetica Neue, Arial, sans-serif"
-    fontSize: "0.88rem"
-    fontWeight: 400
-    lineHeight: 1.4
-  caption:
-    fontFamily: "Mona Sans, Helvetica Neue, Arial, sans-serif"
-    fontSize: "0.82rem"
-    fontWeight: 400
-    lineHeight: 1.6
-  code:
-    fontFamily: "Fragment Mono, ui-monospace, Menlo, monospace"
-    fontSize: "0.82rem"
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "19px"
     fontWeight: 400
     lineHeight: 1.5
+  body:
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: 1.55
+  caption:
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: 1.55
+    fontFeature: "\"tnum\" 1"
+  label:
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: 1.45
+  button:
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "16px"
+    fontWeight: 600
+    lineHeight: 1.2
+  figure-name:
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: 1.2
+    fontFeature: "\"tnum\" 1"
+  figure-value:
+    fontFamily: "Hanken Grotesk, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+    fontSize: "18.5px"
+    fontWeight: 400
+    lineHeight: 1.2
+    fontFeature: "\"tnum\" 1"
+  code:
+    fontFamily: "ui-monospace, SF Mono, SFMono-Regular, Menlo, Consolas, monospace"
+    fontSize: "13.5px"
+    fontWeight: 400
+    lineHeight: 1.5
+  app-headline:
+    fontFamily: "-apple-system, SF Pro"
+    fontSize: "28px"
+    fontWeight: 700
+    lineHeight: 1.15
+  app-figure-total:
+    fontFamily: "-apple-system, SF Pro"
+    fontSize: "26px"
+    fontWeight: 600
+    lineHeight: 1.1
+    fontFeature: "\"tnum\" 1"
+  app-card-title:
+    fontFamily: "-apple-system, SF Pro"
+    fontSize: "13px"
+    fontWeight: 700
+    lineHeight: 1.3
+  app-body:
+    fontFamily: "-apple-system, SF Pro"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: 1.35
+  app-caption:
+    fontFamily: "-apple-system, SF Pro"
+    fontSize: "10px"
+    fontWeight: 400
+    lineHeight: 1.3
 rounded:
-  xs: "5px"
-  sm: "7px"
-  md: "10px"
-  lg: "12px"
+  xs: "3px"
+  sm: "4px"
+  tile: "8px"
+  term: "10px"
+  md: "12px"
+  lg: "16px"
+  frame: "18px"
+  full: "999px"
 spacing:
-  gutter: "max(16px, 4vw)"
-  container: "74rem"
-  label-column: "17rem"
-  section: "clamp(5.5rem, 10vw, 8.5rem)"
-  panel: "1.5rem"
-  row: "1.05rem"
+  container: "1360px"
+  gutter: "40px"
+  gutter-mobile: "18px"
+  section: "110px"
+  section-mobile: "80px"
+  sec-head: "640px"
+  hero-lead: "minmax(320px, 420px)"
+  ring-gap: "4px"
+  app-card: "18px"
+  app-stack: "22px"
+  app-gap: "16px"
 components:
+  button-glossy:
+    backgroundColor: "{colors.glossy-top}"
+    textColor: "#ffffff"
+    typography: "{typography.button}"
+    rounded: "{rounded.full}"
+    padding: "12px 24px"
+  button-glossy-app:
+    backgroundColor: "{colors.glossy-top}"
+    textColor: "#ffffff"
+    typography: "{typography.app-body}"
+    rounded: "{rounded.full}"
+    padding: "9px 20px"
   button-copy:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.graphite-ground}"
-    typography: "{typography.caption}"
-    rounded: "{rounded.sm}"
-    padding: "0.55rem 0.8rem"
-  button-copy-hover:
-    backgroundColor: "#ffffff"
-    textColor: "{colors.graphite-ground}"
-  button-copy-done:
-    backgroundColor: "{colors.status-good}"
-    textColor: "{colors.graphite-ground}"
-  button-download:
-    backgroundColor: "{colors.graphite-raise}"
+    backgroundColor: "transparent"
     textColor: "{colors.ink}"
     typography: "{typography.label}"
-    rounded: "8px"
-    padding: "0.55rem 0.9rem"
+    padding: "0 16px"
+  button-copy-hover:
+    backgroundColor: "{colors.ground-3}"
+    textColor: "{colors.ink}"
   command-bar:
-    backgroundColor: "{colors.graphite-surface}"
+    backgroundColor: "{colors.ground-2}"
     textColor: "{colors.ink}"
     typography: "{typography.code}"
     rounded: "{rounded.md}"
-    padding: "0.45rem 0.45rem 0.45rem 1rem"
-  panel:
-    backgroundColor: "{colors.graphite-surface}"
-    textColor: "{colors.ink-muted}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.panel}"
-  code-inline:
-    backgroundColor: "{colors.graphite-raise}"
+    padding: "13px 14px"
+  figure-caption:
+    textColor: "{colors.ink-2}"
+    typography: "{typography.caption}"
+  figure-key-row:
     textColor: "{colors.ink}"
-    rounded: "{rounded.xs}"
-    padding: "0.05rem 0.35rem"
+    typography: "{typography.caption}"
+    padding: "11px 2px"
+  figure-key-row-selected:
+    backgroundColor: "{colors.ground-2}"
+    textColor: "{colors.ink}"
   nav-link:
-    textColor: "{colors.ink-muted}"
+    textColor: "{colors.ink-2}"
     typography: "{typography.label}"
   nav-link-hover:
     textColor: "{colors.ink}"
   terminal-window:
     backgroundColor: "{colors.terminal-ground}"
-    textColor: "#d8dde6"
-    rounded: "{rounded.md}"
-    width: "520px"
+    textColor: "{colors.ink-2}"
+    typography: "{typography.code}"
+    rounded: "{rounded.term}"
+  app-desktop:
+    backgroundColor: "{colors.desk-ground}"
+    rounded: "{rounded.frame}"
+  glass-card:
+    backgroundColor: "{colors.app-glass}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.app-card}"
+  color-tile:
+    backgroundColor: "{colors.apps-blue}"
+    textColor: "#ffffff"
+    rounded: "{rounded.tile}"
+    size: "30px"
+  state-bar:
+    backgroundColor: "{colors.track}"
+    rounded: "{rounded.xs}"
+    height: "6px"
 ---
 
 # Design System: MacSafe
 
 ## Overview
 
-**Creative North Star: "The Instrument Panel"**
+**Creative North Star: "The Journal Figure"**
 
-The MacSafe site is a quiet graphite panel with the product mounted in it. The chrome is dark neutral, near-black, and has no hue of its own. It is drawn with 1px hairlines rather than fills or shadows, so the eye goes to the two real renders it frames: the Overview window of the Mac app and the `macsafe` terminal dashboard. The only saturated colour anywhere is the product's own data palette. When blue, orange, aqua or yellow appears, it is measuring a disk.
+MacSafe draws the disk as one cross-section seen end-on, the way a scientific journal prints a figure: the categories form the inner ring, the biggest folders form the outer ring, and the largest files are radial bars. Selecting any part focuses it. The site sets this figure on flat deep navy, labels it with thin leader lines and sentence-case two-tier labels, and numbers every figure on the page as a real sequence (Fig. 1 to Fig. 4). The Mac app draws the same figure natively at the top of Overview. That shared figure is what makes the site and the app one system.
 
-The register is serious and professional, at the level of Raycast, Linear, Tailscale and Apple's macOS pages. The user rejected playful and illustrative directions (cardboard boxes, food labels, sci-fi consoles) as childish. Density is moderate: a left label column carries each section title and a one-line gloss, and the right column carries the evidence as tables, hairline lists, numbered steps and command bars. Type does the hierarchy work. Mona Sans runs slightly wide on headings, and Fragment Mono appears only where something could be pasted or typed.
+Colour comes only from the app's own vibrant category pairs: Applications blue, Your files orange, App data & caches green, macOS & other yellow. Each pair runs from a bright top to a deep partner along the arc. Free space is a neutral white track and never takes a hue. Around the figure the chrome stays quiet: hairlines, ink in three steps, tabular figures, and no ornament. The calm comes from the scientific figure and the energy from the app's palette. The one atmospheric device is the app's soft Glows (blue lower-left, purple upper-right, green lower-right), placed behind the figure and behind the app window and nowhere else.
 
-The page has no grid background, no gradient washes and no decorative art. It has one motion moment, when the ring's arcs in the app mock draw in on load, as they do in the app.
+The register is serious and professional. The owner rejected HUD chrome, ALL-CAPS tracked labels, sci-fi copy and DaisyDisk look-alikes for this world. Safety is drawn as line form rather than with badges: a solid line means you can undo, a dashed line means it asks first, and a struck line means MacSafe refuses. Hatching means review first, and space you got back is a labelled cut-out gap.
+
+There are two surfaces. The site (docs/index.html) is set in Hanken Grotesk on #0c1220. The app (MacApp) uses the system font, sits on the native window background with Glows, supports both light and dark appearance, and takes its palette from `MacApp/Sources/Theme.swift`. That file is the palette source of truth for both surfaces.
 
 **Key Characteristics:**
-- Graphite ground (#0a0b0d) with hairline (#22262c) structure. Surfaces are separated by tone and rule, not by shadow.
-- All colour comes from the app's data palette (blue, orange, aqua, yellow) plus three status dots.
-- The primary action is an off-white button on graphite, not a coloured one.
-- Mona Sans at 600 with its width axis opened to 106–112% on headings. Fragment Mono only for code and commands.
-- The product renders are the only raised, shadowed objects on the page.
-- One authored motion: the disk-bar segments settle on load.
+- One figure, end-on: inner ring categories, outer ring folders, radial bars for files, with a centre readout of the total.
+- Category gradient pairs in a fixed order, and a neutral track for free and empty.
+- Leader-line labels with a ground-colour halo, two tiers (semibold name, lighter value with a smaller unit).
+- "Fig. n" captions as a sequence, in sentence case, with tabular figures.
+- Safety in line form, hatch for review-first, and cleared space as a cut-out gap.
+- Flat page and lifted product: only the drive, the app window, the glossy button and colour tiles carry depth.
 
 ## Colors
 
-The palette is graphite neutrals plus the Mac app's categorical data colours. It is restrained everywhere except where data is being shown.
+A deep-navy ground with neutral steel hairlines, lit only by the app's four category pairs and one glossy blue action.
 
 ### Primary
-- **Disk Blue** (data-blue): the app's first series slot (Applications) and its accent. On the page it also serves as the focus ring, the text-selection highlight, the selected sidebar row in the app mock, and the accent glyph and active tab in the terminal render. It is the only colour the chrome borrows.
+- **Applications Blue** (apps-blue → apps-blue-deep): the first category, in the inner ring, the legend dot, and bars for Applications. It is the hue of the Overview selection and of the site's text-selection tint.
+- **Glossy Blue** (glossy-top → glossy-deep, glow glossy-shadow): used only for the single primary action on a screen ("Download for Mac", "Review & Clean"). The label is white semibold.
 
 ### Secondary
-- **Kiln Orange** (data-orange): series slot 2, "Your files". Data only.
-- **Mint Aqua** (data-aqua): series slot 3, "App data & caches". Data only.
-- **Amber Yellow** (data-yellow): series slot 4, "macOS & other". Data only.
-- **Free-space Track** (data-track): the unfilled "Free" segment, and the rail under progress and size bars.
-
-These are the dark-appearance values of `Palette.series`, `Palette.accent` and `Palette.track` in `MacApp/Sources/Theme.swift`. The page copies them. It does not define them. The brand mark and favicon use the light-appearance steps from the same file (#2a78d6, #eb6834, #1baf7a, #eda100), because the mark is drawn on its own navy tile (#171c29 to #29334a) rather than on a data surface.
+- **Your Files Orange** (files-orange → files-orange-deep): your files. Installers, old downloads and developer leftovers in Free up space take this hue.
+- **App Data Green** (appdata-green → appdata-green-deep): app data & caches. Backups and caches take this hue. The same green is the "freeable" text colour and the third glow, low on the right where cleanup lives.
+- **macOS Yellow** (system-yellow → system-yellow-deep): macOS & other. The largest category is usually yellow.
+- **Free Track** (track): free space and every empty track. It is neutral white at about 8–9% over the ground (the app uses 8%, the site's free arc 9%; in light appearance black at 8%).
 
 ### Tertiary
-- **Status Green / Amber / Coral** (status-good, status-warn, status-bad): 0.5rem dots in the safety table meaning reversible, irreversible-with-warning and refused. Status Green also fills the Copy button for 1.8s after a successful copy. These are the web page's own values, tuned for the graphite ground. They are not the app's `good`/`warning`/`critical`.
+- **Tile tints** (tile-purple, tile-pink, tile-teal, tile-gray, each with a deep partner): sidebar and cleanup ColorTiles only, as the app uses them. They are app chrome and never data. Purple is also the upper-right glow, and tile-gray marks Trash.
 
 ### Neutral
-- **Graphite Ground** (graphite-ground): page background and `theme-color`. Also the text colour on the off-white Copy button.
-- **Graphite Surface** (graphite-surface): command bars, feature-comparison panels, install cards, table header row.
-- **Graphite Raise** (graphite-raise): one step up, for inline `code`, `kbd` and the download button.
-- **Hairline** (hairline): every border, divider and rule on the page (nav underline, list rows, table rows, panel edges, step spine, footer rule).
-- **Ink** (ink): headings, body emphasis, command text. It is also the fill of the primary button.
-- **Ink Muted** (ink-muted): ledes, section glosses, list descriptions, nav links at rest, footer.
-- **Ink Faint** (ink-faint): captions, the `$ ` prompt, facts-row separators, link underlines at rest. It is the lowest-contrast text allowed. It measures about 5:1 on the ground, so don't go darker.
-- **Terminal Ground / Rule / Titlebar**: the terminal render's own darker, slightly blue-shifted set, which keeps it reading as a separate app window.
-- **Window Ground / Sidebar / Card / Line**: macOS dark-appearance approximations, used only inside the app-window mock.
+- **Deep Navy Ground** (ground): the site's flat page ground. The app equivalent is the native window background.
+- **Raised Navy** (ground-2, ground-3): the selected legend row, the command bar fill (at 82%), copy-button hover, and inline code.
+- **Desk** (desk-ground) and **Terminal** (terminal-ground): the macOS desktop frame around the app reproduction, and the terminal window. Both are slightly darker than the ground so the lit objects sit in them.
+- **Hairlines** (hair, hair-2): every rule, row divider, caption top rule and border. hair-2 is used for stronger structure such as the command bar border, table heads and the steps rule.
+- **Steel** (steel): link underlines.
+- **Figure hairlines** (figure-hair, leader): ring guides, ticks and leader lines inside the figure.
+- **Ink** (ink, ink-2, ink-3): primary text, secondary text (lede, captions, descriptions), and tertiary text (facts, units, credits, footer).
+- **Focus** (focus): a 2px focus outline offset 3px. In the figure the focused category draws a #9cc4ff ring.
+
+### App semantic colours
+The app pairs each light and dark value: app-accent (links, plain bars), app-freeable (the "You could free up" figure), app-good, app-warning and app-critical (status), and app-glass / app-glass-edge (Card fill and stroke over the Glows).
 
 ### Named Rules
-**The Data Is the Colour Rule.** Chromatic hues on this site mean data. Blue, orange, aqua and yellow appear only as disk categories, in their fixed series order (blue Applications, orange Your files, aqua App data & caches, yellow macOS & other). The one exception is Disk Blue as the interaction accent. No section tint, no brand gradient, no coloured headline.
+**The Category Order Rule.** The four categories always appear in engine order (Applications blue, Your files orange, App data & caches green, macOS & other yellow), always as their top → deep pair, and always from `Theme.swift`. No surface invents a fifth data hue.
 
-**The Theme.swift Is the Source Rule.** The data colours and app-window colours are reproductions. If the app's palette changes, change `Theme.swift` first and then carry the values here. Never tune a mock colour away from the shipping app.
+**The Neutral Track Rule.** Free and empty space is neutral white at 8–9%, never a hue and never a hue at low alpha over navy, which reads as mud-brown. Dimming an unselected part mixes it toward grey at about 40% opacity, never toward a darker version of its own hue.
+
+**The Tiles Are Chrome Rule.** Purple, pink, teal and gray belong to ColorTiles and the Glows. They never colour a ring, bar or legend dot.
 
 ## Typography
 
-**Display Font:** Mona Sans (with Helvetica Neue, Arial). It is loaded as a variable font over width 75–125 and weight 400–800.
-**Body Font:** Mona Sans.
-**Label/Mono Font:** Fragment Mono (with ui-monospace, Menlo).
+**Display Font:** Hanken Grotesk 400/500/600/700 (Google Fonts), falling back to ui-sans-serif and the system stack. Site only.
+**App Font:** the system font (SF Pro), using SwiftUI text styles.
+**Code Font:** ui-monospace, SF Mono, Menlo. Used for commands, paths and the terminal render only.
 
-**Character:** Mona Sans opened slightly wide on headings gives an engineered, confident voice without shouting, and at body sizes it stays neutral and readable. Fragment Mono is plain and slightly warm, and it marks things you can type.
+**Character:** a plain, slightly warm grotesk with tight negative tracking at size and sentence case everywhere, so the type reads like a journal's figure apparatus rather than product marketing.
 
 ### Hierarchy
-- **Display** (600, clamp(2.6rem, 6vw, 4.6rem), 1.02, width 112%): the single hero headline, left-aligned and capped at 15ch so it breaks into two lines.
-- **Headline** (600, clamp(1.6rem, 2.8vw, 2.1rem), 1.1, width 106%): section titles in the left label column. These are sentence-case statements that end with a full stop.
-- **Title** (600, 1.1–1.15rem, width 106%): panel and card headings.
-- **Lede** (400, clamp(1.05rem, 1.5vw, 1.2rem), 1.55): hero lede in Ink Muted, max 40rem, with one bold phrase lifted to Ink at weight 500.
-- **Body** (400, 1rem, 1.6): running text. Inside panels, lists and cards it steps down to 0.92–0.95rem in Ink Muted, with the item name in Ink at weight 500.
-- **Label** (400, 0.88rem): nav links, facts row, definition lists, download button.
-- **Caption** (400, 0.82rem): figure captions and footer, in Ink Faint or Ink Muted.
-- **Code** (Fragment Mono 400, 0.82rem, 1.5): install and uninstall commands (0.76rem inside cards), and inline `code` at 0.86em.
-
-The weights in use are 400, 500 and 600. Weight 500 is emphasis inside muted text. Weight 600 is headings. Headings get `text-wrap: balance` and negative tracking (-0.02em to -0.035em) that tightens as size grows.
+- **Display** (600, clamp(2.5rem, 4.1vw, 3.6rem), 1.04, balanced wrap): the hero line only. It drops to 2.35rem at 720px and below.
+- **Headline** (600, clamp(1.85rem, 3vw, 2.5rem), 1.1): section heads, written as full sentences with a period. The closing head steps up to clamp(2.1rem, 3.6vw, 3.1rem).
+- **Title** (600, 19px): step names, front-end names, and the download/FDA/uninstall heads.
+- **Lede** (400, 19px, 1.5, max 34ch): the hero paragraph.
+- **Body** (400, 17px, 1.55): section intros (max 60ch) and running text.
+- **Caption** (400, 15px, 1.55): "Fig. n" captions. The figure number is set in Ink 600 and the rest in Ink 2. Section captions use 14.5px.
+- **Label** (400, 14px): nav (15px), command labels, the facts line, notes and the footer.
+- **Figure name / Figure value** (600 20px / 400 18.5px in the figure's SVG units, with a 4px ground-colour stroke halo): the two tiers of every leader label. Units are set smaller (16.5px) and lighter.
+- **App:** headline 28 bold ("You could free up 26.5 GB", with the figure in the freeable green), figure total 26 semibold tabular, card titles in `.headline`, body in `.callout`, captions in `.caption`, and units at 10.5 medium in secondary colour.
 
 ### Named Rules
-**The Mono Means Code Rule.** Monospace marks something you could paste or type: commands, paths, flags, key names, and the terminal render. Facts, labels, headers and metadata are set in Mona Sans. The facts row under the hero is deliberately not mono.
+**The Tabular Figures Rule.** Every number that can sit beside another number (legend values, percentages, sizes, captions, the centre readout) uses tabular figures, with the unit set smaller and lighter after the value.
 
-**The Wide Headline Rule.** Headings are Mona Sans 600 with the width axis opened to 106%, and 112% for the hero. Body text stays at the default width. Don't use the width axis on running text.
+**The Sentence Case Rule.** Labels, headings, buttons and captions use sentence case. No ALL-CAPS, no tracked-out labels, and no kicker above a heading.
+
+**The Mono Means Code Rule.** Monospace appears only for what can be typed or pasted (the install command, `macsafe`, paths, key glyphs) and inside the terminal render.
 
 ## Layout
 
-The page is a single left-aligned column system, with a container of max 74rem, centred, and gutters of max(16px, 4vw).
+The site uses a 1360px container with 40px gutters (18px at 720px and below). The hero is a two-column grid: a lead column of minmax(320px, 420px) holds the headline, lede, glossy download, facts line and install command, and the figure takes the rest and bleeds 24px to the right. The download stack sits in the first viewport. Below 1060px everything stacks into one column. Below 720px the figure's leader labels, scale and tick labels hide, and a tappable key list (dot, name, tabular value, percent) replaces them.
 
-- **Hero:** stacked with a 1.6rem gap: headline, lede, command bar (max 48rem), facts row. Below them, the full-width app window starts clamp(3rem, 6vw, 4.5rem) down, with a caption under it. Nothing sits beside the headline.
-- **Sections:** a two-column grid, with a label column (minmax(0, 17rem)) holding the h2 and a one-line gloss, and an evidence column. Column gap is clamp(2rem, 5vw, 4.5rem). Sections are separated by clamp(5.5rem, 10vw, 8.5rem) of empty space, with no rules or bands between them.
-- **Evidence forms:** two-up panels sharing a single hairline border, a two-column hairline list, a bordered table, a numbered step spine, and two-up cards.
-- **At 900px** the label column stacks above its evidence, and the nav drops to brand and GitHub.
-- **At 640px** every two-up form becomes one column. The safety table becomes stacked rows (header hidden, action name on its own line). The facts row drops its middle-dot separators and wraps on gap alone.
-- **The app mock** is its own container. It sizes its whole UI from one unit (`--u`, 13px at full width) scaled to the container, and below 620px of container width it drops the sidebar and shows traffic lights in the toolbar. The terminal render sizes its monospace font to fit 66 columns, and in the two-column section it is capped at 520px.
+Sections open at 110px (80px mobile) with a 640px head block (headline plus intro) and then one evidence grid: two-up asymmetric (1fr / 1.15–1.25fr, 56–64px gaps), a four-step row divided by hairlines (2 then 1 columns as it narrows), or a three-column download/FDA/uninstall row ruled off at the top. Lists and tables are hairline-ruled rows, not cards.
+
+"The same picture, in the app" places the real Overview window (1280×800, scaled to fit) on a macOS desktop frame with a menubar, lit by the same three glows as the hero, with faint figure rings in the wallpaper. At phone width the window reflows as a narrow macOS window (sidebar behind a toggle, figure above legend, finds stacked) instead of shrinking.
+
+The app's Overview is a vertical stack (22pt): the figure beside the headline column (headline, glossy action, glass legend, caption), then the Free up space card, then Biggest folders beside Largest files and Outside your home when the content is at least 820pt wide, and stacked below that. Cards are separated by 16pt.
+
+The figure keeps 4px ground gaps between arcs (converted to degrees per radius) and square arc ends.
 
 ## Elevation & Depth
 
-The page itself is flat. Depth comes from three tonal steps (Ground, Surface, Raise) and 1px Hairline borders. Only the two product renders cast shadows. They are the objects, and everything else is the panel they sit in.
+The page is flat. Panels, lists, tables, captions and the command bar sit on the ground with hairlines and no shadows. Depth is reserved for objects that are lifted in real life:
 
 ### Shadow Vocabulary
-- **App window** (`box-shadow: 0 2.4em 5em -1.8em rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.1)`): a long, soft drop plus a light edge ring, like a macOS window on a dark desktop.
-- **Terminal window** (`box-shadow: 0 16px 32px -14px rgba(0,0,0,.75)`): shorter and denser, for the smaller window.
-- **In-mock button** (`box-shadow: 0 1px 1px rgba(0,0,0,.06)`): part of the app reproduction, not a page token.
+- **Glossy action** (`0 6px 14px -4px rgba(50,100,240,.36), 0 2px 10px rgba(50,100,240,.2)`; hover `.5`/`.3`): the blue glow under the primary button, matching the app's shadow (#3264f0 at 0.36, radius 10, y 5; 0.5 and radius 14 on hover).
+- **ColorTile** (`0 1.6px 4px` deep tint at 35%): tiles cast their own colour.
+- **App window** (`0 0 0 .5px rgba(255,255,255,.16), 0 30px 80px -12px rgba(0,0,0,.7), 0 10px 24px rgba(0,0,0,.35)`): the reproduction on the desktop frame only.
+- **Selected arc** (`drop-shadow(0 0 16px <category hue>)` on the site; a 24pt glow at 0.9 in dark and 10pt at 0.4 in light in the app): at most one glow at a time, on the selected category.
+
+**Glows** (blur 110px): blue #3566e8 at 0.28 lower-left, purple at 0.16 top-right, and green at 0.12 lower-right. In the app light appearance they drop to 55%.
+
+**The drive** (hero, WebGL): a dark machined-aluminium HDD (casing #4b525c, matte) turns from a three-quarter view to end-on, and its platter becomes the SVG figure in one handoff. With no WebGL, a load failure or reduced motion, the SVG figure stands alone and nothing is left at opacity 0.
 
 ### Named Rules
-**The Product Casts the Only Shadow Rule.** Panels, cards, tables, command bars and buttons have no shadow. They are defined by tone and hairline. A shadow on this page means "this is a real window from the product."
+**The Lifted Objects Rule.** Only physical things are lifted: the drive, the app window, the glossy action and the ColorTiles. Page structure never casts a shadow.
+
+**The One Glow Rule.** At most one arc glows, and only the selected one.
 
 ## Shapes
 
-Corners are gently rounded and grow with the size of the container. Inline code and kbd use 5px. The Copy button uses 7px and the download button 8px. The command bar and terminal window use 10px. Panels, tables and cards use 12px. Status dots and step counters are full circles. The app mock uses its own macOS-scaled radii (0.85em window, 0.95em cards, 0.45em rows). Borders are always 1px Hairline and never heavier. Grouped panels share one outer border with internal hairline dividers rather than each being boxed separately.
+The figure's arcs have square ends separated by ground gaps, and its hairline rings and ticks are 1px. Leader lines are 0.75px with an angled or radial stem and a short horizontal shoulder, ending in a small dot, with a 3.5px ground halo so they stay unbroken over the metal.
+
+The site chrome uses soft but small corners: inline code 4px, terminal 10px, command bar and app window 12px, glass cards 16px, desktop frame 18px. Actions are capsules (full radius): the glossy button, pills and badges. Bars and state bars use 3px. App cards are continuous-corner 16pt rectangles, ColorTiles round at 0.27 of their size (8pt at 30pt), and row hovers use 8–10pt.
+
+Line form carries meaning: solid 1.6px means reversible, dashed (5 4) means it warns first, a line with a slash and a struck label means refused, 45° hatching means review first, and a dashed outline means it asks before deleting.
 
 ## Components
 
 ### Buttons
-Buttons here are quiet, and the only emphatic one is the Copy button.
-- **Primary (Copy):** Ink fill with Graphite Ground text, 500 weight at 0.82rem, 7px radius, 0.55rem 0.8rem padding, min-width 5.4rem, with a line-stroke copy icon. It sits inside the right end of a command bar.
-- **Hover / Focus:** hover lifts the fill to pure white. Focus is the page-wide 2px Disk Blue outline at 3px offset. After a copy, the label becomes "Copied" on Status Green for 1.8s. If clipboard access fails, the command text is selected and the label says "Press ⌘C".
-- **Secondary (Download):** Graphite Raise fill, Hairline border, Ink text at 0.88rem/500, 8px radius, and a download icon. Hover brightens the border to Ink Faint.
+- **Glossy primary:** a capsule with a vertical gradient (glossy-top → #3a6aec at 45% → glossy-deep), a 0.75px top-light border (white 45% → 8%) and a blue glow. The label is white 600. On the site the padding is 12px 24px (10px 20px in the download row) with a 17px download glyph. In the app it is `.body` semibold at 9×20pt (large) or `.callout` at 6×14pt. Hover brightens the whole button (filter 1.1 / white 12% veil) and lifts the glow; press darkens it to 0.88 / black 16%. Disabled is desaturated at 50% opacity. Use one per screen.
+- **Copy:** a transparent segment fused to the command bar's right edge behind a hair-2 divider, with a 14px 500 "Copy" label and glyph. Hover fills it with ground-3. Success changes the note under the bar to green and the label to "Copied".
+- **Pill (app):** a white 7% capsule with a white 12% border, used for row actions like "Review".
 
-### Command Bar (signature)
-The command bar is how the page asks for action. It is a Graphite Surface bar with a Hairline border and 10px radius, containing the command in Fragment Mono with a faint `$ ` prompt, and a Copy button flush right. Commands wrap only at `<wbr>` points (`white-space: pre-wrap`, no word breaking). In the narrower install cards, the command takes the full width and the button drops below it, right-aligned.
+### Command bar
+A 12px hair-2 bordered bar on ground-2 at 82%, holding the install command in code type. It breaks only at explicit `<wbr>` points, and the whole command is selectable. A label above ("Or install with Terminal") and a live note below sit with it.
 
-### Cards / Containers
-- **Corner Style:** 12px.
-- **Background:** Graphite Surface.
+### Figure caption
+Below the figure, behind a top hairline: "**Fig. n**" in Ink 600, then one plain sentence in Ink 2 that states the subject, says "example data", and explains how to read the figure. The caption rewrites itself for the selected part. The drive credit sits directly below it, aligned to the caption's left edge, in Ink 3 13px, shown only when the drive rendered.
+
+### Figure key (mobile)
+Hairline-ruled rows of a 10px colour dot, name, tabular value with smaller unit, and right-aligned percent. The selected row fills with ground-2.
+
+### Cards / Containers (app)
+- **Corner Style:** 16pt continuous.
+- **Background:** app-glass over the Glows, with an app-glass-edge stroke.
 - **Shadow Strategy:** none (see Elevation).
-- **Border:** 1px Hairline. Two-up panels share one border with a hairline divider between them.
-- **Internal Padding:** 1.5–1.6rem.
+- **Internal Padding:** 18pt, with a title row (headline, caption subtitle, trailing tabular total or link).
 
-### Lists and Tables
-- **Hairline list:** rows divided by Hairline top and bottom, with a 1.05rem vertical rhythm. Each row has a muted line icon, an Ink 500 name and a muted description.
-- **Table:** bordered 12px wrapper, 0.85rem 1.1rem cells, hairline row dividers. Status is shown with a coloured dot plus a muted word, never colour alone. Key names sit in small raised `kbd` chips.
-- **Step spine:** a vertical Hairline with circular numbered markers (Ground fill, Hairline ring, muted numeral). The bold step name is followed by a muted explanation.
+### ColorTile (app)
+A rounded square in a tint's top → deep gradient, with a white SF Symbol at 46% of the tile size, a 0.75px white top-light edge, and a shadow in its own deep colour. Sidebar rows use 20–30pt tiles and cleanup items use 30pt.
+
+### State bar (app and site)
+A 6px neutral track with a fill in the item's category hue: a solid gradient sweep (deep → top) means safe to clear, 45° hatching over a 22% tint with a 1px outline means review first, and a dashed outline (3 2.4) means it asks before deleting. Trash uses tile-gray.
 
 ### Navigation
-A 3.6rem bar with a Hairline underline. The brand mark and "MacSafe" (600) sit left. Links are Label size in Ink Muted and turn Ink on hover, with no underline. Section links hide below 900px and GitHub stays.
+A 22px-padded bar with no underline: the brand mark plus "MacSafe" in 600 18px on the left, and links on the right in Ink 2 15px that turn Ink on hover, 28px apart. Optional links hide below 720px.
 
-### Icons
-Line icons on a 24px grid with 1.7–1.8 stroke and round caps and joins, inlined as SVG symbols and coloured with `currentColor`. They are muted in lists and Disk Blue inside the app mock.
+### Lists and Tables
+Rows divided by hairlines, with 13–14px vertical padding, a bold name and an Ink 2 description. The safety table leads each row with its line-form glyph and strikes the refused row's label. App tables use caption-weight sortable headers with a chevron, tabular right-aligned sizes and hover tints.
 
-### App Window Mock (signature)
-The app's Overview screen rebuilt in HTML, in the macOS dark appearance, using the system font stack (it is the app, not the site). It follows the 1.3 app: traffic lights, a sidebar of colour tiles under Storage, Find and Clean Up with the selected row tinted blue, the disk ring with what you could free beside it, a glass legend with tabular figures, the Free up space list sorted by size, and the app's soft glows. The tiles, glows and tile colours (purple, pink, teal) are deliberately faithful to the shipping app and belong to product reproductions only. The whole mock is one `role="img"` with a full text description.
+### Terminal render
+`macsafe` as real preformatted text in system monospace inside a terminal-ground window with three hair-2 dots in its bar, using the four category colours for the ring and Ink 3 for rules. It is captioned as Fig. 2.
 
-### Terminal Render
-The `macsafe` dashboard as real preformatted text in a system monospace (chosen for accurate box-drawing metrics) inside a window with traffic lights and a Terminal Titlebar. The ring is generated from the CLI's own `donut_cells` geometry: each cell is painted with its top and bottom halves' colours, in the terminal's 256-colour palette (lavender macOS & other, pink app data, blue applications, orange your files). Rules and borders use the dim terminal rule colour. It is also a single `role="img"` with a description.
+### Cross-section figure (signature)
+The disk at its true proportions: hairline ring guides and a tick scale, the inner category ring, the outer folder ring (category hue mixed 42% toward the ground, 10% when selected; unplaced space uses the neutral track), and radial bars for the largest files, one cell per gigabyte, with a "Bar length 1 GB" scale key. The centre readout shows the disk name, total and free space. Labels sit in one justified column per side and never on an arc. Selecting a category greys the others and updates the caption and, in the app, every list below. The hub resets the selection. Transitions run 0.25s on `cubic-bezier(.16,1,.3,1)` and are removed under reduced motion.
 
-### Motion
-The single authored moment is the app mock's disk-bar segments, which grow from 45% to full width over 1.1s on `cubic-bezier(.16, 1, .3, 1)`, staggered 0.06s per segment. It is fully disabled under `prefers-reduced-motion`. State changes (hover colours) are instant, with no transitions.
+### Cut-out (Fig. 4)
+Part of the ring with a dashed (2 3) sector outline where cleared space used to be, labelled with a leader ("6.4 GB freed / Caches cleared"), next to the remaining category label.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** draw structure with 1px Hairline borders and the Ground / Surface / Raise tonal steps.
-- **Do** keep the series colours in their fixed category order and pull them from `MacApp/Sources/Theme.swift`.
-- **Do** make the single primary action an Ink-filled button on graphite, with a Copied state on Status Green.
-- **Do** pair every status colour with a word, as in the dot-plus-label pattern in the safety table.
-- **Do** set headings in Mona Sans 600 at width 106% (112% for the hero) with balanced wrapping and negative tracking.
-- **Do** show the real product (the app window, the terminal output) as the page's imagery, labelled as example data.
-- **Do** break long commands only at explicit `<wbr>` points.
+- **Do** take every data colour from `Theme.swift` Tint pairs, in category order, as a gradient along the arc or bar.
+- **Do** draw free and empty space as the neutral track and dim unselected parts toward grey at about 40%.
+- **Do** label the figure with 0.75px leader lines, a ground halo, and two tiers (semibold name; lighter value with a smaller unit).
+- **Do** number figures as a real sequence with "Fig. n" captions that say "example data" when the data is illustrative.
+- **Do** show safety as line form: solid for undo, dashed for warns first, struck for refused, hatched for review first.
+- **Do** keep one glossy blue action per screen and keep its white label at 4.5:1 or better.
+- **Do** keep the drive credit under Fig. 1 when the drive renders, and the full CC BY 4.0 attribution in the footer always.
+- **Do** let the figure degrade to the SVG on no WebGL, a load failure or reduced motion, with nothing left invisible.
 
 ### Don't:
-- **Don't** add a grid, dot or noise background behind the page or hero.
-- **Don't** set facts, labels, table headers or metadata in monospace. Mono is for code, commands and the terminal render.
-- **Don't** introduce a brand colour, gradient or tinted section outside the app's data palette.
-- **Don't** put shadows on page panels, cards or buttons. Only product renders are lifted.
-- **Don't** add more motion than the disk-bar settle. No scroll reveals and no hover lifts.
-- **Don't** use white small text on Disk Blue in page UI. That pairing belongs to the faithful app reproduction only.
-- **Don't** use illustrative or playful metaphors (boxes, labels, consoles) or centred-column download-page tropes like checkmark feature lists.
-- **Don't** use text lighter than Ink Faint on the graphite ground.
+- **Don't** add HUD chrome, corner brackets, scanlines, or sci-fi copy around the figure.
+- **Don't** set labels in ALL-CAPS with tracking, or put a kicker above a heading.
+- **Don't** echo DaisyDisk: no rainbow hue rotation, no rings beyond the two plus file bars, no circled total badge as the hero, no royal-blue radial page gradient, no tilted stacked screenshots.
+- **Don't** tint free space or empty tracks with a hue, or dim a part by lowering a hue's alpha over navy.
+- **Don't** put labels on arcs, or fade or mask the drive model.
+- **Don't** use the tile tints (purple, pink, teal) as data colours.
+- **Don't** add shadows to page panels, lists or tables.
+- **Don't** call MacSafe "open source"; say "The source is on GitHub".
 
 ### Known debt (not rules)
-- At 390px wide, the hero install command wraps after the hyphen in "gabrielesarria167-" instead of at a `<wbr>` point.
-- The safety-table column headers are set in uppercase Fragment Mono with tracking, and the step counters use mono numerals. Both break the Mono Means Code Rule and should move to Mona Sans.
-- Definition-list terms and `kbd` chips use `ui-monospace` instead of Fragment Mono. They should be unified onto Fragment Mono. The terminal render's system mono is intentional.
-- The stylesheet's opening comment still describes a "hairline-grid hero". There is no grid, so the comment is stale.
+- Site stylesheet leftovers: an unused `.more .btn` rule, and the terminal's category colours declared twice (once by variable, once by literal hex).

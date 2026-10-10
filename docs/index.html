@@ -5,575 +5,1376 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MacSafe: see where your Mac's disk space went</title>
 <meta name="description" content="A free Mac app and terminal dashboard that show where your storage went, folder by folder, and help you clear it safely. Install with one Terminal command.">
-<meta name="theme-color" content="#0a0b0d">
+<meta name="theme-color" content="#0c1220">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='fb' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232d4fd6'/%3E%3Cstop offset='1' stop-color='%230d1450'/%3E%3C/linearGradient%3E%3ClinearGradient id='fg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.4'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='.08'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22.5' fill='url%28%23fb%29'/%3E%3Cpath d='M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z' fill='url%28%23fg%29'/%3E%3Cg fill='none' stroke-width='7' stroke-linejoin='round'%3E%3Cpath d='M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z' pathLength='100' stroke-dasharray='20.4 100' stroke-dashoffset='-0.8' stroke='%234da3ff'/%3E%3Cpath d='M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z' pathLength='100' stroke-dasharray='13.4 100' stroke-dashoffset='-22.8' stroke='%23ff7a45'/%3E%3Cpath d='M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z' pathLength='100' stroke-dasharray='21.4 100' stroke-dashoffset='-37.8' stroke='%232fd49a'/%3E%3Cpath d='M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z' pathLength='100' stroke-dasharray='16.4 100' stroke-dashoffset='-60.8' stroke='%23ffc233'/%3E%3Cpath d='M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z' pathLength='100' stroke-dasharray='20.4 100' stroke-dashoffset='-78.8' stroke='%23fff' stroke-opacity='.25'/%3E%3C/g%3E%3Cpath d='M38.5 50 L46.5 58.5 L62 41' fill='none' stroke='%23fff' stroke-width='8.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,400..800&family=Fragment+Mono&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: a hero with the real app window, then label-column sections; the terminal dashboard sits in the second section. */
-:root {
-  --b-bg: #0a0b0d; --b-surface: #111316; --b-raise: #16191d; --b-line: #22262c;
-  --b-fg: #eceef1; --b-muted: #8d939c; --b-faint: #7c838e; --b-good: #3fb950; --b-warn: #e3a008; --b-bad: #f0645a;
-  /* app window, dark appearance (values from MacApp/Sources/Theme.swift) */
-  --wd-bg: #1f1f21; --wd-side: #2a292d; --wd-card: #28282b; --wd-line: #38383c; --wd-fg: #ececef; --wd-muted: #98989e; --wd-btn: #3a3a3e; --wd-edge: rgba(255,255,255,.1);
-  --wd-s1: #4da3ff; --wd-s2: #ff7a45; --wd-s3: #2fd49a; --wd-s4: #ffc233; --wd-track: rgba(255,255,255,.08);
-  --wd-glass: rgba(255,255,255,.045); --wd-glass-edge: rgba(255,255,255,.09); --wd-freeable: #2fd49a;
-  --traffic-r: #ff5f57; --traffic-y: #febc2e; --traffic-g: #28c840;
-  --f-b: "Mona Sans", "Helvetica Neue", Arial, sans-serif;
-  --f-b-mono: "Fragment Mono", ui-monospace, Menlo, monospace;
-  --f-sys: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+:root{
   color-scheme: dark;
+  --ground:#0c1220;
+  --ground-2:#111a2b;
+  --ground-3:#162238;
+  --hair:#1d2940;
+  --hair-2:#2a3a58;
+  --steel:#5b77a3;
+  --steel-2:#8fa3c6;
+  --ink:#eef1f6;
+  --ink-2:#b4bfd1;
+  --ink-3:#97a3b8;
+  --c-apps:#4da3ff;
+  --c-files:#ff7a45;
+  --c-appdata:#2fd49a;
+  --c-system:#ffc233;
+  --focus:#8cc2ff;
+  --font:"Hanken Grotesk", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
 }
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body { margin: 0; background: var(--b-bg); padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
-p, h1, h2, h3, ol, ul, figure, pre, dl, dd { margin: 0; }
-img { max-width: 100%; }
-svg.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-.mark { width: 1.15em; height: 1.15em; flex: none; }
-.b-sec { scroll-margin-top: 2rem; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+*{box-sizing:border-box}
+html{background:#0c1220;color:#eef1f6;-webkit-text-size-adjust:100%;scroll-behavior:smooth;scrollbar-color:var(--hair-2) var(--ground)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:#0c1220;color:#eef1f6;font-family:var(--font);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+::selection{background:rgba(77,163,255,.38);color:#fff}
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:var(--ground)}
+::-webkit-scrollbar-thumb{background:var(--hair-2);border-radius:8px;border:3px solid var(--ground)}
+a{color:var(--ink);text-decoration-color:var(--steel);text-underline-offset:.22em;text-decoration-thickness:1px}
+a:hover{text-decoration-color:var(--ink)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:4px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+p code{color:var(--ink);background:var(--ground-3);padding:.08em .35em;border-radius:4px}
+.wrap{max-width:1360px;margin:0 auto;padding:0 40px}
+@media (max-width:720px){.wrap{padding:0 18px}}
 
-/* =========================================================
-   APP WINDOW (shared). 1em = 13px at full size (1100px wide).
-   ========================================================= */
-.win-wrap { container-type: inline-size; min-width: 0; }
-.win {
-  --u: clamp(5px, calc(100cqw / 84.6), 13px);
-  font: 400 var(--u)/1.35 var(--f-sys); letter-spacing: 0;
-  display: grid; grid-template-columns: 17.2em minmax(0, 1fr);
-  border-radius: .85em; overflow: hidden; background: var(--w-bg); color: var(--w-fg);
-  box-shadow: 0 2.4em 5em -1.8em rgba(0, 0, 0, .38), 0 0 0 1px var(--w-edge);
-  text-align: left; user-select: none;
-}
-.win.dark { --w-bg: var(--wd-bg); --w-side: var(--wd-side); --w-card: var(--wd-card); --w-line: var(--wd-line); --w-fg: var(--wd-fg); --w-muted: var(--wd-muted); --w-btn: var(--wd-btn); --w-edge: var(--wd-edge); --s1: var(--wd-s1); --s2: var(--wd-s2); --s3: var(--wd-s3); --s4: var(--wd-s4); --track: var(--wd-track); }
-.w-side { background: var(--w-side); padding: 1em .6em 1.1em; display: flex; flex-direction: column; gap: 1.1em; border-right: 1px solid var(--w-line); }
-.w-lights { display: flex; gap: .6em; padding-left: .4em; }
-.w-lights i { width: 1em; height: 1em; border-radius: 50%; background: var(--traffic-r); }
-.w-lights i:nth-child(2) { background: var(--traffic-y); }
-.w-lights i:nth-child(3) { background: var(--traffic-g); }
-.w-nav { list-style: none; padding: 0; display: grid; gap: .12em; }
-.w-nav .sec { font-size: .82em; font-weight: 600; color: var(--w-muted); padding: .8em .6em .3em; }
-.w-nav .sec:first-child { padding-top: 0; }
-.w-nav li:not(.sec) { display: flex; align-items: center; gap: .7em; padding: .3em .45em; border-radius: .62em; border: 1px solid transparent; }
-.w-nav li.on { background: linear-gradient(90deg, rgba(77,163,255,.32), rgba(77,163,255,.14)); border-color: rgba(77,163,255,.4); font-weight: 600; }
-.w-nav .bdg { margin-left: auto; font-size: .78em; font-weight: 600; color: var(--wd-freeable); background: rgba(47,212,154,.16); border-radius: 1em; padding: .08em .55em; font-variant-numeric: tabular-nums; }
-.tile { width: 1.55em; height: 1.55em; border-radius: .42em; flex: none; display: grid; place-items: center; color: #fff; background: linear-gradient(var(--ta), var(--tb)); box-shadow: inset 0 0 0 .06em rgba(255,255,255,.28), 0 .15em .35em -.05em color-mix(in srgb, var(--tb) 45%, transparent); }
-.tile svg { width: 60%; height: 60%; stroke-width: 2.4; }
-.tile.lg { width: 2.3em; height: 2.3em; border-radius: .62em; }
-.t-blue { --ta: #4da3ff; --tb: #2f6fe8; } .t-orange { --ta: #ff7a45; --tb: #e8502a; } .t-green { --ta: #2fd49a; --tb: #14a877; }
-.t-yellow { --ta: #ffc233; --tb: #f09a12; } .t-purple { --ta: #9b7bff; --tb: #6a4ae0; } .t-pink { --ta: #ff5c8a; --tb: #e0346a; }
-.t-teal { --ta: #3ccfe0; --tb: #1596b8; }
-.w-foot { margin-top: auto; padding: .9em .5em 0; display: grid; gap: .55em; font-size: .95em; }
-.w-foot .hd { display: flex; align-items: center; gap: .5em; font-weight: 500; }
-.w-foot .hd svg { font-size: 1.2em; color: var(--w-muted); }
-.w-strip { display: flex; gap: .12em; height: .46em; }
-.w-strip i { border-radius: 1em; background: linear-gradient(var(--ta), var(--tb)); }
-.w-strip i:last-child { background: var(--track); }
-.w-foot small { font-size: .88em; color: var(--w-muted); }
-.w-main { position: relative; isolation: isolate; display: grid; grid-template-rows: 3.8em minmax(0, 1fr); min-width: 0; }
-/* the app's soft glows: blue low left, purple top right, green low right */
-.w-main::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(30em 30em at 14% 88%, rgba(53,103,255,.26), transparent 70%), radial-gradient(28em 28em at 88% 6%, rgba(155,90,255,.16), transparent 70%), radial-gradient(26em 26em at 92% 82%, rgba(47,212,154,.11), transparent 70%); }
-.w-tool { display: flex; align-items: center; justify-content: space-between; padding: 0 1.7em; border-bottom: 1px solid var(--w-line); font-weight: 700; font-size: 1.1em; color: var(--w-muted); }
-.w-tool small { font-size: .78em; font-weight: 500; }
-.w-content { padding: 1.4em 2.4em 2em; display: grid; gap: 1.7em; align-content: start; overflow: hidden; min-width: 0; }
-.w-hero { display: grid; grid-template-columns: auto minmax(0, 1fr) 22em; gap: 2.4em; align-items: center; }
-.w-ring { position: relative; width: 14.5em; height: 14.5em; }
-.w-ring::before { content: ""; position: absolute; inset: -2.6em; border-radius: 50%; background: radial-gradient(closest-side, rgba(53,103,255,.35) 30%, rgba(155,90,255,.12) 65%, transparent); }
-.w-ring svg { position: relative; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; filter: drop-shadow(0 0 1em rgba(53,103,255,.35)); }
-.w-ring circle { fill: none; stroke-width: 13; }
-.w-ring .c { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: .1em; }
-.w-ring .c b { font-size: 2em; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.w-ring .c small { font-size: .9em; color: var(--w-muted); }
-.w-head b { display: block; font-size: 2.45em; font-weight: 700; line-height: 1.12; letter-spacing: -.01em; }
-.w-head b em { font-style: normal; color: var(--wd-freeable); }
-.w-head p { color: var(--w-muted); font-size: 1.05em; margin-top: .75em; }
-.w-gloss { display: inline-block; margin-top: 1.25em; color: #fff; font-weight: 600; font-size: 1.05em; padding: .6em 1.5em; border-radius: 2em; background: linear-gradient(#5b97ff, #2f5fe0); box-shadow: inset 0 0 0 .06em rgba(255,255,255,.3), 0 .4em .8em -.15em rgba(50,100,240,.4); }
-.w-legend { list-style: none; padding: .45em; display: grid; gap: .05em; background: var(--wd-glass); border: 1px solid var(--wd-glass-edge); border-radius: 1.2em; }
-.w-legend li { display: grid; grid-template-columns: .8em minmax(0, 1fr) auto 2.5em; align-items: center; gap: .75em; padding: .5em .75em; }
-.w-legend i { width: .8em; height: .8em; border-radius: .22em; background: var(--c); box-shadow: 0 .05em .35em color-mix(in srgb, var(--c) 60%, transparent); }
-.w-legend .z { font-variant-numeric: tabular-nums; }
-.w-legend .p { font-size: .85em; color: var(--w-muted); text-align: right; font-variant-numeric: tabular-nums; }
-.w-card { background: rgba(40,40,43,.62); border: 1px solid var(--wd-glass-edge); border-radius: 1.15em; padding: 1.15em 1.4em; display: grid; gap: .5em; align-content: start; min-width: 0; }
-.w-card .hd { display: flex; justify-content: space-between; align-items: baseline; gap: 1em; }
-.w-card .hd b { font-weight: 700; font-size: 1.08em; }
-.w-card .hd > span, .w-card .hd small { color: var(--w-muted); font-size: .9em; }
-.w-card .hd small { display: block; }
-.w-card .hd a { color: var(--wd-s1); text-decoration: none; }
-.w-finds { list-style: none; padding: 0; }
-.w-finds li { display: grid; grid-template-columns: 2.3em minmax(0, 1fr) 13em 5.6em 8.4em; gap: 1.1em; align-items: center; padding: .75em 0; }
-.w-finds li + li { background: linear-gradient(var(--w-line), var(--w-line)) 3.4em 0 / 100% 1px no-repeat; }
-.w-finds .tt { min-width: 0; }
-.w-finds .tt b { display: block; font-weight: 500; }
-.w-finds .tt small { display: block; color: var(--w-muted); font-size: .88em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.w-sb { height: .42em; border-radius: 1em; background: var(--track); overflow: hidden; }
-.w-sb i { display: block; height: 100%; min-width: .42em; border-radius: 1em; background: linear-gradient(90deg, var(--tb), var(--ta)); }
-.w-finds .z { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
-.w-pill { justify-self: end; font-size: .95em; font-weight: 500; padding: .28em .95em; border-radius: 2em; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); white-space: nowrap; }
-.w-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2em; }
-.w-rows { list-style: none; padding: 0; display: grid; gap: .7em; margin-top: .4em; }
-.w-rows.f li { display: grid; grid-template-columns: 1.5em 7.5em minmax(0, 1fr) 4.8em; gap: .8em; align-items: center; }
-.w-fold { width: 1.45em; height: 1.1em; border-radius: .2em; background: linear-gradient(#8fd0ff, #4fa9ee); }
-.w-rows .z { text-align: right; font-variant-numeric: tabular-nums; }
-.w-rows.l li { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) auto; gap: .8em; align-items: center; }
-.w-doc { width: 1.35em; height: 1.65em; border-radius: .2em; background: linear-gradient(#f4f4f6, #d6d6dc); }
-.w-rows.l span { display: grid; min-width: 0; }
-.w-rows.l span b { font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.w-rows.l small { font-size: .85em; color: var(--w-muted); }
-@container (max-width: 620px) {
-  .win { --u: calc(100cqw / 46); grid-template-columns: minmax(0, 1fr); }
-  .w-side { display: none; }
-  .w-content { padding: 1.4em 1.5em 1.6em; }
-  .w-hero { grid-template-columns: auto minmax(0, 1fr); gap: 1.6em 2em; }
-  .w-ring { width: 12em; height: 12em; }
-  .w-head b { font-size: 2em; }
-  .w-legend { grid-column: 1 / -1; }
-  .w-finds li { grid-template-columns: 2.3em minmax(0, 1fr) auto; }
-  .w-finds .w-sb, .w-finds .w-pill { display: none; }
-  .w-cols { grid-template-columns: minmax(0, 1fr); }
-  .w-cols .w-card:last-child { display: none; }
-  .w-tool::before { content: ""; width: 3.6em; height: 1em; margin-right: 1.2em; background: radial-gradient(circle at .5em 50%, var(--traffic-r) .45em, transparent .5em), radial-gradient(circle at 1.8em 50%, var(--traffic-y) .45em, transparent .5em), radial-gradient(circle at 3.1em 50%, var(--traffic-g) .45em, transparent .5em); }
-  .w-tool { justify-content: flex-start; }
-  .w-tool small { margin-left: auto; }
-}
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 0;position:relative;z-index:2}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:18px;text-decoration:none;letter-spacing:-.01em}
+.brand svg{width:26px;height:26px}
+.top nav{display:flex;gap:28px;font-size:15px}
+.top nav a{text-decoration:none;color:var(--ink-2)}
+.top nav a:hover{color:var(--ink)}
+@media (max-width:720px){.top nav a.opt{display:none}}
 
-/* =========================================================
-   B · DEVELOPER TOOL
-   ========================================================= */
-.vb { --gut: max(16px, 4vw); background: var(--b-bg); color: var(--b-fg); font: 400 1rem/1.6 var(--f-b); padding-block: 0 7rem; color-scheme: dark; }
-.vb ::selection { background: var(--wd-s1); color: #fff; }
-.vb a { color: var(--b-fg); text-underline-offset: .2em; text-decoration-color: var(--b-faint); }
-.vb a:hover { text-decoration-color: var(--b-fg); }
-.vb :focus-visible { outline: 2px solid var(--wd-s1); outline-offset: 3px; border-radius: 4px; }
-.vb .in { max-width: 74rem; margin-inline: auto; padding-inline: var(--gut); }
-.vb h1, .vb h2, .vb h3 { text-wrap: balance; font-weight: 600; letter-spacing: -.025em; font-stretch: 106%; }
-.vb .mono { font-family: var(--f-b-mono); }
-.b-nav .in { display: flex; align-items: center; gap: 1.6rem; height: 3.6rem; font-size: .88rem; border-bottom: 1px solid var(--b-line); }
-.b-nav .brand { font-weight: 600; font-size: 1rem; text-decoration: none; margin-right: auto; display: flex; align-items: center; gap: .55rem; letter-spacing: -.01em; }
-.b-nav a:not(.brand) { color: var(--b-muted); text-decoration: none; }
-.b-nav a:not(.brand):hover { color: var(--b-fg); }
-.b-hero { position: relative; padding-top: clamp(3.5rem, 8vw, 6.5rem); }
-.b-hero .in { position: relative; display: grid; gap: 1.6rem; }
-.b-hero h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 1.02; letter-spacing: -.035em; font-stretch: 112%; max-width: 15ch; }
-.b-lede { font-size: clamp(1.05rem, 1.5vw, 1.2rem); color: var(--b-muted); max-width: 40rem; line-height: 1.55; }
-.b-lede b { color: var(--b-fg); font-weight: 500; }
-.b-cmd { display: flex; align-items: center; gap: .8rem; max-width: 48rem; background: var(--b-surface); border: 1px solid var(--b-line); border-radius: 10px; padding: .45rem .45rem .45rem 1rem; min-width: 0; }
-.b-cmd pre { flex: 1; min-width: 0; font: 400 .82rem/1.5 var(--f-b-mono); color: var(--b-fg); white-space: pre-wrap; overflow-wrap: normal; word-break: normal; padding-block: .35rem; }
-.b-cmd pre::before { content: "$ "; color: var(--b-faint); }
-.b-copy { display: inline-flex; align-items: center; gap: .4rem; font: 500 .82rem/1 var(--f-b); color: var(--b-bg); background: var(--b-fg); border: 0; border-radius: 7px; padding: .55rem .8rem; cursor: pointer; min-width: 5.4rem; justify-content: center; }
-.b-copy:hover { background: #ffffff; }
-.b-copy.done { background: var(--b-good); }
-.b-get { display: grid; grid-template-columns: minmax(0, 48rem) auto; gap: 1rem 1.25rem; align-items: start; justify-content: start; }
-.b-opt { display: grid; gap: .5rem; min-width: 0; align-content: start; }
-.b-opt > span { font-size: .8rem; color: var(--b-faint); }
-.b-opt > p { font-size: .82rem; color: var(--b-muted); }
-.b-opt .b-cmd { max-width: none; }
-.b-dlp { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 3.05rem; padding: 0 1.15rem; border-radius: 10px; background: var(--b-raise); border: 1px solid var(--b-line); color: var(--b-fg); font-weight: 500; font-size: .92rem; text-decoration: none; white-space: nowrap; }
-.vb a.b-dlp { text-decoration: none; }
-.b-dlp:hover { border-color: var(--b-faint); background: #1c2025; }
-.b-meta { display: flex; flex-wrap: wrap; gap: .35rem 0; font: 400 .88rem/1.4 var(--f-b); color: var(--b-muted); list-style: none; padding: 0; }
-.b-meta li + li::before { content: "·"; margin: 0 .7rem; color: var(--b-faint); }
-.b-stage { margin-top: clamp(3rem, 6vw, 4.5rem); }
-.b-stage figcaption, .term-wrap figcaption { margin-top: 1rem; font-size: .82rem; color: var(--b-faint); }
-.term-wrap figcaption code { font-size: .8rem; }
-.b-two-col { display: grid; gap: 1.5rem; min-width: 0; }
-.b-two-col .term-wrap { max-width: 580px; }
+/* glossy primary, as the app's GlossyButtonStyle */
+.glossy{appearance:none;border:.75px solid transparent;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;color:#fff;font:600 16px var(--font);padding:12px 24px;text-decoration:none;
+  background:linear-gradient(#5b97ff,#3a6aec 45%,#2f5fe0) padding-box,linear-gradient(rgba(255,255,255,.45),rgba(255,255,255,.08)) border-box;
+  box-shadow:0 6px 14px -4px rgba(50,100,240,.36),0 2px 10px rgba(50,100,240,.2);transition:box-shadow .15s var(--ease),filter .15s var(--ease)}
+.glossy:hover{filter:brightness(1.1);box-shadow:0 8px 18px -4px rgba(50,100,240,.5),0 2px 12px rgba(50,100,240,.3)}
+.glossy:active{filter:brightness(.88)}
+.glossy svg{width:17px;height:17px}
 
-/* terminal */
-.term-wrap { container-type: inline-size; min-width: 0; }
-.term { background: #0e1014; border: 1px solid #2a2f37; border-radius: 10px; overflow: hidden; box-shadow: 0 16px 32px -14px rgba(0,0,0,.75); }
-.term-bar { display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; background: #1a1d22; border-bottom: 1px solid #2a2f37; font: 500 11px/1 var(--f-sys); color: #8b929c; }
-.term-bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--traffic-r); }
-.term-bar i:nth-child(2) { background: var(--traffic-y); }
-.term-bar i:nth-child(3) { background: var(--traffic-g); }
-.term-bar span { margin-left: auto; margin-right: auto; padding-right: 40px; }
-.term pre { font: 400 clamp(5px, calc((100cqw - 2px) / 73.5 / .602), 13px)/1.18 ui-monospace, "SF Mono", Menlo, "DejaVu Sans Mono", "Cascadia Mono", Consolas, monospace; color: #d8dde6; padding: .9em 1em 1em; white-space: pre; overflow: hidden; user-select: none; }
-.term .mut { color: #7f8896; } .term .fnt { color: #4b525e; } .term .rul { color: #2d333c; } .term .b { color: #eef1f5; font-weight: 500; }
-.term .acc { color: var(--wd-s1); } .term .on { background: var(--wd-s1); color: #fff; } .term .good { color: #3fb950; }
-.term .key { background: #262b33; color: #eef1f5; }
-.term .d { display: inline-block; width: 1ch; height: 1.18em; vertical-align: top; }
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:20px 28px;align-items:start;padding:28px 0 24px;position:relative}
+.lead{padding-top:64px;position:relative;z-index:1}
+h1{font-size:clamp(2.5rem,4.1vw,3.6rem);line-height:1.04;letter-spacing:-.03em;font-weight:600;margin:0 0 22px;text-wrap:balance}
+.lede{color:var(--ink-2);font-size:19px;line-height:1.5;margin:0 0 30px;max-width:34ch}
+.facts{font-size:14.5px;color:var(--ink-3);margin:14px 0 26px}
+.cmd-label{font-size:14px;color:var(--ink-2);margin:0 0 8px;display:block}
+.cmd{display:flex;align-items:stretch;border:1px solid var(--hair-2);border-radius:12px;background:rgba(17,26,43,.82);overflow:hidden}
+.cmd code{flex:1;padding:13px 14px;font-size:13.5px;line-height:1.5;color:var(--ink);white-space:normal;word-break:keep-all;overflow-wrap:normal;user-select:all}
+.cmd .nw{white-space:nowrap}
+.copy{appearance:none;border:0;border-left:1px solid var(--hair-2);background:transparent;color:var(--ink);font:500 14px var(--font);padding:0 16px;cursor:pointer;display:flex;align-items:center;gap:7px;min-width:84px;justify-content:center;transition:background-color .15s var(--ease)}
+.copy:hover{background:var(--ground-3)}
+.copy:active{background:var(--hair)}
+.copy svg{width:15px;height:15px}
+.copy:focus-visible{outline-offset:-3px;border-radius:0 11px 11px 0}
+.cmd-note{font-size:14px;color:var(--ink-3);margin:9px 0 0;min-height:1.4em}
+.cmd-note[data-state=ok]{color:var(--c-appdata)}
+@media (max-width:720px){.cmd code{font-size:12.5px;padding:12px}}
 
-.b-sec { margin-top: clamp(5.5rem, 10vw, 8.5rem); }
-.b-sec .in { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr); gap: 2rem clamp(2rem, 5vw, 4.5rem); }
-.b-sec .lab { display: grid; gap: .8rem; align-content: start; }
-.b-sec .lab h2 { font-size: clamp(1.6rem, 2.8vw, 2.1rem); line-height: 1.1; }
-.b-sec .lab p { color: var(--b-muted); font-size: .95rem; }
-.b-duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--b-line); border-radius: 12px; overflow: hidden; }
-.b-duo > div { padding: 1.6rem 1.6rem 1.7rem; display: grid; gap: .7rem; align-content: start; background: var(--b-surface); }
-.b-duo > div + div { border-left: 1px solid var(--b-line); }
-.b-duo h3 { font-size: 1.15rem; letter-spacing: -.02em; }
-.b-duo p { color: var(--b-muted); font-size: .95rem; }
-.b-duo dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .45rem 1rem; font-size: .88rem; margin-top: .4rem; }
-.b-duo dt { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .82rem; color: var(--b-fg); white-space: nowrap; }
-.b-duo dd { color: var(--b-muted); }
-.b-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2.5rem; border-top: 1px solid var(--b-line); }
-.b-list li { display: grid; grid-template-columns: 1.3rem minmax(0, 1fr); align-content: start; gap: .15rem .8rem; padding-block: 1.05rem; border-bottom: 1px solid var(--b-line); }
-.b-list svg { font-size: 1.05rem; color: var(--b-muted); margin-top: .22rem; grid-row: span 2; stroke-width: 1.7; }
-.b-list b { font-weight: 500; }
-.b-list span { color: var(--b-muted); font-size: .92rem; }
-.b-table { width: 100%; border-collapse: collapse; font: 400 .92rem/1.5 var(--f-b); color: var(--b-fg); }
-.b-tablewrap { overflow-x: auto; border: 1px solid var(--b-line); border-radius: 12px; }
-.b-table th, .b-table td { text-align: left; padding: .85rem 1.1rem; border-bottom: 1px solid var(--b-line); vertical-align: top; }
-.b-table tr:last-child td { border-bottom: 0; }
-.b-table th { font: 500 .74rem/1.2 var(--f-b-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--b-faint); background: var(--b-surface); }
-.b-table td:first-child { font-weight: 500; white-space: nowrap; }
-.b-table kbd { font: 400 .78rem ui-monospace, "SF Mono", Menlo, monospace; color: var(--b-fg); background: var(--b-raise); border: 1px solid var(--b-line); border-radius: 5px; padding: .08rem .38rem; margin-left: .35rem; }
-.st { display: inline-flex; align-items: center; gap: .45rem; color: var(--b-muted); white-space: nowrap; }
-.st::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--dot); }
-.st.g { --dot: var(--b-good); } .st.w { --dot: var(--b-warn); } .st.r { --dot: var(--b-bad); }
-.b-note { color: var(--b-muted); font-size: .9rem; margin-top: 1rem; }
-.b-steps { list-style: none; padding: 0; counter-reset: s; display: grid; gap: 0; border-left: 1px solid var(--b-line); }
-.b-steps li { counter-increment: s; position: relative; padding: 0 0 1.6rem 2rem; display: grid; gap: .25rem; }
-.b-steps li::before { content: counter(s); position: absolute; left: -.8rem; top: -.05rem; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--b-bg); border: 1px solid var(--b-line); font: 500 .75rem/1.5rem var(--f-b-mono); text-align: center; color: var(--b-muted); }
-.b-steps b { font-weight: 500; }
-.b-steps p { color: var(--b-muted); font-size: .94rem; }
-.vb code { font: 400 .86em var(--f-b-mono); color: var(--b-fg); background: var(--b-raise); border: 1px solid var(--b-line); border-radius: 5px; padding: .05rem .35rem; }
-.b-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 2rem; }
-.b-cards section { border: 1px solid var(--b-line); border-radius: 12px; padding: 1.5rem; display: grid; gap: .9rem; align-content: start; background: var(--b-surface); min-width: 0; }
-.b-cards h3 { font-size: 1.1rem; }
-.b-cards p, .b-cards li { color: var(--b-muted); font-size: .93rem; }
-.b-cards strong { color: var(--b-fg); font-weight: 500; }
-.b-cards ol { padding-left: 1.2rem; display: grid; gap: .4rem; }
-.b-cards .b-cmd { max-width: none; flex-wrap: wrap; padding: .45rem; }
-.b-cards .b-cmd pre { font-size: .76rem; flex-basis: 100%; padding-inline: .55rem; }
-.b-cards .b-copy { margin-left: auto; }
-.b-dl { justify-self: start; display: inline-flex; align-items: center; gap: .5rem; font-weight: 500; font-size: .88rem; text-decoration: none; border: 1px solid var(--b-line); background: var(--b-raise); border-radius: 8px; padding: .55rem .9rem; }
-.b-dl:hover { border-color: var(--b-faint); }
-.b-foot .in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 2rem; margin-top: clamp(5rem, 9vw, 7rem); padding-block: 1.6rem; border-top: 1px solid var(--b-line); font-size: .82rem; color: var(--b-muted); }
-@media (max-width: 900px) {
-  .b-sec .in { grid-template-columns: minmax(0, 1fr); }
-  .b-nav .hide-s { display: none; }
+.figure{margin:0 -24px 0 0;min-width:0;position:relative}
+.stage{position:relative;isolation:isolate}
+.stage .glows{position:absolute;inset:-6% -4% -6% -4%;pointer-events:none;z-index:-1}
+.stage .glows i{position:absolute;border-radius:50%;filter:blur(110px)}
+.stage .glows .gb{width:46%;aspect-ratio:1;left:4%;top:48%;background:rgba(53,102,232,.28)}
+.stage .glows .gp{width:42%;aspect-ratio:1;left:58%;top:-8%;background:rgba(155,123,255,.16)}
+.stage .glows .gg{width:38%;aspect-ratio:1;left:62%;top:52%;background:rgba(47,212,154,.12)}
+#hdd{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0}
+.stage.is-3d #hdd{opacity:1}
+.fig-svg{display:block;width:100%;height:auto;overflow:visible;font-family:var(--font);-webkit-user-select:none;user-select:none;position:relative;transition:opacity .6s var(--ease)}
+.stage.pending .fig-svg,.stage.is-3d:not(.handoff) .fig-svg{opacity:0}
+.figure .fig-cap,.figure .credit{max-width:640px;margin-left:auto;margin-right:0}
+.fig-cap{font-size:15px;line-height:1.55;color:var(--ink-2);margin-top:6px;padding-top:14px;border-top:1px solid var(--hair);min-height:5.2em}
+.fig-cap b{color:var(--ink);font-weight:600;margin-right:.4em}
+.fig-cap .reset{appearance:none;background:none;border:0;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-decoration-color:var(--steel);text-underline-offset:.22em;cursor:pointer}
+.credit{display:none;font-size:13px;color:var(--ink-3);margin-top:8px;margin-bottom:0}
+.stage.is-3d ~ .credit{display:block}
+.credit a{color:var(--ink-3)}
+.key{display:none;list-style:none;margin:14px 0 0;padding:0;border-top:1px solid var(--hair)}
+.key button{appearance:none;width:100%;display:grid;grid-template-columns:14px 1fr auto 44px;gap:12px;align-items:center;background:none;border:0;border-bottom:1px solid var(--hair);color:var(--ink);font:15px var(--font);padding:11px 2px;text-align:left;cursor:pointer}
+.key button[aria-pressed=true]{background:var(--ground-2)}
+.key .sw{width:10px;height:10px;border-radius:50%}
+.key .gb{font-variant-numeric:tabular-nums}
+.key .gb small{font-size:12px;color:var(--ink-3);margin-left:2px}
+.key .pc{color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:1060px){
+  .hero{grid-template-columns:1fr;padding-top:12px}
+  .lead{padding-top:16px;max-width:560px}
+  .figure{margin-right:0}
 }
-@media (max-width: 640px) {
-  .b-duo, .b-list, .b-cards { grid-template-columns: minmax(0, 1fr); }
-  .b-duo > div + div { border-left: 0; border-top: 1px solid var(--b-line); }
+@media (max-width:720px){
+  .fig-svg .lbls,.fig-svg .scale,.fig-svg .tick-lbl{display:none}
+  .key{display:block}
+  .figure .fig-cap,.figure .credit{margin-left:0;max-width:none}
+  h1{font-size:2.35rem}
+  .lede{font-size:18px}
 }
+/* the figure (shared) */
+.ring-hair{fill:none;stroke:rgba(160,176,205,.28);stroke-width:1}
+.tick{stroke:rgba(160,176,205,.45);stroke-width:1}
+.tick.major{stroke:rgba(190,204,228,.75)}
+.tick-lbl{fill:#8f9bb0;font-size:16.5px}
+.cat{cursor:pointer;outline:none;transition:opacity .25s cubic-bezier(.16,1,.3,1),filter .25s cubic-bezier(.16,1,.3,1)}
+.cat .hit{fill:transparent}
+.cat .inner{transition:filter .25s cubic-bezier(.16,1,.3,1)}
+.cat .free-arc{fill:rgba(255,255,255,.09)}
+.cat .folds{transition:filter .25s cubic-bezier(.16,1,.3,1)}
+.cat .fring{fill:none;stroke:#9cc4ff;stroke-width:2.5;opacity:0}
+.cat:focus-visible .fring{opacity:1}
+.cat:hover .inner{filter:brightness(1.1)}
+/* unselected parts fall back toward the neutral track, never toward a darker version of their hue */
+svg[data-sel] .cat{filter:grayscale(1);opacity:.4}
+svg[data-sel] .cat.on{filter:none;opacity:1}
+svg[data-sel] .cat.on .inner{filter:drop-shadow(0 0 16px var(--glow))}
+svg[data-sel] .cat.on .folds{filter:brightness(1.55)}
+.ctr{cursor:pointer}.ctr .hit{fill:transparent}
+.ctr-a{fill:#aeb8ca}
+.ctr-b{fill:#eef1f6;font-weight:600;letter-spacing:-.02em}
+.ctr-c{fill:#8f9bb0}
+svg text{font-variant-numeric:tabular-nums}
+.leader-halo{fill:none;stroke:#0c1220;stroke-width:3.5;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.92}
+.leader{fill:none;stroke:rgba(190,200,218,.7);stroke-width:.75;vector-effect:non-scaling-stroke}
+.leader-dot{fill:#c3cce0;stroke:#0c1220;stroke-width:1.5;paint-order:stroke}
+.lbl-a{fill:#eef1f6;font-size:20px;font-weight:600;stroke:#0c1220;stroke-width:4px;stroke-linejoin:round;paint-order:stroke}
+.lbl-b{fill:#b4bfd1;font-size:18.5px;stroke:#0c1220;stroke-width:4px;stroke-linejoin:round;paint-order:stroke}
+.lbl-u{font-size:16.5px;fill:#a3afc3}
+.lbl-x{fill:#a3afc3}
+.scale-line{stroke:#b4bfd1;stroke-width:1.2}
+.scale-lbl{fill:#a3afc3;font-size:16.5px}
+@media (prefers-reduced-motion:reduce){.cat,.cat .inner,.cat .folds{transition:none}}
 
 
-@media (max-width: 640px) {
-  .b-get { grid-template-columns: minmax(0, 1fr); }
-  .b-dlp { justify-self: stretch; }
-  .b-meta { gap: .35rem 1.2rem; }
-  .b-meta li + li::before { content: none; }
-  .b-tablewrap { overflow: visible; }
-  .b-table thead { display: none; }
-  .b-table, .b-table tbody, .b-table tr, .b-table td { display: block; }
-  .b-table tr { padding: .9rem 1rem; border-bottom: 1px solid var(--b-line); }
-  .b-table tr:last-child { border-bottom: 0; }
-  .b-table td { padding: .12rem 0; border: 0; }
-  .b-table td:first-child { white-space: normal; margin-bottom: .35rem; }
-  .b-table td:last-child { color: var(--b-muted); }
+/* the app, on a desktop lit by the hero's light */
+.app-sec{padding:120px 0 0}
+.desktop{position:relative;border-radius:18px;overflow:hidden;background:#0a0f1b;border:1px solid var(--hair);padding:0 0 56px;isolation:isolate}
+.desktop .wall{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.desktop .wall i{position:absolute;border-radius:50%;filter:blur(120px)}
+.desktop .wall .gb{width:52%;aspect-ratio:1;left:-6%;top:40%;background:rgba(53,102,232,.36)}
+.desktop .wall .gp{width:44%;aspect-ratio:1;left:66%;top:-14%;background:rgba(155,123,255,.22)}
+.desktop .wall .gg{width:40%;aspect-ratio:1;left:70%;top:50%;background:rgba(47,212,154,.16)}
+.desktop .wall svg{position:absolute;right:-8%;top:-30%;width:70%;height:auto;opacity:.16}
+.menubar{display:flex;align-items:center;gap:20px;height:30px;padding:0 18px;font:500 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;color:#e6e9ef;background:rgba(10,14,24,.45);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.menubar b{font-weight:700}
+.menubar span{color:#d5d9e2;font-weight:400}
+.menubar .sp{flex:1}
+.desk-fit{width:min(1180px,calc(100% - 64px));margin:44px auto 0;overflow:hidden}
+.desk-scaler{width:1280px;height:800px;transform-origin:0 0}
+.desk-fit.is-narrow{overflow:visible}
+.desk-fit .mac-win.narrow{height:700px}
+.desk-fit .mac-win.narrow .mw-main{min-height:0}
+@media (max-width:720px){
+  .desk-fit{width:calc(100% - 20px);margin-top:12px}
+  .desktop{padding-bottom:10px;border-radius:14px}
+  .menubar{gap:14px;font-size:12px;height:26px;padding:0 12px}
+  .menubar .opt{display:none}
 }
-/* One authored moment: the ring's arcs draw in on load, as in the app. */
-@media (prefers-reduced-motion: no-preference) {
-  .b-stage .w-ring .arc { animation: arc-in 1.2s cubic-bezier(.16, 1, .3, 1) backwards; }
+/* the MacSafe window (shared by the landing page and the app sketch) */
+.mac-win{--w-base:#15181e;--w-side:rgba(33,37,46,.9);--w-bar:rgba(24,27,34,.92);--w-ink:#eceef2;--w-ink2:#a9afba;--w-ink3:#8b919d;--w-hair:rgba(255,255,255,.07);
+  position:relative;width:1280px;height:800px;display:flex;border-radius:12px;overflow:hidden;background:var(--w-base);color:var(--w-ink);
+  font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;font-size:13px;line-height:1.4;text-align:left;
+  box-shadow:0 0 0 .5px rgba(255,255,255,.16),0 30px 80px -12px rgba(0,0,0,.7),0 10px 24px rgba(0,0,0,.35);isolation:isolate}
+.mac-win button{font:inherit;color:inherit}
+.mac-win :focus-visible{outline:2px solid #7fb4ff;outline-offset:1px;border-radius:5px}
+.mac-win .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.mw-side{width:232px;flex:none;background:var(--w-side);-webkit-backdrop-filter:blur(30px) saturate(1.4);backdrop-filter:blur(30px) saturate(1.4);display:flex;flex-direction:column;box-shadow:inset -1px 0 0 rgba(0,0,0,.5),inset -2px 0 0 rgba(255,255,255,.03);position:relative;z-index:2}
+.mw-lights{height:52px;display:flex;align-items:center;gap:8px;padding:0 18px;flex:none}
+.mw-lights i{width:12px;height:12px;border-radius:50%;display:block;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.25)}
+.mw-lights i:nth-child(1){background:#ff5f57}.mw-lights i:nth-child(2){background:#febc2e}.mw-lights i:nth-child(3){background:#28c840}
+.mw-nav{flex:1;overflow:hidden;padding:2px 10px}
+.mw-nav h3{font-size:11px;font-weight:600;color:var(--w-ink3);margin:14px 8px 4px}
+.mw-nav h3:first-child{margin-top:2px}
+.mw-nav ul{list-style:none;margin:0;padding:0}
+.mw-row{width:100%;display:flex;align-items:center;gap:9px;padding:4px 6px;border:1px solid transparent;background:transparent;border-radius:8px;cursor:default;text-align:left;font-size:13px;height:30px}
+.mw-row:hover{background:rgba(255,255,255,.06)}
+.mw-row[aria-current=page]{background:linear-gradient(90deg,rgba(77,163,255,.32),rgba(77,163,255,.14));border-color:rgba(77,163,255,.4);font-weight:600}
+.mw-row .lab{flex:1}
+.tile{width:20px;height:20px;border-radius:5.4px;display:grid;place-items:center;flex:none;position:relative;background:linear-gradient(var(--a),var(--b));box-shadow:0 1.6px 4px color-mix(in srgb,var(--b) 35%,transparent)}
+.tile::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:.75px;background:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,.05));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.tile svg{width:11px;height:11px;fill:#fff}
+.tile.big{width:30px;height:30px;border-radius:8px}
+.tile.big svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.t-blue{--a:#4da3ff;--b:#2f6fe8}.t-orange{--a:#ff7a45;--b:#e8502a}.t-green{--a:#2fd49a;--b:#14a877}.t-yellow{--a:#ffc233;--b:#f09a12}
+.t-purple{--a:#9b7bff;--b:#6a4ae0}.t-pink{--a:#ff5c8a;--b:#e0346a}.t-teal{--a:#3ccfe0;--b:#1596b8}.t-gray{--a:#9a9aa1;--b:#66666d}
+.mw-badge{font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:#2fd49a;background:rgba(47,212,154,.16);padding:1px 6px;border-radius:9px}
+.mw-disk{padding:12px 16px 14px}
+.mw-disk .hd{display:flex;align-items:center;gap:6px;font-weight:500;margin-bottom:8px}
+.mw-disk .hd svg{width:14px;height:14px;stroke:var(--w-ink2);fill:none}
+.mw-strip{display:flex;gap:1.5px;height:6px;margin-bottom:7px}
+.mw-strip span{border-radius:3px}
+.mw-disk .free{color:var(--w-ink2);font-size:11.5px;font-variant-numeric:tabular-nums}
+.mw-disk .sc{display:flex;align-items:center;justify-content:space-between;color:var(--w-ink3);font-size:11.5px;margin-top:6px}
+.mw-icon{appearance:none;border:0;background:transparent;width:24px;height:22px;border-radius:5px;display:grid;place-items:center;color:var(--w-ink2);cursor:default}
+.mw-icon:hover{background:rgba(255,255,255,.08);color:var(--w-ink)}
+.mw-icon svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.mw-main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;overflow:hidden}
+.mw-glows{position:absolute;inset:0;pointer-events:none;z-index:0}
+.mw-glows i{position:absolute;border-radius:50%;filter:blur(110px)}
+.mw-glows .gb{width:460px;height:460px;left:calc(18% - 230px);top:calc(85% - 230px);background:rgba(53,102,232,.28)}
+.mw-glows .gp{width:420px;height:420px;left:calc(85% - 210px);top:calc(10% - 210px);background:rgba(155,123,255,.16)}
+.mw-glows .gg{width:380px;height:380px;left:calc(90% - 190px);top:calc(80% - 190px);background:rgba(47,212,154,.12)}
+.mw-bar{height:52px;flex:none;display:flex;align-items:center;gap:10px;padding:0 16px 0 10px;background:var(--w-bar);box-shadow:0 1px 0 rgba(0,0,0,.45);position:relative;z-index:1}
+.mw-bar h2{font-size:15px;font-weight:600;margin:0 0 0 4px}
+.mw-bar .sp,.mw-card-h .sp{flex:1}
+.mw-bar .ver{color:var(--w-ink3);font-size:11.5px}
+.mw-content{flex:1;overflow:auto;padding:16px 28px 28px;position:relative;z-index:1;scrollbar-color:rgba(255,255,255,.16) transparent}
+.mw-top{display:grid;grid-template-columns:372px 1fr;gap:30px;align-items:start}
+.ov-fig{display:block;width:372px;height:306px;-webkit-user-select:none;user-select:none;font-family:inherit}
+.mw-head h2{font-size:26px;font-weight:700;letter-spacing:-.01em;margin:2px 0 4px}
+.mw-head h2 em{font-style:normal;color:#2fd49a}
+.mw-head > p{margin:0 0 14px;color:var(--w-ink2)}
+.mac-win .glossy{appearance:none;border:.75px solid transparent;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:#fff;font-weight:600;padding:6px 16px;
+  background:linear-gradient(#5b97ff,#3a6aec 45%,#2f5fe0) padding-box,linear-gradient(rgba(255,255,255,.45),rgba(255,255,255,.08)) border-box;
+  box-shadow:0 5px 10px -2px rgba(50,100,240,.36),0 2px 8px rgba(50,100,240,.2);transition:box-shadow .15s cubic-bezier(.16,1,.3,1),filter .15s cubic-bezier(.16,1,.3,1)}
+.mac-win .glossy:hover{filter:brightness(1.1);box-shadow:0 6px 14px -2px rgba(50,100,240,.5),0 2px 10px rgba(50,100,240,.28)}
+.mac-win .glossy:active{filter:brightness(.88)}
+.glass{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:16px}
+.mw-legend-card{margin-top:18px;padding:6px}
+.mw-legend{list-style:none;margin:0;padding:0}
+.mw-legend li{display:grid;grid-template-columns:16px 1fr auto 44px 168px;align-items:center;gap:8px;height:32px;padding:0 10px;border-radius:9px;cursor:pointer}
+.mw-legend li:hover{background:rgba(255,255,255,.05)}
+.mw-legend li[aria-selected=true]{background:rgba(255,255,255,.09)}
+.mw-legend li:focus-visible{outline:2px solid #7fb4ff;outline-offset:-2px}
+.mw-legend .dot{width:9px;height:9px;border-radius:50%}
+.mw-legend .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.mw-legend .v small,.mw-finds .sz small,.mw-tbl small{font-size:10.5px;color:var(--w-ink2);font-weight:500;margin-left:2px}
+.mw-legend .p{text-align:right;color:var(--w-ink3);font-variant-numeric:tabular-nums}
+.mw-legend .w{color:var(--w-ink3);font-size:11.5px;padding-left:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mw-cap{display:flex;gap:16px;align-items:flex-start;color:var(--w-ink2);font-size:12px;line-height:1.45;margin-top:12px;min-height:36px}
+.mw-cap p{margin:0;flex:1}
+.mw-cap b{color:var(--w-ink);font-weight:600}
+.pill{appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);border-radius:999px;padding:3px 12px;font-weight:500;cursor:default;white-space:nowrap}
+.pill:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.24)}
+.pill:active{background:rgba(255,255,255,.18)}
+.pill[hidden]{display:none}
+.mw-card{margin-top:20px;padding:16px 18px}
+.mw-card-h{display:flex;align-items:baseline;gap:10px;margin:0 0 8px}
+.mw-card-h h3{font-size:14px;font-weight:600;margin:0}
+.mw-card-h .sub{color:var(--w-ink3);font-size:12px}
+.mw-card-h .trail{color:var(--w-ink2);font-size:12px;font-variant-numeric:tabular-nums}
+.mw-filter{display:none;align-items:center;gap:8px;font-size:12px;color:var(--w-ink2)}
+.mw-filter .tok{display:inline-flex;align-items:center;padding:1px 8px;border-radius:9px;background:rgba(255,255,255,.08);color:var(--w-ink)}
+.has-sel .mw-filter{display:inline-flex}
+.mw-link{appearance:none;border:0;background:none;padding:0;color:#7fb0ff;font-size:12px;cursor:pointer}
+.mw-link:hover{text-decoration:underline}
+.mw-finds{list-style:none;margin:0;padding:0}
+.mw-finds li{display:grid;grid-template-columns:30px 1fr 170px 72px 112px;gap:14px;align-items:center;height:50px;border-top:1px solid var(--w-hair)}
+.mw-finds li:first-child{border-top:0}
+.mw-finds li[hidden]{display:none}
+.mw-finds .t{font-weight:500;display:block}
+.mw-finds .d{color:var(--w-ink3);font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mw-finds .sz{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.mw-finds .act{text-align:right}
+.mw-finds .sbar{display:block;width:170px;height:10px}
+.mw-finds .mw-empty{display:block;height:auto;padding:14px 0;border:0;color:var(--w-ink2);font-size:12.5px}
+.mw-pair{display:grid;grid-template-columns:1fr 1.1fr;gap:20px;margin-top:20px}
+.mw-pair .mw-card{margin-top:0}
+.mw-tbl{border-collapse:collapse;width:100%}
+.mw-tbl th{font-size:11.5px;font-weight:500;color:var(--w-ink2);text-align:left;padding:0;height:26px;border-bottom:1px solid rgba(255,255,255,.1)}
+.mw-tbl th > span,.mw-tbl th > button{display:flex;align-items:center;gap:4px;height:26px;padding:0 8px;width:100%;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:default}
+.mw-tbl th + th > span,.mw-tbl th + th > button{border-left:1px solid var(--w-hair)}
+.mw-tbl th > button:hover{color:var(--w-ink)}
+.mw-tbl th.r > span,.mw-tbl th.r > button{justify-content:flex-end}
+.mw-tbl .chev{width:9px;height:9px;fill:none;stroke:currentColor;stroke-width:1.6;opacity:0}
+.mw-tbl th[aria-sort] .chev{opacity:1}
+.mw-tbl th[aria-sort=ascending] .chev{transform:rotate(180deg)}
+.mw-tbl td{padding:0 8px;height:32px;border-bottom:1px solid var(--w-hair);white-space:nowrap}
+.mw-tbl tr:last-child td{border-bottom:0}
+.mw-tbl td.r{text-align:right;font-variant-numeric:tabular-nums}
+.mw-tbl td.dim{color:var(--w-ink3)}
+.mw-tbl tr[hidden]{display:none}
+.ov-files td{height:40px}
+.mw-fi{display:inline-flex;align-items:center;gap:8px}
+.mw-fi svg{width:16px;height:16px;flex:none}
+.mw-loc{display:block;color:var(--w-ink3);font-size:11.5px}
+.mw-acts{display:inline-flex;gap:2px}
+.mw-bar-mini{display:inline-block;height:6px;border-radius:3px;vertical-align:1px;margin-right:10px}
+.mw-empty{color:var(--w-ink2);font-size:12.5px;margin:10px 0 2px}
+.mw-empty[hidden]{display:none}
+
+/* narrow: the same window at phone width. Sidebar behind the toggle, figure above legend, finds stacked. */
+.mw-lights-bar{display:none}
+.mac-win.narrow{width:100%;height:auto;flex-direction:column}
+.narrow .mw-side{display:none}
+.narrow.side-open .mw-side{display:flex;position:absolute;left:0;top:52px;bottom:0;width:232px;z-index:6;box-shadow:12px 0 30px rgba(0,0,0,.45)}
+.narrow.side-open .mw-side > .mw-lights{display:none}
+.narrow .mw-lights-bar{display:flex;height:auto;padding:0 6px 0 4px}
+.narrow .mw-content{padding:14px 14px 20px}
+.narrow .mw-top{grid-template-columns:1fr;gap:10px}
+.narrow .ov-fig{width:100%;height:auto}
+.narrow .mw-head h2{font-size:22px}
+.narrow .mw-legend li{grid-template-columns:14px 1fr auto 40px;padding:0 6px;height:40px}
+.narrow .mw-legend .w{display:none}
+.narrow .mw-cap{flex-direction:column;gap:8px}
+.narrow .mw-card{padding:12px}
+.narrow .mw-card-h{flex-wrap:wrap}
+.narrow .mw-finds li{grid-template-columns:30px 1fr auto;grid-template-areas:"t x s" "t b a";column-gap:12px;row-gap:6px;height:auto;padding:10px 0}
+.narrow .mw-finds li > .tile{grid-area:t;align-self:start}
+.narrow .mw-finds .tx{grid-area:x}
+.narrow .mw-finds .bw{grid-area:b}
+.narrow .mw-finds .sz{grid-area:s}
+.narrow .mw-finds .act{grid-area:a}
+.narrow .mw-finds .sbar{width:100%}
+.narrow .mw-finds .d{white-space:normal}
+.narrow .mw-pair{grid-template-columns:1fr}
+.narrow .ov-folders th:nth-child(2),.narrow .ov-folders td:nth-child(2){display:none}
+.narrow .ov-files .mw-fi span{white-space:normal;overflow-wrap:anywhere}
+
+
+/* sections */
+
+section.sec{padding:110px 0 0}
+.sec-head{max-width:640px;margin-bottom:44px}
+h2{font-size:clamp(1.85rem,3vw,2.5rem);line-height:1.1;letter-spacing:-.025em;font-weight:600;margin:0 0 14px;text-wrap:balance}
+h3{font-size:19px;font-weight:600;letter-spacing:-.01em;margin:0 0 8px}
+.sec-head p{color:var(--ink-2);margin:0;max-width:60ch}
+.cap{font-size:14.5px;color:var(--ink-2);line-height:1.55;margin:14px 0 0;max-width:68ch}
+.cap b{color:var(--ink);font-weight:600;margin-right:.35em}
+
+/* two front-ends */
+.two>*,.finds>*,.safety>*,.close>*,.hero>*,.more>*{min-width:0}
+.two{display:grid;grid-template-columns:1fr 1.25fr;gap:56px;align-items:start}
+.fe + .fe{margin-top:36px;padding-top:32px;border-top:1px solid var(--hair)}
+.fe p{color:var(--ink-2);margin:0 0 16px;max-width:52ch}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:0;font-size:15px}
+.kv dt{font-family:var(--mono);font-size:13.5px;color:var(--ink);white-space:nowrap}
+.kv dd{margin:0;color:var(--ink-2)}
+.term{background:#090e19;border:1px solid var(--hair-2);border-radius:10px;overflow:hidden}
+.term-bar{display:flex;align-items:center;gap:7px;padding:10px 12px;border-bottom:1px solid var(--hair)}
+.term-bar i{width:11px;height:11px;border-radius:50%;background:var(--hair-2)}
+.term-bar span{margin-left:8px;font-size:13px;color:var(--ink-3)}
+.term pre{margin:0;padding:16px 18px 18px;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--ink-2);overflow-x:auto}
+.term .t1{color:var(--ink)}.term .ty{color:var(--c-files)}.term .tc{color:var(--c-appdata)}.term .tr{color:var(--c-apps)}.term .tv{color:var(--c-system)}.term .tg{color:var(--ink-3)}
+
+/* finds */
+.finds{display:grid;grid-template-columns:1fr 1.15fr;gap:64px;align-items:start}
+.views{list-style:none;margin:0;padding:0;border-top:1px solid var(--hair)}
+.views li{display:grid;grid-template-columns:170px 1fr;gap:18px;padding:13px 0;border-bottom:1px solid var(--hair);font-size:16px}
+.views b{font-weight:600}
+.views span{color:var(--ink-2)}
+.fbar{display:block;width:100%;height:auto}
+.fscale{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-bottom:2px}
+.fkey{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 28px}
+.fkey li{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--hair);font-size:15px}
+.fkey svg{width:30px;height:12px;align-self:center}
+.fkey small{display:block;color:var(--ink-3);font-size:13.5px;line-height:1.4}
+.fkey .gb{font-variant-numeric:tabular-nums;color:var(--ink)}
+.states{display:flex;flex-wrap:wrap;gap:10px 26px;margin:20px 0 0;font-size:14px;color:var(--ink-2)}
+.states span{display:inline-flex;align-items:center;gap:9px}
+.states svg{width:30px;height:12px}
+
+/* safety */
+.safety{display:grid;grid-template-columns:1.2fr 1fr;gap:64px;align-items:start}
+.rules{width:100%;border-collapse:collapse;font-size:16px}
+.rules th{text-align:left;font-weight:500;color:var(--ink-3);font-size:14px;padding:0 12px 10px 0;border-bottom:1px solid var(--hair-2)}
+.rules td{padding:14px 12px 14px 0;border-bottom:1px solid var(--hair);vertical-align:top}
+.rules td:first-child{width:44px;padding-top:20px}
+.rules td svg{width:36px;height:10px;display:block}
+.rules .what{font-weight:500}
+.rules .what kbd{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);margin-left:8px;font-weight:400}
+.rules td:last-child{color:var(--ink-2)}
+.refused{text-decoration:line-through;text-decoration-color:var(--ink-3);text-decoration-thickness:1px}
+.note{color:var(--ink-2);font-size:15px;margin:20px 0 0;max-width:62ch}
+.cut{display:block;width:100%;height:auto;max-width:460px}
+
+/* installer */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--hair-2)}
+.steps li{padding:22px 24px 6px 0;position:relative}
+.steps li + li{padding-left:24px;border-left:1px solid var(--hair)}
+.steps .n{display:block;font-size:15px;color:var(--ink-3);margin-bottom:14px;font-variant-numeric:tabular-nums}
+.steps p{color:var(--ink-2);margin:0;font-size:15.5px}
+
+/* download etc */
+.more{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin-top:84px;padding-top:36px;border-top:1px solid var(--hair-2)}
+.more p{color:var(--ink-2);margin:0 0 14px;font-size:15.5px}
+.more .btn{font-size:15px;padding:10px 16px}
+.more .cmd code{font-size:12.5px}
+@media (max-width:720px){.cmd code{font-size:12.5px;padding:12px}}
+.path{color:var(--ink);white-space:nowrap}
+
+/* close */
+.close{padding:130px 0 70px;display:grid;grid-template-columns:1fr minmax(320px,520px);gap:56px;align-items:end}
+.close h2{font-size:clamp(2.1rem,3.6vw,3.1rem);margin:0}
+.close p{color:var(--ink-2);margin:14px 0 0;max-width:46ch}
+footer{border-top:1px solid var(--hair);padding:26px 0 44px;color:var(--ink-3);font-size:14px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 28px}
+footer a{color:var(--ink-2)}
+footer nav{display:flex;gap:22px;flex-wrap:wrap}
+
+@media (max-width:1060px){
+  .two,.finds,.safety,.close{grid-template-columns:1fr;gap:44px}
+  .steps{grid-template-columns:1fr 1fr}
+  .steps li:nth-child(3){padding-left:0;border-left:0}
+  .steps li:nth-child(n+3){border-top:1px solid var(--hair);margin-top:14px}
+  .more{grid-template-columns:1fr}
 }
-@keyframes arc-in { from { stroke-dasharray: 0 100; } }
+@media (max-width:720px){
+  section.sec{padding-top:80px}
+  .views li{grid-template-columns:1fr;gap:2px}
+  .fkey{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .steps li,.steps li + li{padding:18px 0 4px;border-left:0}
+  .steps li + li{border-top:1px solid var(--hair);margin-top:12px}
+  .rules td:last-child{display:block;padding-top:0;padding-left:0}
+  .rules td{display:block;border-bottom:0;padding-bottom:4px}
+  .rules tr{display:grid;grid-template-columns:44px 1fr;border-bottom:1px solid var(--hair);padding-bottom:10px}
+  .rules tr td:last-child{grid-column:2}
+  .rules thead{display:none}
+  .close{padding-top:90px}
+}
+
+.term .ty{color:#ff7a45}.term .tc{color:#2fd49a}.term .tr{color:#4da3ff}.term .tv{color:#ffc233}
+.more .glossy{font-size:15px;padding:10px 20px}
+footer .attr{flex-basis:100%;font-size:13px;color:var(--ink-3);margin:0}
+footer .attr a{color:var(--ink-2);word-break:break-all}
 </style>
 </head>
 <body>
-<!--
-THESIS: Show the real product doing its job: the Overview window as the hero, the macsafe terminal dashboard in the next section (moved out of the hero so neither window covers the other); refuse the centered-column, rounded-card, checkmark-list download page.
-OWN-WORLD: Graphite ground, hairline rules, Mona Sans and Fragment Mono, white primary button; the only color is the app's own data palette (blue, orange, aqua, yellow) and three status dots.
-STORY: A Mac owner sees exactly where 174 GB went (the 1.3 Overview: ring, Free up space list), reads the safety model, and pastes one command.
-FIRST VIEWPORT: Left-aligned 2-line headline, lede, the install command with a white Copy button beside the MacSafe.dmg download, a plain-text facts row (not mono: monospace is kept for code and data); the full-width app window begins below.
-FORM: safer re-roll round 1, grounded candidate "developer tool" (Raycast/Linear bar). Seed 7d67d0fe.
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
--->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-ov" viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M7 16v-5"/><path d="M12 16V6"/><path d="M17 16v-8"/></symbol>
-  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2h9A1.5 1.5 0 0 1 21 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5Z"/></symbol>
-  <symbol id="i-updoc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 17v-6"/><path d="m9.5 13.5 2.5-2.5 2.5 2.5"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.5-6"/><path d="M3.5 4.5V8H7"/><path d="M12 8v4l2.5 2"/></symbol>
-  <symbol id="i-docs" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></symbol>
-  <symbol id="i-box" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/><path d="M10 13h4"/></symbol>
-  <symbol id="i-tray" viewBox="0 0 24 24"><path d="M3 13h5l1.5 2.5h5L16 13h5"/><path d="M3 13l2.5-7h13L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M9 9.5h6"/></symbol>
-  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
-  <symbol id="i-drive" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 12h.01"/><path d="M11 12h6"/></symbol>
-  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="m6 7 1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></symbol>
-  <symbol id="i-dlc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8"/><path d="m8.5 12.5 3.5 3.5 3.5-3.5"/></symbol>
-  <symbol id="i-ext" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="m5 11 2.2-5h9.6l2.2 5"/><path d="M17 15h.01"/></symbol>
-  <symbol id="i-hammer" viewBox="0 0 24 24"><path d="m14.5 8.5-9 9a1.5 1.5 0 0 0 2 2.1l9-9"/><path d="M11.5 5.5 14 3l6.5 6.5L18 12z"/></symbol>
-  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></symbol>
-  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
-  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
-  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19.5 7"/></symbol>
-  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10.5 5 5 5-5"/><path d="M5 20h14"/></symbol>
-  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
-  <symbol id="i-term" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 9.5 3 2.5-3 2.5"/><path d="M12.5 15H17"/></symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5.5c0 4.3 3 7.9 7 9.5 4-1.6 7-5.2 7-9.5V6z"/></symbol>
-  <symbol id="i-pie" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M12 4v15"/><path d="m6 13 6 6 6-6"/></symbol>
-  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8.5-8.5"/><path d="m16 7 2.5 2.5"/></symbol>
-</svg>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#" aria-label="MacSafe home">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2.5A10.5 10.5 0 0 1 21 6.2" fill="none" stroke="#4da3ff" stroke-width="3.4"/><path d="M21.8 7.5A10.5 10.5 0 0 1 23.3 11" fill="none" stroke="#ff7a45" stroke-width="3.4"/><path d="M23.5 12.6A10.5 10.5 0 0 1 20.2 20.7" fill="none" stroke="#2fd49a" stroke-width="3.4"/><path d="M19 21.7A10.5 10.5 0 0 1 3.4 17.3" fill="none" stroke="#ffc233" stroke-width="3.4"/><path d="M2.9 15.6A10.5 10.5 0 0 1 11.4 2.6" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="3.4"/></svg>
+      MacSafe
+    </a>
+    <nav aria-label="Sections">
+      <a class="opt" href="#app">The app</a>
+      <a class="opt" href="#safety">Safety</a>
+      <a class="opt" href="#install">Install</a>
+      <a href="https://github.com/gabrielesarria167-ai/MacSafe">GitHub</a>
+    </nav>
+  </header>
 
-
-<div class="vb">
-  <nav class="b-nav" aria-label="MacSafe"><div class="in">
-    <a class="brand" href="./"><svg class="mark" aria-hidden="true" viewBox="0 0 100 100"><defs><linearGradient id="mk-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2d4fd6"/><stop offset="1" stop-color="#0d1450"/></linearGradient><linearGradient id="mk-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity=".08"/></linearGradient></defs><rect width="100" height="100" rx="22.5" fill="url(#mk-b)"/><path d="M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z" fill="url(#mk-g)"/><g fill="none" stroke-width="6" stroke-linejoin="round"><path d="M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z" pathLength="100" stroke-dasharray="20.4 100" stroke-dashoffset="-0.8" stroke="#4da3ff"/><path d="M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z" pathLength="100" stroke-dasharray="13.4 100" stroke-dashoffset="-22.8" stroke="#ff7a45"/><path d="M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z" pathLength="100" stroke-dasharray="21.4 100" stroke-dashoffset="-37.8" stroke="#2fd49a"/><path d="M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z" pathLength="100" stroke-dasharray="16.4 100" stroke-dashoffset="-60.8" stroke="#ffc233"/><path d="M50 17 L77 26.5 V48 C77 67 65.5 79 50 86 C34.5 79 23 67 23 48 V26.5 Z" pathLength="100" stroke-dasharray="20.4 100" stroke-dashoffset="-78.8" stroke="#fff" stroke-opacity=".25"/></g><path d="M38.5 50 L46.5 58.5 L62 41" fill="none" stroke="#fff" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>MacSafe</a>
-    <a class="hide-s" href="#b-two">App &amp; CLI</a>
-    <a class="hide-s" href="#b-safe">Safety</a>
-    <a class="hide-s" href="#b-inst">Install</a>
-    <a href="https://github.com/gabrielesarria167-ai/MacSafe">GitHub</a>
-  </div></nav>
-
-  <header class="b-hero">
-    <div class="in">
-      <h1>Find out where your disk space went.</h1>
-      <p class="b-lede">A native Mac app and a terminal dashboard on one scanner. <b>See every gigabyte by folder, then clear it safely.</b></p>
-      <div class="b-get">
-        <div class="b-opt">
-          <span>Paste into Terminal</span>
-          <div class="b-cmd" aria-label="Install command">
-            <pre id="b-cmd">curl -fsSL https://<wbr>gabrielesarria167-ai.github.io<wbr>/MacSafe/install.sh | bash</pre>
-            <button class="b-copy copy" type="button" data-copy="b-cmd"><svg class="ic"><use href="#i-copy"/></svg><span>Copy</span></button>
-          </div>
-          <p>Installs the app and the <code>macsafe</code> command. No “could not verify” warning.</p>
-        </div>
-        <div class="b-opt">
-          <span>Or download the disk image</span>
-          <a class="b-dlp" href="https://github.com/gabrielesarria167-ai/MacSafe/releases/latest/download/MacSafe.dmg"><svg class="ic"><use href="#i-down"/></svg>Download MacSafe.dmg</a>
-          <p>Drag it into Applications. <a href="#b-dmg">First launch</a> needs one extra step.</p>
-        </div>
+  <main>
+  <div class="hero">
+    <div class="lead">
+      <h1>One picture of your whole disk.</h1>
+      <p class="lede">MacSafe draws where your Mac’s storage went, from the big categories down to single files. Then it helps you clear space without breaking anything.</p>
+      <a class="glossy" href="https://github.com/gabrielesarria167-ai/MacSafe/releases/latest/download/MacSafe.dmg"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.5v9M5.2 7.9 9 11.6l3.8-3.7M3 14.8h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
+      <p class="facts">Free. macOS 14 or later, on Apple Silicon and Intel. Nothing leaves your Mac.</p>
+      <label class="cmd-label" for="cmd1">Or install with Terminal</label>
+      <div class="cmd">
+        <code id="cmd1" tabindex="0"><span class="nw">curl -fsSL https://</span><wbr><span class="nw">gabrielesarria167-ai.github.io</span><wbr><span class="nw">/MacSafe/install.sh</span> <span class="nw">| bash</span></code>
+        <button class="copy" type="button" data-copy="cmd1" aria-describedby="note1"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="8.5" height="8.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3.6A1.5 1.5 0 0 0 2.1 3v5.4a1.5 1.5 0 0 0 1.5 1.5h.2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><span>Copy</span></button>
       </div>
-      <ul class="b-meta"><li>Free</li><li>macOS 14 or later</li><li>Apple Silicon &amp; Intel</li><li>Nothing leaves your Mac</li></ul>
-
-      <figure class="b-stage">
-        <div class="win-wrap">
-<div class="win dark" role="img" aria-label="Example of the MacSafe Overview: 71.2 GB free of 245 GB, shown as a ring split into applications, your files, app data and caches, and macOS and other; 26.5 GB you could free up, listed by size; biggest folders and largest files.">
-    <div class="w-side">
-      <div class="w-lights"><i></i><i></i><i></i></div>
-      <ul class="w-nav">
-        <li class="sec">Storage</li>
-        <li class="on"><span class="tile t-blue"><svg class="ic"><use href="#i-pie"/></svg></span>Overview</li>
-        <li><span class="tile t-teal"><svg class="ic"><use href="#i-folder"/></svg></span>Explorer</li>
-        <li class="sec">Find</li>
-        <li><span class="tile t-orange"><svg class="ic"><use href="#i-updoc"/></svg></span>Large Files</li>
-        <li><span class="tile t-yellow"><svg class="ic"><use href="#i-clock"/></svg></span>Unused</li>
-        <li><span class="tile t-pink"><svg class="ic"><use href="#i-docs"/></svg></span>Duplicates</li>
-        <li class="sec">Clean Up</li>
-        <li><span class="tile t-green"><svg class="ic"><use href="#i-box"/></svg></span>Caches<span class="bdg">6.4 GB</span></li>
-        <li><span class="tile t-purple"><svg class="ic"><use href="#i-tray"/></svg></span>Clutter<span class="bdg">18.2 GB</span></li>
-        <li><span class="tile t-blue"><svg class="ic"><use href="#i-grid"/></svg></span>Applications</li>
-      </ul>
-      <div class="w-foot">
-        <div class="hd"><svg class="ic"><use href="#i-drive"/></svg>Macintosh HD</div>
-        <div class="w-strip"><i class="t-blue" style="flex:23.3"></i><i class="t-orange" style="flex:7.8"></i><i class="t-green" style="flex:43.7"></i><i class="t-yellow" style="flex:99"></i><i style="flex:71.2"></i></div>
-        <small>71.2 GB free of 245 GB</small>
-        <small>Scanned 2 minutes ago</small>
-      </div>
+      <p class="cmd-note" id="note1" aria-live="polite">Installs the app and the <code>macsafe</code> command. The disk image’s <a href="#dmg">first launch</a> needs one extra step.</p>
     </div>
-    <div class="w-main">
-      <div class="w-tool">Overview<small>MacSafe 1.3</small></div>
-      <div class="w-content">
-        <div class="w-hero">
-          <div class="w-ring">
-            <svg viewBox="0 0 188 188" aria-hidden="true"><circle cx="94" cy="94" r="87.5" stroke="var(--track)"/><circle class="arc" cx="94" cy="94" r="87.5" pathLength="100" stroke="var(--s1)" stroke-dasharray="8.91 100" stroke-dashoffset="-0.30"/><circle class="arc" cx="94" cy="94" r="87.5" pathLength="100" stroke="var(--s2)" stroke-dasharray="2.58 100" stroke-dashoffset="-9.81"/><circle class="arc" cx="94" cy="94" r="87.5" pathLength="100" stroke="var(--s3)" stroke-dasharray="17.24 100" stroke-dashoffset="-12.99"/><circle class="arc" cx="94" cy="94" r="87.5" pathLength="100" stroke="var(--s4)" stroke-dasharray="39.81 100" stroke-dashoffset="-30.83"/></svg>
-            <div class="c"><b>71.2 GB</b><small>free of 245 GB</small></div>
+
+    <figure class="figure" id="fig1">
+      <div class="stage" id="stage">
+        <div class="glows" aria-hidden="true"><i class="gb"></i><i class="gp"></i><i class="gg"></i></div>
+        <canvas id="hdd" aria-hidden="true"></canvas>
+        <svg class="fig-svg" id="disk" role="group" aria-label="Cross-section of an example 245 GB Mac disk. Select a category to focus it."></svg>
+      </div>
+      <ul class="key" id="key" aria-label="Categories"></ul>
+      <figcaption class="fig-cap" id="cap" aria-live="polite"></figcaption>
+      <p class="credit">Drive model: “<a href="https://sketchfab.com/3d-models/hdd-66abd679b8934298ba8af35db56d8106">HDD</a>” by <a href="https://sketchfab.com/nsarieva13">Nadya Sarieva</a>, <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Platter replaced, materials changed.</p>
+    </figure>
+  </div>
+
+  <section class="app-sec" id="app" aria-labelledby="app-h">
+    <div class="sec-head">
+      <h2 id="app-h">The same picture, in the app.</h2>
+      <p>Open MacSafe and the Overview draws this figure for your own disk. Select a category and every list under it follows: what you could free, the biggest folders, the largest files.</p>
+    </div>
+    <div class="desktop">
+      <div class="wall" aria-hidden="true"><i class="gb"></i><i class="gp"></i><i class="gg"></i><svg id="wall-rings" viewBox="0 0 680 680"></svg></div>
+      <div class="menubar" aria-hidden="true"><b>MacSafe</b><span>File</span><span>Edit</span><span>View</span><span class="opt">Window</span><span class="opt">Help</span><span class="sp"></span><span class="opt">Fri 10 Oct</span><span>9:41</span></div>
+      <div class="desk-fit" id="desk-fit"><div class="desk-scaler" id="desk-scaler">
+<div class="mac-win" role="group" aria-label="MacSafe window, Overview">
+  <aside class="mw-side">
+    <div class="mw-lights" aria-hidden="true"><i></i><i></i><i></i></div>
+    <nav class="mw-nav" aria-label="Views">
+      <h3>Storage</h3>
+      <ul>
+        <li><button class="mw-row" type="button" aria-current="page"><span class="tile t-blue"><svg viewBox="0 0 16 16"><path d="M7.2 2.6a5.8 5.8 0 1 0 6.2 6.2H7.2z"/><path d="M8.8 1.2v6h6A6 6 0 0 0 8.8 1.2z"/></svg></span><span class="lab">Overview</span></button></li>
+        <li><button class="mw-row" type="button"><span class="tile t-teal"><svg viewBox="0 0 16 16"><path d="M1.5 4.2a1 1 0 0 1 1-1h3.7l1.5 1.6h5.8a1 1 0 0 1 1 1v6.9a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1z"/></svg></span><span class="lab">Explorer</span></button></li>
+      </ul>
+      <h3>Find</h3>
+      <ul>
+        <li><button class="mw-row" type="button"><span class="tile t-orange"><svg viewBox="0 0 16 16"><path d="M4 1.3h5l3.6 3.6v9.3a.6.6 0 0 1-.6.6H4a.6.6 0 0 1-.6-.6V1.9a.6.6 0 0 1 .6-.6z"/></svg></span><span class="lab">Large Files</span></button></li>
+        <li><button class="mw-row" type="button"><span class="tile t-yellow"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zM7.2 4v4.6l3.4 2 .8-1.3-2.6-1.6V4z"/></svg></span><span class="lab">Unused</span></button></li>
+        <li><button class="mw-row" type="button"><span class="tile t-pink"><svg viewBox="0 0 16 16"><rect x="5" y="1.5" width="9" height="10" rx="1"/><path d="M3.6 4v8.4a1 1 0 0 0 1 1H11v1.1H4a2 2 0 0 1-2-2V4z"/></svg></span><span class="lab">Duplicates</span></button></li>
+      </ul>
+      <h3>Clean Up</h3>
+      <ul>
+        <li><button class="mw-row" type="button"><span class="tile t-green"><svg viewBox="0 0 16 16"><rect x="1.3" y="2.3" width="13.4" height="3.6" rx=".7"/><path fill-rule="evenodd" d="M2.3 6.9h11.4v6a1 1 0 0 1-1 1H3.3a1 1 0 0 1-1-1zM6 8.5v1.2h4V8.5z"/></svg></span><span class="lab">Caches</span><span class="mw-badge">6.4 GB</span></button></li>
+        <li><button class="mw-row" type="button"><span class="tile t-purple"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3.4 2.5h9.2l2 7v3.8a1 1 0 0 1-1 1H2.4a1 1 0 0 1-1-1V9.5zM4.4 4l-1.5 5h3.4l.7 1.4h2l.7-1.4h3.4L11.6 4z"/></svg></span><span class="lab">Clutter</span><span class="mw-badge">18.2 GB</span></button></li>
+        <li><button class="mw-row" type="button"><span class="tile t-blue"><svg viewBox="0 0 16 16"><rect x="1.8" y="1.8" width="5.4" height="5.4" rx="1.3"/><rect x="8.8" y="1.8" width="5.4" height="5.4" rx="1.3"/><rect x="1.8" y="8.8" width="5.4" height="5.4" rx="1.3"/><rect x="8.8" y="8.8" width="5.4" height="5.4" rx="1.3"/></svg></span><span class="lab">Applications</span></button></li>
+      </ul>
+    </nav>
+    <div class="mw-disk">
+      <div class="hd"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4.5" width="13" height="7" rx="1.5" stroke-width="1.2"/><circle cx="11.5" cy="8" r=".6" fill="currentColor"/></svg>Macintosh HD</div>
+      <div class="mw-strip" aria-hidden="true"></div>
+      <div class="free">71.2 GB free of 245 GB</div>
+      <div class="sc"><span>Scanned 2 minutes ago</span><button class="mw-icon" type="button" title="Rescan (⌘R)" aria-label="Rescan"><svg viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v3h-3"/></svg></button></div>
+    </div>
+  </aside>
+  <div class="mw-main">
+    <div class="mw-glows" aria-hidden="true"><i class="gb"></i><i class="gp"></i><i class="gg"></i></div>
+    <header class="mw-bar">
+      <span class="mw-lights mw-lights-bar" aria-hidden="true"><i></i><i></i><i></i></span>
+      <button class="mw-icon mw-toggle" type="button" aria-label="Hide sidebar" title="Sidebar"><svg viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="2"/><path d="M6 2.5v11"/></svg></button>
+      <h2>Overview</h2>
+      <span class="sp"></span>
+      <span class="ver">MacSafe 1.3</span>
+    </header>
+    <div class="mw-content">
+      <div class="mw-top">
+        <svg class="ov-fig" viewBox="10 0 730 600" role="group" aria-label="Cross-section of Macintosh HD. Select a category to focus it."></svg>
+        <div class="mw-head">
+          <h2>You could free up <em>26.5 GB</em></h2>
+          <p>Most of it is old iPhone and iPad backups.</p>
+          <button class="glossy" type="button">Review &amp; Clean</button>
+          <div class="glass mw-legend-card">
+            <ul class="mw-legend" role="listbox" aria-label="Disk breakdown"></ul>
           </div>
-          <div class="w-head">
-            <b>You could free up <em>26.5 GB</em></b>
-            <p>Most of it is old iPhone and iPad backups.</p>
-            <span class="w-gloss">Review &amp; Clean</span>
-          </div>
-          <ul class="w-legend">
-            <li style="--c:var(--s1)"><i></i><span>Applications</span><span class="z">23.3 GB</span><span class="p">10%</span></li>
-            <li style="--c:var(--s2)"><i></i><span>Your files</span><span class="z">7.8 GB</span><span class="p">3%</span></li>
-            <li style="--c:var(--s3)"><i></i><span>App data &amp; caches</span><span class="z">43.7 GB</span><span class="p">18%</span></li>
-            <li style="--c:var(--s4)"><i></i><span>macOS &amp; other</span><span class="z">99.0 GB</span><span class="p">40%</span></li>
-            <li style="--c:rgba(255,255,255,.2)"><i></i><span>Free</span><span class="z">71.2 GB</span><span class="p">29%</span></li>
-          </ul>
+          <div class="mw-cap"><p class="ov-cap" aria-live="polite"></p><button class="pill ov-whole" type="button" hidden>Show Whole Disk</button></div>
         </div>
-        <div class="w-card">
-          <div class="hd"><b>Free up space</b><span>26.5 GB in 6 places</span></div>
-          <ul class="w-finds">
-            <li class="t-purple"><span class="tile t-purple lg"><svg class="ic"><use href="#i-phone"/></svg></span><span class="tt"><b>Device backups</b><small>Local iPhone and iPad backups.</small></span><span class="w-sb"><i style="width:100.0%"></i></span><span class="z">12.6 GB</span><span class="w-pill">Review</span></li>
-            <li class="t-green"><span class="tile t-green lg"><svg class="ic"><use href="#i-box"/></svg></span><span class="tt"><b>Caches</b><small>Safe to clear. Apps rebuild them as needed.</small></span><span class="w-sb"><i style="width:50.8%"></i></span><span class="z">6.4 GB</span><span class="w-pill">Review</span></li>
-            <li class="t-teal"><span class="tile t-teal lg"><svg class="ic"><use href="#i-box"/></svg></span><span class="tt"><b>Installers</b><small>Disk images and packages you’ve probably already installed.</small></span><span class="w-sb"><i style="width:24.6%"></i></span><span class="z">3.1 GB</span><span class="w-pill">Review</span></li>
-            <li class="t-pink"><span class="tile t-pink lg"><svg class="ic"><use href="#i-trash"/></svg></span><span class="tt"><b>Trash</b><small>Deleted files still take space until you empty the Trash.</small></span><span class="w-sb"><i style="width:15.1%"></i></span><span class="z">1.9 GB</span><span class="w-pill">Empty Trash…</span></li>
-            <li class="t-blue"><span class="tile t-blue lg"><svg class="ic"><use href="#i-arrow"/></svg></span><span class="tt"><b>Old downloads</b><small>Downloads you haven’t touched in 3+ months.</small></span><span class="w-sb"><i style="width:10.3%"></i></span><span class="z">1.3 GB</span><span class="w-pill">Review</span></li>
-            <li class="t-orange"><span class="tile t-orange lg"><svg class="ic"><use href="#i-hammer"/></svg></span><span class="tt"><b>Developer leftovers</b><small>node_modules and virtualenvs you can reinstall.</small></span><span class="w-sb"><i style="width:9.5%"></i></span><span class="z">1.2 GB</span><span class="w-pill">Review</span></li>
-          </ul>
-        </div>
-        <div class="w-cols">
-          <div class="w-card">
-            <div class="hd"><div><b>Biggest folders in your home</b><small>51.5 GB in total</small></div></div>
-            <ul class="w-rows f">
-              <li class="t-green"><span class="w-fold"></span><span>Library</span><span class="w-sb"><i style="width:100.0%"></i></span><span class="z">41.9 GB</span></li>
-              <li class="t-orange"><span class="w-fold"></span><span>Downloads</span><span class="w-sb"><i style="width:9.3%"></i></span><span class="z">3.9 GB</span></li>
-              <li class="t-green"><span class="w-fold"></span><span>.cache</span><span class="w-sb"><i style="width:4.3%"></i></span><span class="z">1.8 GB</span></li>
-              <li class="t-orange"><span class="w-fold"></span><span>Developer</span><span class="w-sb"><i style="width:3.3%"></i></span><span class="z">1.4 GB</span></li>
-              <li class="t-orange"><span class="w-fold"></span><span>Documents</span><span class="w-sb"><i style="width:2.6%"></i></span><span class="z">1.1 GB</span></li>
-            </ul>
-          </div>
-          <div class="w-card">
-            <div class="hd"><div><b>Largest files</b><small>200 MB and up, outside app data</small></div><a>See All</a></div>
-            <ul class="w-rows l">
-              <li><span class="w-doc"></span><span><b>ubuntu-24.04-desktop-arm64.iso</b><small>~/Downloads</small></span><span class="z">2.6 GB</span></li>
-              <li><span class="w-doc"></span><span><b>Project archive.zip</b><small>~/Documents</small></span><span class="z">740 MB</span></li>
-              <li><span class="w-doc"></span><span><b>Docker.dmg</b><small>~/Downloads</small></span><span class="z">520 MB</span></li>
-            </ul>
-          </div>
-        </div>
+      </div>
+
+      <section class="glass mw-card" aria-label="Free up space">
+        <div class="mw-card-h"><h3>Free up space</h3><span class="mw-filter"><span class="tok"></span><button class="mw-link" type="button" data-clear>Show All</button></span><span class="sp"></span><span class="trail ov-trail"></span></div>
+        <ul class="mw-finds"></ul>
+      </section>
+
+      <div class="mw-pair">
+        <section class="glass mw-card" aria-label="Biggest folders in your home">
+          <div class="mw-card-h"><h3>Biggest folders in your home</h3><span class="sub">51.5 GB in total</span></div>
+          <table class="mw-tbl ov-folders">
+            <thead><tr>
+              <th><button type="button" data-sort="name">Name<svg class="chev" viewBox="0 0 10 10"><path d="M2 3.5 5 6.5 8 3.5"/></svg></button></th>
+              <th style="width:140px"><span>Category</span></th>
+              <th class="r" style="width:150px"><button type="button" data-sort="gb">Size<svg class="chev" viewBox="0 0 10 10"><path d="M2 3.5 5 6.5 8 3.5"/></svg></button></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="mw-empty ov-folders-empty" hidden></p>
+        </section>
+        <section class="glass mw-card" aria-label="Largest files">
+          <div class="mw-card-h"><h3>Largest files</h3><span class="sub">200 MB and up, outside app data</span><span class="sp"></span><button class="mw-link" type="button">See All</button></div>
+          <table class="mw-tbl ov-files">
+            <thead><tr>
+              <th><button type="button" data-sort="name">Name<svg class="chev" viewBox="0 0 10 10"><path d="M2 3.5 5 6.5 8 3.5"/></svg></button></th>
+              <th class="r" style="width:90px"><button type="button" data-sort="gb">Size<svg class="chev" viewBox="0 0 10 10"><path d="M2 3.5 5 6.5 8 3.5"/></svg></button></th>
+              <th style="width:64px"><span class="vh">Actions</span></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="mw-empty ov-files-empty" hidden></p>
+        </section>
       </div>
     </div>
   </div>
-        </div>
-        <figcaption>MacSafe.app, with example data from a 245 GB Mac.</figcaption>
-      </figure>
-    </div>
-  </header>
-
-  <section class="b-sec" id="b-two" aria-labelledby="b-two-h"><div class="in">
-    <div class="lab"><h2 id="b-two-h">Two front-ends, one engine.</h2><p>Both open instantly with the last scan and rescan in the background when it’s older than 15 minutes. Both keep themselves current: the app shows an Update button at the top right of its window when a new version is out, and <code>macsafe</code> installs it on its own.</p></div>
-    <div class="b-two-col">
-    <div class="b-duo">
-      <div>
-        <h3>Mac app</h3>
-        <p>For browsing, sorting and bulk cleanup. Click a category in the breakdown to explore it, or <b>Review</b> anything under Free up space.</p>
-        <dl><dt>⌘⌫</dt><dd>Move to Trash</dd><dt>⌘Z</dt><dd>Put it back</dd><dt>⌘R</dt><dd>Rescan</dd></dl>
-      </div>
-      <div>
-        <h3><span class="mono">macsafe</span></h3>
-        <p>A quick check without leaving Terminal. Click a slice of the ring or any row, or use the keyboard.</p>
-        <dl><dt>--report</dt><dd>Print a summary and exit</dd><dt>--update</dt><dd>Install the latest version now</dd><dt>--app</dt><dd>Open the Mac app</dd><dt>--no-mouse</dt><dd>Leave clicks to the terminal for selecting text</dd></dl>
-      </div>
-    </div>
-        <figure class="term-wrap">
-          <div class="term" role="img" aria-label="Example of the macsafe terminal dashboard: the same disk as a ring with its breakdown, and quick wins with the key that opens each.">
-            <div class="term-bar"><i></i><i></i><i></i><span>macsafe</span></div>
-            <pre><span style="color:#5fafff"> ◆ </span><span style="font-weight:600">MacSafe</span>                       <span style="color:#8a8a8a">71.2 GB free · scanned 2 minutes ago </span>
- <span style="color:#000000;background:#5fafff;font-weight:600"> 1 Overview </span> <span style="color:#8a8a8a"> 2 </span> <span style="color:#8a8a8a"> 3 </span> <span style="color:#8a8a8a"> 4 </span> <span style="color:#8a8a8a"> 5 </span> <span style="color:#8a8a8a"> 6 </span> <span style="color:#8a8a8a"> 7 </span> <span style="color:#8a8a8a"> 8 </span>
-<span style="color:#3a3a3a">──────────────────────────────────────────────────────────────────────</span>
-
- <span style="color:#4e4e4e">╭─</span><span style="font-weight:600"> Macintosh HD </span><span style="color:#4e4e4e">──────────────────────────────────────────</span><span style="color:#8a8a8a"> 245 GB </span><span style="color:#4e4e4e">─╮</span>
- <span style="color:#4e4e4e">│</span>                                                                  <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>         <i class="d" style="width:3ch;background:linear-gradient(transparent 50%,#4e4e4e 50%)"></i><i class="d" style="width:3ch;background:#4e4e4e"></i><i class="d" style="width:3ch;background:#8787af"></i><i class="d" style="width:3ch;background:linear-gradient(transparent 50%,#8787af 50%)"></i>                                             <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>      <i class="d" style="width:2ch;background:linear-gradient(transparent 50%,#4e4e4e 50%)"></i><i class="d" style="width:7ch;background:#4e4e4e"></i><i class="d" style="width:7ch;background:#8787af"></i><i class="d" style="width:2ch;background:linear-gradient(transparent 50%,#8787af 50%)"></i>                                          <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>     <i class="d" style="width:8ch;background:#4e4e4e"></i><i class="d" style="width:2ch;background:linear-gradient(#4e4e4e 50%,transparent 50%)"></i><i class="d" style="width:2ch;background:linear-gradient(#8787af 50%,transparent 50%)"></i><i class="d" style="width:8ch;background:#8787af"></i>                                         <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>   <i class="d" style="background:linear-gradient(transparent 50%,#4e4e4e 50%)"></i><i class="d" style="width:6ch;background:#4e4e4e"></i><i class="d" style="background:linear-gradient(#4e4e4e 50%,transparent 50%)"></i>        <i class="d" style="background:linear-gradient(#8787af 50%,transparent 50%)"></i><i class="d" style="width:6ch;background:#8787af"></i><i class="d" style="background:linear-gradient(transparent 50%,#8787af 50%)"></i>                                       <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>   <i class="d" style="width:5ch;background:#4e4e4e"></i><i class="d" style="background:linear-gradient(#4e4e4e 50%,transparent 50%)"></i>            <i class="d" style="background:linear-gradient(#8787af 50%,transparent 50%)"></i><i class="d" style="width:5ch;background:#8787af"></i>     <span style="color:#8787af">●</span> macOS &amp; other     <span style="font-weight:600"> 99.0 GB</span> <span style="color:#8a8a8a"> 40%</span> <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>  <i class="d" style="width:5ch;background:#4e4e4e"></i><i class="d" style="background:linear-gradient(#4e4e4e 50%,transparent 50%)"></i>    <span style="font-weight:600">174 GB</span>    <i class="d" style="background:linear-gradient(#8787af 50%,transparent 50%)"></i><i class="d" style="width:5ch;background:#8787af"></i>    <span style="color:#d787d7">●</span> App data &amp; caches <span style="font-weight:600"> 43.7 GB</span> <span style="color:#8a8a8a"> 18%</span> <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>  <i class="d" style="width:5ch;background:#4e4e4e"></i>    <span style="color:#8a8a8a">of 245 GB</span>   <i class="d" style="width:5ch;background:#8787af"></i>    <span style="color:#5fafff">●</span> Applications      <span style="font-weight:600"> 23.3 GB</span> <span style="color:#8a8a8a"> 10%</span> <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>  <i class="d" style="width:3ch;background:#4e4e4e"></i><i class="d" style="width:2ch;background:linear-gradient(#4e4e4e 50%,#ffaf5f 50%)"></i><i class="d" style="background:linear-gradient(transparent 50%,#ffaf5f 50%)"></i>   <span style="color:#8a8a8a">71% used</span>   <i class="d" style="background:linear-gradient(transparent 50%,#8787af 50%)"></i><i class="d" style="width:5ch;background:#8787af"></i>    <span style="color:#ffaf5f">●</span> Your files        <span style="font-weight:600">  7.8 GB</span> <span style="color:#8a8a8a">  3%</span> <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>   <i class="d" style="width:3ch;background:#ffaf5f"></i><i class="d" style="width:2ch;background:linear-gradient(#ffaf5f 50%,#5fafff 50%)"></i><i class="d" style="background:linear-gradient(transparent 50%,#5fafff 50%)"></i>            <i class="d" style="background:linear-gradient(transparent 50%,#8787af 50%)"></i><i class="d" style="width:5ch;background:#8787af"></i>     <span style="color:#4e4e4e">●</span> <span style="color:#8a8a8a">Free             </span>  71.2 GB <span style="color:#8a8a8a"> 29%</span> <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>   <i class="d" style="background:linear-gradient(#ffaf5f 50%,transparent 50%)"></i><i class="d" style="width:6ch;background:#5fafff"></i><i class="d" style="background:linear-gradient(transparent 50%,#5fafff 50%)"></i>        <i class="d" style="background:linear-gradient(transparent 50%,#8787af 50%)"></i><i class="d" style="width:6ch;background:#8787af"></i><i class="d" style="background:linear-gradient(#8787af 50%,transparent 50%)"></i>                                       <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>     <i class="d" style="width:5ch;background:#5fafff"></i><i class="d" style="background:linear-gradient(#5fafff 50%,#d787d7 50%)"></i><i class="d" style="width:2ch;background:#d787d7"></i><i class="d" style="width:4ch;background:linear-gradient(transparent 50%,#d787d7 50%)"></i><i class="d" style="width:3ch;background:#d787d7"></i><i class="d" style="background:linear-gradient(#8787af 50%,#d787d7 50%)"></i><i class="d" style="width:4ch;background:#8787af"></i>                                         <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>      <i class="d" style="width:2ch;background:linear-gradient(#5fafff 50%,transparent 50%)"></i><i class="d" style="background:#5fafff"></i><i class="d" style="background:linear-gradient(#5fafff 50%,#d787d7 50%)"></i><i class="d" style="width:12ch;background:#d787d7"></i><i class="d" style="width:2ch;background:linear-gradient(#8787af 50%,transparent 50%)"></i>                                          <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>         <i class="d" style="width:3ch;background:linear-gradient(#d787d7 50%,transparent 50%)"></i><i class="d" style="width:6ch;background:#d787d7"></i><i class="d" style="width:3ch;background:linear-gradient(#d787d7 50%,transparent 50%)"></i>                                             <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>                                                                  <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">╰──────────────────────────────────────────────────────────────────╯</span>
-
- <span style="color:#4e4e4e">╭─</span><span style="font-weight:600"> Quick wins </span><span style="color:#4e4e4e">───────────────────────────────────</span><span style="color:#87d787"> 26.5 GB to free </span><span style="color:#4e4e4e">─╮</span>
- <span style="color:#4e4e4e">│</span>                                                                  <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span> Safe-to-clear caches           <span style="font-weight:600">  6.4 GB</span>   <span style="color:#d0d0d0;background:#3a3a3a"> 4 </span><span style="color:#8a8a8a"> Caches</span>             <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span> node_modules &amp; virtualenvs     <span style="font-weight:600">  1.2 GB</span>   <span style="color:#d0d0d0;background:#3a3a3a"> 5 </span><span style="color:#8a8a8a"> Clutter</span>            <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span> Installers &amp; disk images       <span style="font-weight:600">  3.1 GB</span>   <span style="color:#d0d0d0;background:#3a3a3a"> 5 </span><span style="color:#8a8a8a"> Clutter</span>            <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span> Downloads untouched 3+ months  <span style="font-weight:600">  1.3 GB</span>   <span style="color:#d0d0d0;background:#3a3a3a"> 5 </span><span style="color:#8a8a8a"> Clutter</span>            <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span> iPhone / iPad backups          <span style="font-weight:600"> 12.6 GB</span>   <span style="color:#d0d0d0;background:#3a3a3a"> 5 </span><span style="color:#8a8a8a"> Clutter</span>            <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span> Trash                          <span style="font-weight:600">  1.9 GB</span>   <span style="color:#d0d0d0;background:#3a3a3a"> E </span><span style="color:#8a8a8a"> empty</span>              <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">│</span>                                                                  <span style="color:#4e4e4e">│</span>
- <span style="color:#4e4e4e">╰──────────────────────────────────────────────────────────────────╯</span>
-<span style="color:#3a3a3a">──────────────────────────────────────────────────────────────────────</span>
- <span style="color:#d0d0d0;background:#3a3a3a"> ↑↓ </span><span style="color:#8a8a8a"> move</span>  <span style="color:#d0d0d0;background:#3a3a3a"> ⏎ </span><span style="color:#8a8a8a"> open</span>  <span style="color:#d0d0d0;background:#3a3a3a"> space </span><span style="color:#8a8a8a"> select</span>  <span style="color:#d0d0d0;background:#3a3a3a"> t </span><span style="color:#8a8a8a"> trash</span>  <span style="color:#d0d0d0;background:#3a3a3a"> ? </span><span style="color:#8a8a8a"> help</span>  <span style="color:#d0d0d0;background:#3a3a3a"> q </span><span style="color:#8a8a8a"> quit</span></pre>
-          </div>
-          <figcaption>The same example Mac in <code>macsafe</code>.</figcaption>
-        </figure>
-    </div>
-  </div></section>
-
-  <section class="b-sec" aria-labelledby="b-find-h"><div class="in">
-    <div class="lab"><h2 id="b-find-h">What it finds.</h2><p>Eight views, each sorted biggest first.</p></div>
-    <ul class="b-list">
-      <li><svg class="ic"><use href="#i-updoc"/></svg><b>Large files</b><span>Anything over 100 MB, biggest first.</span></li>
-      <li><svg class="ic"><use href="#i-clock"/></svg><b>Unused</b><span>Not opened or changed in N months.</span></li>
-      <li><svg class="ic"><use href="#i-box"/></svg><b>Caches</b><span>Safe to clear, or review first.</span></li>
-      <li><svg class="ic"><use href="#i-tray"/></svg><b>Clutter</b><span>Old downloads, installers, node_modules and venvs, iPhone backups.</span></li>
-      <li><svg class="ic"><use href="#i-grid"/></svg><b>Applications</b><span>Last opened, leftovers in Library, uninstall.</span></li>
-      <li><svg class="ic"><use href="#i-docs"/></svg><b>Duplicates</b><span>Byte-for-byte identical copies.</span></li>
-      <li><svg class="ic"><use href="#i-folder"/></svg><b>Explorer</b><span>Drill into any folder by size.</span></li>
-      <li><svg class="ic"><use href="#i-drive"/></svg><b>Outside your home</b><span>What makes up “macOS &amp; other”.</span></li>
-    </ul>
-  </div></section>
-
-  <section class="b-sec" id="b-safe" aria-labelledby="b-safe-h"><div class="in">
-    <div class="lab"><h2 id="b-safe-h">Safety model.</h2><p>What each action does, and what it will never do.</p></div>
-    <div>
-      <div class="b-tablewrap">
-        <table class="b-table">
-          <thead><tr><th scope="col">Action</th><th scope="col">Reversible</th><th scope="col">Confirmation</th></tr></thead>
-          <tbody>
-            <tr><td>Move to Trash<kbd>⌘⌫</kbd><kbd>t</kbd></td><td><span class="st g">Yes, with Undo</span></td><td>None needed</td></tr>
-            <tr><td>Delete permanently<kbd>x</kbd></td><td><span class="st w">No</span></td><td>Always warns first</td></tr>
-            <tr><td>Clear cache</td><td><span class="st w">No</span></td><td>Always warns first</td></tr>
-            <tr><td>Empty Trash</td><td><span class="st w">No</span></td><td>Always warns first</td></tr>
-            <tr><td>System &amp; standard folders</td><td><span class="st r">Refused</span></td><td>Can’t be removed at all</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="b-note">In the app, Return cancels a warning. In the terminal, only the <code>y</code> key confirms; a mouse click can’t. Keychains, Preferences, <code>~/.ssh</code> and anything inside a package such as a Photos library are refused too.</p>
-    </div>
-  </div></section>
-
-  <section class="b-sec" id="b-inst" aria-labelledby="b-inst-h"><div class="in">
-    <div class="lab"><h2 id="b-inst-h">What the installer does.</h2><p>Nothing else is installed: no Homebrew, no background services. Re-run to update.</p></div>
-    <div>
-      <ol class="b-steps">
-        <li><b>Checks your Mac</b><p>macOS 14 or later, Apple Silicon or Intel.</p></li>
-        <li><b>Installs Python 3, only if it’s missing</b><p>The official python.org package, signature-checked against the Python Software Foundation. Asks for your password once.</p></li>
-        <li><b>Installs the app</b><p>The latest release, verified against its published checksum, into <code>/Applications/MacSafe.app</code>.</p></li>
-        <li><b>Adds <code>macsafe</code></b><p>Into <code>~/.local/bin</code>. It replaces the older <code>storagemon</code> command and Storage Monitor.app if you had them.</p></li>
-      </ol>
-      <div class="b-cards">
-        <section id="b-dmg" aria-labelledby="b-zip">
-          <h3 id="b-zip">Disk image</h3>
-          <p>Open the disk image and drag <strong>MacSafe</strong> into <strong>Applications</strong>. The app isn’t notarized, so the first launch shows a “could not verify” warning once: click <strong>Done</strong>, then <strong>System Settings › Privacy &amp; Security › Open Anyway</strong>. Needs Python 3 from <a href="https://www.python.org/downloads/macos/">python.org</a>.</p>
-          <a class="b-dl" href="https://github.com/gabrielesarria167-ai/MacSafe/releases/latest/download/MacSafe.dmg"><svg class="ic"><use href="#i-down"/></svg>MacSafe.dmg</a>
-        </section>
-        <section aria-labelledby="b-fda">
-          <h3 id="b-fda">Full Disk Access &amp; uninstall</h3>
-          <p>For complete totals, turn on <strong>MacSafe</strong> (and <strong>Terminal</strong>, for <code>macsafe</code>) in <strong>System Settings › Privacy &amp; Security › Full Disk Access</strong>. The app walks you through it the first time it opens, before the first scan, and updates keep it on.</p>
-          <div class="b-cmd" aria-label="Uninstall command">
-            <pre id="b-un">curl -fsSL https://<wbr>gabrielesarria167-ai.github.io<wbr>/MacSafe/install.sh | bash -s -- --uninstall</pre>
-            <button class="b-copy copy" type="button" data-copy="b-un"><svg class="ic"><use href="#i-copy"/></svg><span>Copy</span></button>
-          </div>
-          <p>Removes the app, the command and their caches. Python stays.</p>
-        </section>
-      </div>
-    </div>
-  </div></section>
-
-  <footer class="b-foot"><div class="in">
-    <span>MacSafe runs entirely on your Mac. Nothing is uploaded.</span>
-    <span><a href="https://github.com/gabrielesarria167-ai/MacSafe/releases/latest">Release notes</a> · <a href="https://github.com/gabrielesarria167-ai/MacSafe">github.com/gabrielesarria167-ai/MacSafe</a></span>
-  </div></footer>
 </div>
 
+      </div></div>
+    </div>
+  </section>
+
+  <section class="sec" id="two" aria-labelledby="two-h">
+    <div class="sec-head">
+      <h2 id="two-h">Two ways in, one scanner.</h2>
+      <p>A Mac app and the <code>macsafe</code> terminal dashboard read the same scan. Both open instantly with the last one and rescan in the background when it’s older than 15 minutes. Both keep themselves up to date.</p>
+    </div>
+    <div class="two">
+      <div>
+        <div class="fe">
+          <h3>The Mac app</h3>
+          <p>For browsing, sorting and bulk cleanup. Select any part of the disk to see what’s in it, or review anything under Free up space.</p>
+          <dl class="kv">
+            <dt>⌘⌫</dt><dd>Move to Trash</dd>
+            <dt>⌘Z</dt><dd>Put it back</dd>
+            <dt>⌘R</dt><dd>Rescan</dd>
+          </dl>
+        </div>
+        <div class="fe">
+          <h3>The <code>macsafe</code> command</h3>
+          <p>A quick check without leaving Terminal. Click a slice of the ring or any row, or use the keyboard.</p>
+          <dl class="kv">
+            <dt>--report</dt><dd>Print a summary and exit</dd>
+            <dt>--update</dt><dd>Install the latest version now</dd>
+            <dt>--app</dt><dd>Open the Mac app</dd>
+            <dt>--no-mouse</dt><dd>Leave clicks to the terminal for selecting text</dd>
+          </dl>
+        </div>
+      </div>
+      <figure style="margin:0">
+        <div class="term">
+          <div class="term-bar" aria-hidden="true"><i></i><i></i><i></i><span>macsafe</span></div>
+<pre aria-label="macsafe terminal dashboard, quick wins panel"><span class="t1">MacSafe</span>  71.2 GB free, scanned 2 minutes ago
+
+╭─ Macintosh HD ─────────────────────────── 245 GB ─╮
+│  <span class="tv">●</span> macOS &amp; other          99.0 GB   40%          │
+│  <span class="tc">●</span> App data &amp; caches      43.7 GB   18%          │
+│  <span class="tr">●</span> Applications           23.3 GB   10%          │
+│  <span class="ty">●</span> Your files              7.8 GB    3%          │
+│  <span class="tg">○</span> Free                   71.2 GB   29%          │
+╰───────────────────────────────────────────────────╯
+╭─ Quick wins ───────────────────── 26.5 GB to free ─╮
+│  Safe-to-clear caches          6.4 GB   4 Caches   │
+│  node_modules &amp; virtualenvs    1.2 GB   5 Clutter  │
+│  Installers &amp; disk images      3.1 GB   5 Clutter  │
+│  Downloads untouched 3+ months 1.3 GB   5 Clutter  │
+│  iPhone / iPad backups        12.6 GB   5 Clutter  │
+│  Trash                         1.9 GB   E empty    │
+╰───────────────────────────────────────────────────╯
+<span class="tg">↑↓ move   ⏎ open   t trash   ? help   q quit</span></pre>
+        </div>
+        <figcaption class="cap"><b>Fig. 2</b> The same example Mac in <code>macsafe</code>, the terminal dashboard.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="sec" id="finds" aria-labelledby="finds-h">
+    <div class="sec-head">
+      <h2 id="finds-h">What it finds.</h2>
+      <p>Each view names a culprit and sorts it biggest first.</p>
+    </div>
+    <div class="finds">
+      <ul class="views">
+        <li><b>Overview</b><span>The whole disk at once, and what you could free.</span></li>
+        <li><b>Explorer</b><span>Drill into any folder by size.</span></li>
+        <li><b>Large files</b><span>Anything over 100 MB.</span></li>
+        <li><b>Unused</b><span>Not opened or changed in months.</span></li>
+        <li><b>Duplicates</b><span>Byte-for-byte identical copies.</span></li>
+        <li><b>Caches</b><span>Safe to clear, or review first.</span></li>
+        <li><b>Clutter</b><span>Old downloads, installers, node_modules and virtualenvs, iPhone backups.</span></li>
+        <li><b>Applications</b><span>When you last opened each app, its leftovers, and uninstall.</span></li>
+        <li><b>Outside your home</b><span>What makes up macOS &amp; other.</span></li>
+      </ul>
+      <figure style="margin:0">
+        <div class="fscale" aria-hidden="true"><span>0</span><span>26.5 GB</span></div>
+        <svg class="fbar" id="fbar" role="img" aria-label="Bar of 26.5 GB you could free, split into six finds"></svg>
+        <ul class="fkey" id="fkey"></ul>
+        <div class="states" aria-label="How to read the marks">
+          <span><svg viewBox="0 0 30 12" aria-hidden="true"><rect x="0" y="1" width="30" height="10" rx="1" fill="#2fd49a"/></svg>Safe to clear</span>
+          <span><svg viewBox="0 0 30 12" aria-hidden="true"><rect x="0" y="1" width="30" height="10" rx="1" fill="url(#hatch-k)"/><rect x=".5" y="1.5" width="29" height="9" rx="1" fill="none" stroke="#b4bfd1" stroke-width="1"/></svg>Look before deleting</span>
+          <span><svg viewBox="0 0 30 12" aria-hidden="true"><rect x=".6" y="1.6" width="28.8" height="8.8" rx="1" fill="none" stroke="#b4bfd1" stroke-width="1.2" stroke-dasharray="3 2.4"/></svg>Asks before it deletes</span>
+        </div>
+        <figcaption class="cap"><b>Fig. 3</b> The 26.5 GB you could free on the example Mac, drawn to one scale. Hatched finds are yours to check first: MacSafe shows them, you decide.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="sec" id="safety" aria-labelledby="safety-h">
+    <div class="sec-head">
+      <h2 id="safety-h">Careful by default.</h2>
+      <p>The safe path is the default path. One line tells you what each action does: solid means you can undo it, dashed means it asks first, struck means MacSafe won’t do it.</p>
+    </div>
+    <div class="safety">
+      <div>
+        <table class="rules">
+          <thead><tr><th scope="col"><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">State</span></th><th scope="col">Action</th><th scope="col">What happens</th></tr></thead>
+          <tbody>
+            <tr><td><svg viewBox="0 0 36 10" aria-hidden="true"><line x1="0" y1="5" x2="36" y2="5" stroke="#e8ecf3" stroke-width="1.6"/></svg></td><td class="what">Move to Trash<kbd>⌘⌫</kbd></td><td>Reversible. Undo puts it back where it was.</td></tr>
+            <tr><td><svg viewBox="0 0 36 10" aria-hidden="true"><line x1="0" y1="5" x2="36" y2="5" stroke="#e8ecf3" stroke-width="1.6" stroke-dasharray="5 4"/></svg></td><td class="what">Delete permanently</td><td>Always warns first. Return cancels the warning.</td></tr>
+            <tr><td><svg viewBox="0 0 36 10" aria-hidden="true"><line x1="0" y1="5" x2="36" y2="5" stroke="#e8ecf3" stroke-width="1.6" stroke-dasharray="5 4"/></svg></td><td class="what">Clear cache</td><td>Always warns first. Apps rebuild what they need.</td></tr>
+            <tr><td><svg viewBox="0 0 36 10" aria-hidden="true"><line x1="0" y1="5" x2="36" y2="5" stroke="#e8ecf3" stroke-width="1.6" stroke-dasharray="5 4"/></svg></td><td class="what">Empty Trash</td><td>Always warns first.</td></tr>
+            <tr><td><svg viewBox="0 0 36 10" aria-hidden="true"><line x1="0" y1="5" x2="36" y2="5" stroke="#8593aa" stroke-width="1.6"/><line x1="13" y1="10" x2="23" y2="0" stroke="#e8ecf3" stroke-width="1.6"/></svg></td><td class="what refused">System and standard folders</td><td>Refused outright, along with Keychains, Preferences, <code>~/.ssh</code> and anything inside a package such as a Photos library.</td></tr>
+          </tbody>
+        </table>
+        <p class="note">In the terminal only the <code>y</code> key confirms a warning; a mouse click can’t.</p>
+      </div>
+      <figure style="margin:0">
+        <svg class="cut" id="cut" role="img" aria-label="Part of the disk ring with a 6.4 GB gap where caches were cleared"></svg>
+        <figcaption class="cap"><b>Fig. 4</b> App data &amp; caches on the example Mac after clearing 6.4 GB of caches. The gap is space you got back.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="sec" id="install" aria-labelledby="install-h">
+    <div class="sec-head">
+      <h2 id="install-h">What the installer does.</h2>
+      <p>Nothing else gets installed: no Homebrew, no background services. Run it again any time to update.</p>
+    </div>
+    <ol class="steps">
+      <li><span class="n">1</span><h3>Checks your Mac</h3><p>macOS 14 or later, Apple Silicon or Intel.</p></li>
+      <li><span class="n">2</span><h3>Adds Python 3, only if it’s missing</h3><p>The official python.org package, signature-checked against the Python Software Foundation. Asks for your password once.</p></li>
+      <li><span class="n">3</span><h3>Installs the app</h3><p>The latest release, checked against its published checksum, into <code>/Applications/MacSafe.app</code>.</p></li>
+      <li><span class="n">4</span><h3>Adds <code>macsafe</code></h3><p>Into <code>~/.local/bin</code>. It replaces the older <code>storagemon</code> command and Storage Monitor.app if you had them.</p></li>
+    </ol>
+
+    <div class="more">
+      <div id="dmg">
+        <h3>Prefer a regular download</h3>
+        <p>Open the disk image and drag MacSafe into Applications. The app isn’t notarized, so the first launch shows a “could not verify” warning once: click Done, then open <span class="path">System Settings › Privacy &amp; Security</span> and choose Open Anyway. Needs Python 3 from <a href="https://www.python.org/downloads/macos/">python.org</a>.</p>
+        <a class="glossy" href="https://github.com/gabrielesarria167-ai/MacSafe/releases/latest/download/MacSafe.dmg"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.5v9M5.2 7.9 9 11.6l3.8-3.7M3 14.8h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
+      </div>
+      <div>
+        <h3>Full Disk Access</h3>
+        <p>For complete totals, turn on MacSafe (and Terminal, for <code>macsafe</code>) in <span class="path">System Settings › Privacy &amp; Security</span> › Full Disk Access. The app walks you through it before the first scan, and updates keep it on.</p>
+      </div>
+      <div>
+        <h3>Uninstall</h3>
+        <p>Removes the app, the command and their caches. Python stays.</p>
+        <div class="cmd">
+          <code id="cmd2" tabindex="0"><span class="nw">curl -fsSL https://</span><wbr><span class="nw">gabrielesarria167-ai.github.io</span><wbr><span class="nw">/MacSafe/install.sh</span> <span class="nw">| bash</span> <span class="nw">-s -- --uninstall</span></code>
+          <button class="copy" type="button" data-copy="cmd2" aria-describedby="note2"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="8.5" height="8.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3.6A1.5 1.5 0 0 0 2.1 3v5.4a1.5 1.5 0 0 0 1.5 1.5h.2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><span>Copy</span></button>
+        </div>
+        <p class="cmd-note" id="note2" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="close" aria-labelledby="close-h">
+    <div>
+      <h2 id="close-h">See where it went. Then get it back.</h2>
+      <p>Free. The source is on GitHub. It runs on your Mac, reads your disk, and keeps what it finds to itself.</p>
+    </div>
+    <div>
+      <label class="cmd-label" for="cmd3">Paste into Terminal to install</label>
+      <div class="cmd">
+        <code id="cmd3" tabindex="0"><span class="nw">curl -fsSL https://</span><wbr><span class="nw">gabrielesarria167-ai.github.io</span><wbr><span class="nw">/MacSafe/install.sh</span> <span class="nw">| bash</span></code>
+        <button class="copy" type="button" data-copy="cmd3" aria-describedby="note3"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="8.5" height="8.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3.6A1.5 1.5 0 0 0 2.1 3v5.4a1.5 1.5 0 0 0 1.5 1.5h.2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><span>Copy</span></button>
+      </div>
+      <p class="cmd-note" id="note3" aria-live="polite">Or <a href="https://github.com/gabrielesarria167-ai/MacSafe/releases/latest/download/MacSafe.dmg">download MacSafe.dmg</a>.</p>
+    </div>
+  </section>
+  </main>
+
+
+  <footer>
+    <span>MacSafe runs entirely on your Mac. Nothing is uploaded. Example data from a 245 GB Mac.</span>
+    <nav aria-label="Project">
+      <a href="https://github.com/gabrielesarria167-ai/MacSafe/releases/latest">Release notes</a>
+      <a href="https://github.com/gabrielesarria167-ai/MacSafe">Source on GitHub</a>
+    </nav>
+    <p class="attr">“HDD” (<a href="https://sketchfab.com/3d-models/hdd-66abd679b8934298ba8af35db56d8106">https://sketchfab.com/3d-models/hdd-66abd679b8934298ba8af35db56d8106</a>) by Nadya Sarieva (<a href="https://sketchfab.com/nsarieva13">https://sketchfab.com/nsarieva13</a>), licensed under CC BY 4.0 (<a href="http://creativecommons.org/licenses/by/4.0/">http://creativecommons.org/licenses/by/4.0/</a>). Modified: platter replaced, materials changed.</p>
+  </footer>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch-k" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#b4bfd1" stroke-width="1.2"/></pattern>
+  </defs>
+</svg>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script>
-(function () {
-  /* copy buttons */
-  document.querySelectorAll(".copy").forEach(function (btn) {
-    var label = btn.querySelector("span") || btn;
-    btn.addEventListener("click", function () {
-      var pre = document.getElementById(btn.dataset.copy);
-      function done(text) {
-        label.textContent = text;
-        btn.classList.toggle("done", text === "Copied");
-        setTimeout(function () { label.textContent = "Copy"; btn.classList.remove("done"); }, 1800);
-      }
-      function selectIt() {
-        var r = document.createRange(); r.selectNodeContents(pre);
-        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-        done("Press ⌘C");
-      }
-      try { navigator.clipboard.writeText(pre.textContent).then(function () { done("Copied"); }, selectIt); }
-      catch (e) { selectIt(); }
+(function(){
+"use strict";
+/* ---------- data: example Mac, 245 GB ---------- */
+var NS = "http://www.w3.org/2000/svg";
+var DISK = 245;
+var GROUND = "#0c1220";
+var TRACK = "rgba(255,255,255,.08)";
+var CATS = [
+  {key:"apps",    name:"Applications",      gb:23.3, top:"#4da3ff", deep:"#2f6fe8", what:"Your Applications folder"},
+  {key:"files",   name:"Your files",        gb:7.8,  top:"#ff7a45", deep:"#e8502a", what:"Documents and downloads"},
+  {key:"appdata", name:"App data & caches", gb:43.7, top:"#2fd49a", deep:"#14a877", what:"Library, hidden folders"},
+  {key:"system",  name:"macOS & other",     gb:99.0, top:"#ffc233", deep:"#f09a12", what:"Managed by macOS"},
+  {key:"free",    name:"Free",              gb:71.2, top:null,      deep:null,      what:"Available space"}
+];
+var FOLDERS = [
+  {name:"Downloads", gb:3.9,  cat:"files"},
+  {name:"Developer", gb:1.4,  cat:"files"},
+  {name:"Documents", gb:1.1,  cat:"files"},
+  {name:"Library",   gb:41.9, cat:"appdata"},
+  {name:".cache",    gb:1.8,  cat:"appdata"}
+];
+var FILES = [
+  {name:"ubuntu-24.04-desktop-arm64.iso", gb:2.6,  num:"2.6", unit:"GB", folder:"Downloads"},
+  {name:"Docker.dmg",                     gb:0.52, num:"520", unit:"MB", folder:"Downloads"},
+  {name:"Project archive.zip",            gb:0.74, num:"740", unit:"MB", folder:"Documents"}
+];
+var FINDS = [
+  {name:"Device backups",      gb:12.6, cat:"appdata", state:"review", tint:"purple", icon:"phone", btn:"Review",       detail:"Local iPhone and iPad backups."},
+  {name:"Caches",              gb:6.4,  cat:"appdata", state:"safe",   tint:"green",  icon:"box",   btn:"Review",       detail:"Safe to clear. Apps rebuild them as needed."},
+  {name:"Installers",          gb:3.1,  cat:"files",   state:"review", tint:"teal",   icon:"pkg",   btn:"Review",       detail:"Disk images and packages you’ve probably already installed."},
+  {name:"Trash",               gb:1.9,  cat:null,      state:"warn",   tint:"pink",   icon:"trash", btn:"Empty Trash…", detail:"Deleted files still take space until you empty the Trash."},
+  {name:"Old downloads",       gb:1.3,  cat:"files",   state:"review", tint:"blue",   icon:"down",  btn:"Review",       detail:"Downloads you haven’t touched in 3+ months."},
+  {name:"Developer leftovers", gb:1.2,  cat:"files",   state:"review", tint:"orange", icon:"dev",   btn:"Review",       detail:"node_modules and virtualenvs you can reinstall."}
+];
+var TINTS = {
+  blue:["#4da3ff","#2f6fe8"], orange:["#ff7a45","#e8502a"], green:["#2fd49a","#14a877"], yellow:["#ffc233","#f09a12"],
+  purple:["#9b7bff","#6a4ae0"], pink:["#ff5c8a","#e0346a"], teal:["#3ccfe0","#1596b8"], gray:["#9a9aa1","#66666d"]
+};
+
+/* ---------- colour ---------- */
+function rgbOf(h){ if (h.charAt(0) !== "#") return h.replace(/[^\d,]/g, "").split(",").map(Number); var n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function mixC(a, b, t){ var x = rgbOf(a), y = rgbOf(b); return "rgb(" + [0,1,2].map(function(i){ return Math.round(x[i] + (y[i] - x[i]) * t); }).join(",") + ")"; }
+function toGround(h, t){ return mixC(h, GROUND, t); }
+function gbs(gb){ return gb.toFixed(1) + " GB"; }
+function pct(gb){ return Math.round(gb / DISK * 100) + "%"; }
+
+/* ---------- geometry: one scale, degrees per GB; bar length per GB ---------- */
+var DEG = 360 / DISK;
+var R = {tick0:128, tick1:137, cat0:148, cat1:214, fold0:222, fold1:254, bar0:262, barPerGB:30, clear:268, labelX:362, platter:262, hub:89};
+var BAR_W = 2.8, BAR_GAP = 2.6;
+(function(){
+  var s = 0;
+  CATS.forEach(function(c){ c.d0 = s; c.d1 = s + c.gb * DEG; c.mid = (c.d0 + c.d1) / 2; s = c.d1; });
+  var cur = {};
+  FOLDERS.forEach(function(f){ var c = catBy(f.cat), st = cur[f.cat] == null ? c.d0 : cur[f.cat]; f.d0 = st; f.d1 = st + f.gb * DEG; f.mid = (f.d0 + f.d1) / 2; cur[f.cat] = f.d1; });
+  CATS.forEach(function(c){ c.used = cur[c.key]; });
+  var fc = {};
+  FILES.forEach(function(f){ var p = folderBy(f.folder), st = fc[f.folder] == null ? p.d0 : fc[f.folder]; f.d0 = st; f.d1 = st + f.gb * DEG; fc[f.folder] = f.d1; f.cat = p.cat; f.mid = (f.d0 + f.d1) / 2; f.tip = R.bar0 + f.gb * R.barPerGB; });
+  var prev = -999;
+  FILES.slice().sort(function(a, b){ return a.mid - b.mid; }).forEach(function(f){ f.b0 = Math.max(f.mid - BAR_W / 2, prev + BAR_GAP); f.b1 = f.b0 + BAR_W; f.mid = (f.b0 + f.b1) / 2; prev = f.b1; });
+})();
+function catBy(k){ for (var i = 0; i < CATS.length; i++) if (CATS[i].key === k) return CATS[i]; }
+function folderBy(n){ for (var i = 0; i < FOLDERS.length; i++) if (FOLDERS[i].name === n) return FOLDERS[i]; }
+
+function svgEl(tag, attrs, parent){ var n = document.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+function polar(cx, cy, r, deg){ var a = deg * Math.PI / 180; return [cx + r * Math.sin(a), cy - r * Math.cos(a)]; }
+function sectorPath(cx, cy, r0, r1, d0, d1){
+  var large = (d1 - d0) > 180 ? 1 : 0, a = polar(cx, cy, r1, d0), b = polar(cx, cy, r1, d1), c = polar(cx, cy, r0, d1), d = polar(cx, cy, r0, d0);
+  return "M" + a[0].toFixed(2) + " " + a[1].toFixed(2) + "A" + r1 + " " + r1 + " 0 " + large + " 1 " + b[0].toFixed(2) + " " + b[1].toFixed(2) +
+         "L" + c[0].toFixed(2) + " " + c[1].toFixed(2) + "A" + r0 + " " + r0 + " 0 " + large + " 0 " + d[0].toFixed(2) + " " + d[1].toFixed(2) + "Z";
+}
+/* an arc whose colour runs along its sweep, from a to b, in short overlapping steps (SVG has no conic gradient) */
+function gradientArc(parent, cx, cy, r0, r1, d0, d1, a, b, cls){
+  var g = svgEl("g", {"class":cls || ""}, parent), span = d1 - d0, n = Math.max(1, Math.ceil(span / 1.5));
+  for (var i = 0; i < n; i++){
+    var s0 = d0 + span * i / n, s1 = d0 + span * (i + 1) / n + (i < n - 1 ? .35 : 0);
+    svgEl("path", {d:sectorPath(cx, cy, r0, r1, s0, Math.min(s1, d1)), fill:mixC(a, b, n === 1 ? 0 : i / (n - 1))}, g);
+  }
+  return g;
+}
+function gapDeg(px, r){ return px / r * 180 / Math.PI; }
+
+/* ---------- the figure ---------- */
+function Figure(svg, o){
+  this.svg = svg; this.o = o; this.cx = o.cx; this.cy = o.cy; this.current = null; this.groups = {};
+  this.build();
+}
+Figure.prototype.build = function(){
+  var self = this, o = this.o, svg = this.svg, cx = this.cx, cy = this.cy;
+  var gap = o.gap || 3.5;
+  var rings = this.rings = svgEl("g", {"class":"rings"}, svg);
+  svgEl("circle", {cx:cx, cy:cy, r:R.tick1, "class":"ring-hair"}, rings);
+  var ticks = svgEl("g", {"aria-hidden":"true", "class":"ticks"}, rings);
+  for (var g = 0; g < DISK; g += 10){
+    var major = g % 50 === 0, a = polar(cx, cy, R.tick1, g * DEG), b = polar(cx, cy, major ? R.tick0 - 2 : R.tick0 + 3, g * DEG);
+    svgEl("line", {x1:a[0], y1:a[1], x2:b[0], y2:b[1], "class":"tick" + (major ? " major" : "")}, ticks);
+    if (o.tickLabels && major){ var l = polar(cx, cy, R.tick0 - 20, g * DEG); var t = svgEl("text", {x:l[0].toFixed(1), y:(l[1] + 5).toFixed(1), "class":"tick-lbl", "text-anchor":"middle"}, ticks); t.textContent = g === 0 ? "0 GB" : String(g); }
+  }
+  CATS.forEach(function(c){
+    var grp = svgEl("g", {"class":"cat", "data-key":c.key, tabindex:"0", role:"button", "aria-pressed":"false", "aria-label":c.name + ", " + gbs(c.gb) + ", " + pct(c.gb) + " of the disk"}, rings);
+    if (c.top) grp.setAttribute("style", "--glow:" + c.top);
+    self.groups[c.key] = grp;
+    svgEl("path", {d:sectorPath(cx, cy, R.cat0 - 4, R.fold1 + 6 + (c.key === "files" ? 92 : 0), c.d0, c.d1), "class":"hit"}, grp);
+    var gi = gapDeg(gap / 2, (R.cat0 + R.cat1) / 2);
+    if (c.top) gradientArc(grp, cx, cy, R.cat0, R.cat1, c.d0 + gi, c.d1 - gi, c.top, c.deep, "inner");
+    else svgEl("path", {d:sectorPath(cx, cy, R.cat0, R.cat1, c.d0 + gi, c.d1 - gi), "class":"free-arc inner"}, grp);
+    if (c.top){
+      var folds = svgEl("g", {"class":"folds"}, grp), gf = gapDeg(gap / 2, (R.fold0 + R.fold1) / 2);
+      FOLDERS.filter(function(f){ return f.cat === c.key; }).forEach(function(f){ gradientArc(folds, cx, cy, R.fold0, R.fold1, f.d0 + gf, f.d1 - gf, toGround(c.top, .42), toGround(c.deep, .42), "fold"); });
+      var from = c.used != null ? c.used : c.d0;
+      if (c.d1 - from > .3) svgEl("path", {d:sectorPath(cx, cy, R.fold0, R.fold1, from + gf, c.d1 - gf), fill:TRACK, "class":"track"}, folds);
+      var bars = svgEl("g", {"class":"bars"}, grp);
+      FILES.filter(function(f){ return f.cat === c.key; }).forEach(function(f){
+        for (var k = 0; k < f.gb; k++){
+          var r0 = R.bar0 + k * R.barPerGB + (k ? 2 : 0), r1 = Math.min(f.tip, R.bar0 + (k + 1) * R.barPerGB);
+          svgEl("path", {d:sectorPath(cx, cy, r0, r1, f.b0, f.b1), fill:mixC(c.deep, c.top, Math.min(1, (k + 1) / 3))}, bars);
+        }
+      });
+    }
+    svgEl("path", {d:sectorPath(cx, cy, R.cat0 - 4, R.cat1 + 4, c.d0, c.d1), "class":"fring"}, grp);
+    var tt = svgEl("title", {}, grp); tt.textContent = c.name + ", " + gbs(c.gb);
+    grp.addEventListener("click", function(){ self.select(self.current === c.key ? null : c.key); });
+    grp.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); self.select(self.current === c.key ? null : c.key); } });
+  });
+  var ctr = this.ctr = svgEl("g", {"class":"ctr"}, rings);
+  svgEl("circle", {cx:cx, cy:cy, r:R.tick0 - 26, "class":"hit"}, ctr);
+  var cs = o.center || [17, 42, 16.5];
+  this.ctrA = svgEl("text", {x:cx, y:cy - cs[1] * .72, "class":"ctr-a", "text-anchor":"middle", "font-size":cs[0]}, ctr);
+  this.ctrB = svgEl("text", {x:cx, y:cy + cs[1] * .3, "class":"ctr-b", "text-anchor":"middle", "font-size":cs[1]}, ctr);
+  this.ctrC = svgEl("text", {x:cx, y:cy + cs[1] * .3 + cs[2] * 1.6, "class":"ctr-c", "text-anchor":"middle", "font-size":cs[2]}, ctr);
+  ctr.addEventListener("click", function(){ self.select(null); });
+  if (o.scaleKey){
+    var sc = svgEl("g", {"class":"scale", "aria-hidden":"true"}, svg), sx = o.scaleKey[0], sy = o.scaleKey[1];
+    svgEl("line", {x1:sx, y1:sy, x2:sx + R.barPerGB, y2:sy, "class":"scale-line"}, sc);
+    svgEl("line", {x1:sx, y1:sy - 4, x2:sx, y2:sy + 4, "class":"scale-line"}, sc);
+    svgEl("line", {x1:sx + R.barPerGB, y1:sy - 4, x2:sx + R.barPerGB, y2:sy + 4, "class":"scale-line"}, sc);
+    var st = svgEl("text", {x:sx + R.barPerGB + 10, y:sy + 5, "class":"scale-lbl"}, sc); st.textContent = "Bar length 1 GB";
+  }
+  this.lbls = svgEl("g", {"class":"lbls", "aria-hidden":"true"}, svg);
+  this.select(null, true);
+};
+Figure.prototype.center = function(key){
+  var c = key ? catBy(key) : null, f = this.o.centerText;
+  var t = f ? f(c) : (c ? [c.name, gbs(c.gb), pct(c.gb) + " of 245 GB"] : ["Macintosh HD", "245 GB", "71.2 GB free"]);
+  this.ctrA.textContent = t[0]; this.ctrB.textContent = t[1]; this.ctrC.textContent = t[2];
+};
+Figure.prototype.select = function(key, initial){
+  this.current = key;
+  if (key) this.svg.setAttribute("data-sel", key); else this.svg.removeAttribute("data-sel");
+  for (var k in this.groups){ var on = k === key; this.groups[k].classList.toggle("on", on); this.groups[k].setAttribute("aria-pressed", on ? "true" : "false"); }
+  this.center(key);
+  this.layoutLabels();
+  if (this.o.onChange) this.o.onChange(key, !!initial);
+};
+
+/* labels: one justified column per side, a radial stem then a horizontal shoulder; bold name, lighter value with a smaller unit */
+var LABEL_DEG = {apps:6, files:45.2, appdata:62, system:215, free:307};
+Figure.prototype.labelItems = function(sel){
+  function catItem(c){ return {deg:LABEL_DEG[c.key], r:R.cat1, min:R.clear, a:c.name, num:c.gb.toFixed(1), unit:"GB", extra:pct(c.gb)}; }
+  function fileItem(f){ return {deg:f.mid, r:f.tip, min:f.tip + 12, a:f.name, num:f.num, unit:f.unit, extra:"in ~/" + f.folder}; }
+  var biggest = FILES.slice().sort(function(a, b){ return b.gb - a.gb; })[0];
+  if (!sel){ var rest = CATS.map(catItem); rest.push(fileItem(biggest)); return rest; }
+  var c = catBy(sel), items = [catItem(c)];
+  var folders = FOLDERS.filter(function(f){ return f.cat === sel; }), files = FILES.filter(function(f){ return f.cat === sel; });
+  if (folders.length + files.length > 3){ folders = folders.slice(0, 1); files = files.slice().sort(function(a, b){ return b.gb - a.gb; }).slice(0, 1); }
+  folders.forEach(function(f){
+    var deg = f.mid;
+    FILES.forEach(function(b){ if (b.cat === sel && deg > b.b0 - .2 && deg < b.b1 + .2) deg = b.b1 + BAR_GAP / 2; });
+    if (deg > f.d1) deg = f.mid;
+    items.push({deg:deg, r:R.fold1, min:R.clear, a:f.name, num:f.gb.toFixed(1), unit:"GB", extra:""});
+  });
+  files.forEach(function(f){ items.push(fileItem(f)); });
+  var side = Math.sin(LABEL_DEG[sel] * Math.PI / 180) > 0 ? "r" : "l";
+  items.forEach(function(it){ it.side = side; });
+  return items;
+};
+Figure.prototype.layoutLabels = function(){
+  var lb = this.lbls, cx = this.cx, cy = this.cy, o = this.o;
+  while (lb.firstChild) lb.removeChild(lb.firstChild);
+  if (!o.labels || (o.isNarrow && o.isNarrow())) return;
+  var items = this.labelItems(this.current), H = 52, TOP = 30, BOTTOM = o.bottom || 714;
+  ["r","l"].forEach(function(side){
+    var list = items.filter(function(it){ return (it.side || (Math.sin(it.deg * Math.PI / 180) > 0 ? "r" : "l")) === side; });
+    list.sort(function(a, b){ return side === "r" ? (a.deg - b.deg) || (b.r - a.r) : (b.deg - a.deg) || (b.r - a.r); });
+    list.forEach(function(it){ it.cos = Math.cos(it.deg * Math.PI / 180); it.y = cy - it.cos * it.min; });
+    for (var i = list.length - 2; i >= 0; i--) list[i].y = Math.min(list[i].y, list[i + 1].y - H);
+    for (var j = 0; j < list.length; j++) list[j].y = Math.max(list[j].y, j ? list[j - 1].y + H : TOP);
+    var over = list.length ? list[list.length - 1].y - BOTTOM : 0;
+    if (over > 0) list.forEach(function(it){ it.y -= over; });
+    var lx = side === "r" ? cx + R.labelX : cx - R.labelX, anchor = side === "r" ? "start" : "end";
+    list.forEach(function(it){
+      var rEnd = it.min;
+      if (Math.abs(it.cos) > .3) rEnd = (cy - it.y) / it.cos;
+      var s = Math.sin(it.deg * Math.PI / 180), rMax = Math.abs(s) > .05 ? Math.abs((lx - cx) / s) - 26 : 999;
+      rEnd = Math.max(it.min, Math.min(rEnd, rMax));
+      var p0 = polar(cx, cy, it.r, it.deg), p1 = polar(cx, cy, rEnd, it.deg), tx = side === "r" ? lx - 8 : lx + 8;
+      var pts = p0[0].toFixed(1) + "," + p0[1].toFixed(1) + " " + p1[0].toFixed(1) + "," + p1[1].toFixed(1) + " " + tx + "," + it.y.toFixed(1);
+      svgEl("polyline", {points:pts, "class":"leader-halo"}, lb);
+      svgEl("polyline", {points:pts, "class":"leader"}, lb);
+      svgEl("circle", {cx:p0[0].toFixed(1), cy:p0[1].toFixed(1), r:"2.4", "class":"leader-dot"}, lb);
+      var a = svgEl("text", {x:lx, y:(it.y - 5).toFixed(1), "class":"lbl-a", "text-anchor":anchor}, lb); a.textContent = it.a;
+      var b = svgEl("text", {x:lx, y:(it.y + 17).toFixed(1), "class":"lbl-b", "text-anchor":anchor}, lb);
+      var n = svgEl("tspan", {}, b); n.textContent = it.num;
+      var u = svgEl("tspan", {"class":"lbl-u", dx:"3"}, b); u.textContent = it.unit;
+      if (it.extra){ var e = svgEl("tspan", {"class":"lbl-x", dx:"10"}, b); e.textContent = it.extra; }
     });
   });
+};
+
+/* the same figure painted onto the platter: ring geometry and colours from the same data, revealed outward by p (0..1) */
+function paintPlatter(ctx, size, p, withData){
+  var k = size / 2 / R.platter, c0 = size / 2;
+  ctx.clearRect(0, 0, size, size);
+  ctx.save(); ctx.translate(c0, c0); ctx.scale(k, k);
+  var base = ctx.createRadialGradient(0, 0, R.hub, 0, 0, R.platter);
+  base.addColorStop(0, "#1b2232"); base.addColorStop(1, "#141a28");
+  ctx.fillStyle = base; ctx.beginPath(); ctx.arc(0, 0, R.platter, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.05)"; ctx.lineWidth = 1;
+  for (var rr = R.hub + 10; rr < R.platter; rr += 9){ ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.stroke(); }
+  if (withData){
+    var reveal = R.tick0 + (R.platter - R.tick0) * Math.max(0, Math.min(1, p));
+    ctx.save(); ctx.beginPath(); ctx.arc(0, 0, reveal, 0, Math.PI * 2); ctx.clip();
+    var arc = function(r0, r1, d0, d1, fill){ ctx.beginPath(); ctx.arc(0, 0, r1, (d0 - 90) * Math.PI / 180, (d1 - 90) * Math.PI / 180); ctx.arc(0, 0, r0, (d1 - 90) * Math.PI / 180, (d0 - 90) * Math.PI / 180, true); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); };
+    var conic = function(d0, d1, a, b){ var g = ctx.createConicGradient((d0 - 90) * Math.PI / 180, 0, 0); var f = Math.max(.001, (d1 - d0) / 360); g.addColorStop(0, a); g.addColorStop(f, b); g.addColorStop(Math.min(1, f + .001), b); g.addColorStop(1, b); return g; };
+    var gap = 4;
+    CATS.forEach(function(c){
+      var gi = gapDeg(gap / 2, (R.cat0 + R.cat1) / 2), gf = gapDeg(gap / 2, (R.fold0 + R.fold1) / 2);
+      if (!c.top){ arc(R.cat0, R.cat1, c.d0 + gi, c.d1 - gi, "rgba(255,255,255,.09)"); return; }
+      arc(R.cat0, R.cat1, c.d0 + gi, c.d1 - gi, conic(c.d0, c.d1, c.top, c.deep));
+      FOLDERS.filter(function(f){ return f.cat === c.key; }).forEach(function(f){ arc(R.fold0, R.fold1, f.d0 + gf, f.d1 - gf, conic(f.d0, f.d1, toGround(c.top, .42), toGround(c.deep, .42))); });
+      var from = c.used != null ? c.used : c.d0;
+      if (c.d1 - from > .3) arc(R.fold0, R.fold1, from + gf, c.d1 - gf, TRACK);
+    });
+    ctx.restore();
+  }
+  ctx.strokeStyle = "rgba(160,176,205,.55)"; ctx.lineWidth = 1.2;
+  for (var g = 0; g < DISK; g += 10){ var a = (g * DEG - 90) * Math.PI / 180, r0 = g % 50 === 0 ? R.tick0 - 2 : R.tick0 + 3; ctx.beginPath(); ctx.moveTo(Math.cos(a) * r0, Math.sin(a) * r0); ctx.lineTo(Math.cos(a) * R.tick1, Math.sin(a) * R.tick1); ctx.stroke(); }
+  ctx.restore();
+}
+
+/* ---------- the Overview window ---------- */
+function initWindow(root){
+  var q = function(s){ return root.querySelector(s); };
+  var esc = function(s){ return s.replace(/&/g, "&amp;"); };
+  var unitHTML = function(gb){ return gb.toFixed(1) + "<small>GB</small>"; };
+  var strip = q(".mw-strip");
+  CATS.forEach(function(c){ var s = document.createElement("span"); s.style.flex = String(c.gb); s.style.background = c.top ? "linear-gradient(90deg," + c.deep + "," + c.top + ")" : "rgba(255,255,255,.1)"; strip.appendChild(s); });
+
+  var CAPS = {
+    all: "<b>Macintosh HD, 245 GB.</b> Inner ring: categories. Outer ring: biggest folders in your home. Bars: largest files.",
+    apps: "<b>Applications, 23.3 GB.</b> Open Applications to see when you last used each app and uninstall the ones you don’t.",
+    files: "<b>Your files, 7.8 GB.</b> Downloads 3.9 GB, Developer 1.4 GB, Documents 1.1 GB. 5.6 GB to review first.",
+    appdata: "<b>App data &amp; caches, 43.7 GB.</b> Library 41.9 GB, .cache 1.8 GB. 6.4 GB of caches is safe to clear; 12.6 GB of backups to review first.",
+    system: "<b>macOS &amp; other, 99.0 GB.</b> macOS itself, snapshots and shared tools. Managed by macOS, so MacSafe only shows them.",
+    free: "<b>Free, 71.2 GB.</b> Clearing everything found would bring it to 97.7 GB."
+  };
+  var EMPTY = {
+    apps: "Nothing to clear here. Open Applications to uninstall apps you don’t use.",
+    system: "Nothing to clear here. macOS manages this space itself.",
+    free: "Free space has nothing to clear. Everything above adds to it."
+  };
+
+  /* legend: dot, label, right-aligned value with a smaller unit */
+  var legend = q(".mw-legend"), lrows = {}, fig;
+  CATS.forEach(function(c){
+    var li = document.createElement("li");
+    li.tabIndex = 0; li.setAttribute("role", "option"); li.setAttribute("aria-selected", "false");
+    li.innerHTML = '<span class="dot" style="background:' + (c.top ? "linear-gradient(" + c.top + "," + c.deep + ")" : "#8b919d") + '"></span><span>' + esc(c.name) + '</span><span class="v">' + unitHTML(c.gb) + '</span><span class="p">' + pct(c.gb) + '</span><span class="w">' + c.what + '</span>';
+    li.addEventListener("click", function(){ fig.select(fig.current === c.key ? null : c.key); });
+    li.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); fig.select(fig.current === c.key ? null : c.key); } });
+    legend.appendChild(li); lrows[c.key] = li;
+  });
+
+  /* free up space: bars carry the category's hue (Trash is neutral); tiles keep their own tints */
+  var ICONS = {
+    phone:'<rect x="4.5" y="1.5" width="7" height="13" rx="1.6"/><path d="M7 12.3h2"/>',
+    box:'<rect x="1.8" y="2.5" width="12.4" height="3.3" rx=".6"/><path d="M2.8 5.8v7a1 1 0 0 0 1 1h8.4a1 1 0 0 0 1-1v-7M6.3 8.4h3.4"/>',
+    pkg:'<path d="M8 1.6 14 4.4v7.2L8 14.4 2 11.6V4.4zM2 4.4l6 2.8 6-2.8M8 7.2v7.2"/>',
+    trash:'<path d="M2.5 4h11M6 4V2.5h4V4M3.8 4l.8 9.6a1 1 0 0 0 1 .9h4.8a1 1 0 0 0 1-.9L12.2 4"/>',
+    down:'<path d="M8 2v9M4.5 7.8 8 11.3l3.5-3.5M3 14h10"/>',
+    dev:'<path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/>'
+  };
+  var uid = "w" + Math.random().toString(36).slice(2, 7);
+  function bar(f){
+    var cc = f.cat ? catBy(f.cat) : null, t = cc ? [cc.top, cc.deep] : TINTS.gray, w = Math.max(8, 170 * f.gb / 12.6), id = uid + f.icon;
+    var s = '<svg class="sbar" viewBox="0 0 170 10" preserveAspectRatio="none" aria-hidden="true"><defs>' +
+      '<linearGradient id="g' + id + '"><stop offset="0" stop-color="' + t[1] + '"/><stop offset="1" stop-color="' + t[0] + '"/></linearGradient>' +
+      '<pattern id="h' + id + '" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="' + t[0] + '" fill-opacity=".22"/><line x1="0" y1="0" x2="0" y2="4" stroke="' + t[0] + '" stroke-width="1.6"/></pattern></defs>' +
+      '<rect x="0" y="2" width="170" height="6" rx="3" fill="rgba(255,255,255,.08)"/>';
+    if (f.state === "safe") s += '<rect x="0" y="2" width="' + w + '" height="6" rx="3" fill="url(#g' + id + ')"/>';
+    else if (f.state === "review") s += '<rect x=".5" y="1" width="' + (w - 1) + '" height="8" rx="3" fill="url(#h' + id + ')" stroke="' + t[0] + '" stroke-width="1"/>';
+    else s += '<rect x=".6" y="1.1" width="' + (w - 1.2) + '" height="7.8" rx="3" fill="none" stroke="' + t[0] + '" stroke-width="1.2" stroke-dasharray="3 2.4"/>';
+    return s + '</svg>';
+  }
+  var finds = q(".mw-finds"), findEls = [];
+  FINDS.forEach(function(f){
+    var li = document.createElement("li");
+    var state = f.state === "safe" ? "Safe to clear" : f.state === "review" ? "Review first" : "Asks before deleting";
+    li.innerHTML = '<span class="tile big t-' + f.tint + '"><svg viewBox="0 0 16 16">' + ICONS[f.icon] + '</svg></span>' +
+      '<span class="tx" style="min-width:0"><span class="t">' + f.name + '</span><span class="d">' + f.detail + '</span></span>' +
+      '<span class="bw" title="' + state + '">' + bar(f) + '<span class="vh">' + state + '</span></span>' +
+      '<span class="sz">' + unitHTML(f.gb) + '</span><span class="act"><button class="pill" type="button">' + f.btn + '</button></span>';
+    finds.appendChild(li); findEls.push({f:f, el:li});
+  });
+  var findsEmpty = document.createElement("li"); findsEmpty.className = "mw-empty"; findsEmpty.hidden = true; finds.appendChild(findsEmpty);
+
+  /* tables, with working sort */
+  var folderIcon = function(c){ return '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 4.2a1 1 0 0 1 1-1h3.7l1.5 1.6h5.8a1 1 0 0 1 1 1v6.9a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1z" fill="' + c + '"/></svg>'; };
+  var fileIcon = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.3h5l3.6 3.6v9.3a.6.6 0 0 1-.6.6H4a.6.6 0 0 1-.6-.6V1.9a.6.6 0 0 1 .6-.6z" fill="#c9cfda"/><path d="M9 1.3v3.6h3.6" fill="#8d95a3"/></svg>';
+  var rowsF = FOLDERS.map(function(f){
+    var c = catBy(f.cat), tr = document.createElement("tr");
+    tr.innerHTML = '<td><span class="mw-fi">' + folderIcon(c.top) + f.name + '</span></td><td class="dim">' + esc(c.name) + '</td><td class="r"><span class="mw-bar-mini" style="width:' + Math.max(3, 60 * f.gb / 41.9) + 'px;background:linear-gradient(90deg,' + c.deep + ',' + c.top + ')"></span>' + unitHTML(f.gb) + '</td>';
+    return {name:f.name, gb:f.gb, cat:f.cat, row:tr};
+  });
+  var rowsL = FILES.map(function(f){
+    var tr = document.createElement("tr");
+    tr.innerHTML = '<td><span class="mw-fi">' + fileIcon + '<span>' + f.name + '<span class="mw-loc">~/' + f.folder + '</span></span></span></td><td class="r">' + f.num + '<small>' + f.unit + '</small></td><td><span class="mw-acts"><button class="mw-icon" type="button" title="Show in Finder" aria-label="Show ' + f.name + ' in Finder"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.3"/><path d="m10.2 10.2 3.6 3.6"/></svg></button><button class="mw-icon" type="button" title="Move to Trash (⌘⌫)" aria-label="Move ' + f.name + ' to Trash"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M6 4V2.5h4V4M3.8 4l.8 9.6a1 1 0 0 0 1 .9h4.8a1 1 0 0 0 1-.9L12.2 4"/></svg></button></span></td>';
+    return {name:f.name, gb:f.gb, cat:f.cat, row:tr};
+  });
+  function sortable(table, data){
+    var body = table.querySelector("tbody"), st = {key:"gb", dir:-1};
+    function render(){
+      data.slice().sort(function(a, b){ var x = a[st.key], y = b[st.key]; return typeof x === "string" ? st.dir * x.replace(/^\./, "").localeCompare(y.replace(/^\./, "")) : st.dir * (x - y); }).forEach(function(d){ body.appendChild(d.row); });
+      Array.prototype.forEach.call(table.querySelectorAll("th"), function(th){ var b = th.querySelector("button[data-sort]"); if (b && b.dataset.sort === st.key) th.setAttribute("aria-sort", st.dir < 0 ? "descending" : "ascending"); else th.removeAttribute("aria-sort"); });
+    }
+    Array.prototype.forEach.call(table.querySelectorAll("button[data-sort]"), function(b){ b.addEventListener("click", function(){ if (st.key === b.dataset.sort) st.dir *= -1; else { st.key = b.dataset.sort; st.dir = st.key === "name" ? 1 : -1; } render(); }); });
+    render();
+  }
+  sortable(q(".ov-folders"), rowsF);
+  sortable(q(".ov-files"), rowsL);
+
+  /* the figure, and what selecting it does to everything below */
+  var cap = q(".ov-cap"), whole = q(".ov-whole"), content = q(".mw-content"), trail = q(".ov-trail");
+  var fEmpty = q(".ov-folders-empty"), lEmpty = q(".ov-files-empty");
+  fig = new Figure(q(".ov-fig"), {cx:340, cy:340, gap:4, labels:false, tickLabels:false, center:[22, 50, 21],
+    centerText:function(c){ return c ? [c.name, gbs(c.gb), pct(c.gb) + " of 245 GB"] : ["Macintosh HD", "71.2 GB", "free of 245 GB"]; },
+    onChange:function(key){
+      content.classList.toggle("has-sel", !!key);
+      CATS.forEach(function(c){ if (lrows[c.key]) lrows[c.key].setAttribute("aria-selected", c.key === key ? "true" : "false"); });
+      var c = key ? catBy(key) : null;
+      cap.innerHTML = CAPS[key || "all"]; whole.hidden = !key;
+      Array.prototype.forEach.call(root.querySelectorAll(".mw-filter .tok"), function(t){ t.textContent = c ? c.name : ""; });
+      var n = 0, sum = 0;
+      findEls.forEach(function(x){ var v = !key || x.f.cat === key; x.el.hidden = !v; if (v){ n++; sum += x.f.gb; } });
+      findsEmpty.hidden = n > 0; findsEmpty.textContent = EMPTY[key] || "";
+      trail.textContent = n ? gbs(sum) + " in " + n + (n === 1 ? " place" : " places") : "";
+      var nf = 0; rowsF.forEach(function(r){ var v = !key || r.cat === key; r.row.hidden = !v; if (v) nf++; });
+      fEmpty.hidden = nf > 0; fEmpty.textContent = key === "system" ? "macOS & other sits outside your home. MacSafe only shows it." : key === "apps" ? "Apps live in /Applications, outside your home folders." : "No folders here.";
+      var nl = 0; rowsL.forEach(function(r){ var v = !key || r.cat === key; r.row.hidden = !v; if (v) nl++; });
+      lEmpty.hidden = nl > 0; lEmpty.textContent = key === "appdata" ? "Largest files leaves out app data. Its biggest find is 12.6 GB of device backups." : "No files of 200 MB or more here.";
+    }});
+  whole.addEventListener("click", function(){ fig.select(null); });
+  Array.prototype.forEach.call(root.querySelectorAll("[data-clear]"), function(b){ b.addEventListener("click", function(){ fig.select(null); }); });
+  root.addEventListener("keydown", function(e){ if (e.key === "Escape" && fig.current) fig.select(null); });
+  return fig;
+}
+/* fit a 1280×800 window into its column; below 760px wide, reflow it as a narrow window instead of shrinking it */
+function fitWindow(fit, scaler){
+  var win = scaler.querySelector(".mac-win"), tog = win.querySelector(".mw-toggle");
+  tog.addEventListener("click", function(){
+    if (!win.classList.contains("narrow")) return;
+    var open = win.classList.toggle("side-open");
+    tog.setAttribute("aria-label", open ? "Hide sidebar" : "Show sidebar"); tog.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  function r(){
+    var narrow = fit.clientWidth < 760;
+    win.classList.toggle("narrow", narrow); fit.classList.toggle("is-narrow", narrow);
+    if (!narrow) win.classList.remove("side-open");
+    tog.setAttribute("aria-label", narrow && !win.classList.contains("side-open") ? "Show sidebar" : "Hide sidebar");
+    if (narrow){ scaler.style.transform = ""; scaler.style.width = "100%"; scaler.style.height = "auto"; fit.style.height = "auto"; return; }
+    var s = Math.min(1, fit.clientWidth / 1280);
+    scaler.style.width = "1280px"; scaler.style.height = "800px"; scaler.style.transform = s < 1 ? "scale(" + s + ")" : ""; fit.style.height = (800 * s) + "px";
+  }
+  window.addEventListener("resize", r); r();
+}
+
+/* ---------- Fig. 1, the hero figure ---------- */
+var HCX = 500, HCY = 370;
+var stage = document.getElementById("stage"), svg = document.getElementById("disk"), cap = document.getElementById("cap"), keyList = document.getElementById("key");
+var narrow = window.matchMedia("(max-width: 720px)");
+/* tall enough to hold the whole drive below the platter: the drive is never faded or cut */
+function setBox(){ svg.setAttribute("viewBox", narrow.matches ? (HCX - 362) + " " + (HCY - 362) + " 724 856" : "0 0 1170 870"); }
+setBox();
+var CAPS = {
+  all: "<b>Fig. 1</b> Macintosh HD, example data, scanned 2 minutes ago. Inner ring: categories. Outer ring: biggest folders in your home. Bars: largest files, one cell per gigabyte. Select any part to focus it.",
+  apps: "<b>Fig. 1</b> Applications, 23.3 GB, 10% of the disk. The Applications view shows when you last opened each app and uninstalls it to the Trash, with its leftovers if you choose.",
+  files: "<b>Fig. 1</b> Your files, 7.8 GB, 3%. Downloads 3.9 GB, Developer 1.4 GB, Documents 1.1 GB. The largest file is ubuntu-24.04-desktop-arm64.iso at 2.6 GB, then Project archive.zip at 740 MB and Docker.dmg at 520 MB. Nothing here is cleared blindly: 3.1 GB of installers, 1.3 GB of old downloads and 1.2 GB of developer leftovers are marked to review first.",
+  appdata: "<b>Fig. 1</b> App data &amp; caches, 43.7 GB, 18%. Library 41.9 GB, .cache 1.8 GB. 6.4 GB of it is caches, safe to clear. 12.6 GB is old iPhone and iPad backups, to review first.",
+  system: "<b>Fig. 1</b> macOS &amp; other, 99.0 GB, 40%. macOS itself, snapshots and shared tools. macOS manages them, so MacSafe only shows them.",
+  free: "<b>Fig. 1</b> Free space, 71.2 GB, 29%. Clearing everything MacSafe found would bring it to 97.7 GB."
+};
+var heroFig = new Figure(svg, {cx:HCX, cy:HCY, gap:4, labels:true, tickLabels:true, center:[17, 42, 16.5], scaleKey:[960, 852], bottom:714,
+  isNarrow:function(){ return narrow.matches; },
+  onChange:function(key){
+    if (key){ cap.innerHTML = CAPS[key] + ' <button type="button" class="reset">Show the whole disk</button>'; cap.querySelector(".reset").addEventListener("click", function(){ heroFig.select(null); heroFig.groups[key].focus(); }); }
+    else cap.innerHTML = CAPS.all;
+    Array.prototype.forEach.call(keyList.querySelectorAll("button"), function(b){ b.setAttribute("aria-pressed", b.dataset.key === key ? "true" : "false"); });
+  }});
+CATS.forEach(function(c){
+  var li = document.createElement("li"), b = document.createElement("button");
+  b.type = "button"; b.dataset.key = c.key; b.setAttribute("aria-pressed", "false");
+  b.innerHTML = '<span class="sw" style="background:' + (c.top ? "linear-gradient(" + c.top + "," + c.deep + ")" : "#8b93a3") + '"></span><span>' + c.name.replace("&", "&amp;") + '</span><span class="gb">' + c.gb.toFixed(1) + '<small>GB</small></span><span class="pc">' + pct(c.gb) + '</span>';
+  b.addEventListener("click", function(){ heroFig.select(heroFig.current === c.key ? null : c.key); });
+  li.appendChild(b); keyList.appendChild(li);
+});
+document.addEventListener("keydown", function(e){ if (e.key === "Escape" && heroFig.current) heroFig.select(null); });
+if (narrow.addEventListener) narrow.addEventListener("change", function(){ setBox(); heroFig.layoutLabels(); window.dispatchEvent(new Event("resize")); });
+
+/* the 3D drive takes the stage only where it can: WebGL present, motion allowed. Otherwise the figure stands alone. */
+var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches, gl = false;
+try { var tc = document.createElement("canvas"); gl = !!(window.WebGLRenderingContext && (tc.getContext("webgl2") || tc.getContext("webgl"))); } catch (e) { gl = false; }
+var go = gl && !reduce;
+if (go){
+  stage.classList.add("pending");
+  window.__heroTimer = setTimeout(function(){ stage.classList.remove("pending"); }, 2600);
+}
+window.__hero = {go:go, stage:stage, svg:svg, fig:heroFig, CX:HCX, CY:HCY, R:R, paintPlatter:paintPlatter,
+  reveal:function(){ clearTimeout(window.__heroTimer); stage.classList.remove("pending"); }};
+
+/* ---------- the desktop: the hero's light behind the real window ---------- */
+(function(){
+  var w = document.getElementById("wall-rings");
+  CATS.forEach(function(c){ if (c.top) gradientArc(w, 340, 340, R.cat0, R.fold1, c.d0 + .6, c.d1 - .6, c.top, c.deep); });
 })();
+initWindow(document.querySelector("#desk-scaler .mac-win"));
+fitWindow(document.getElementById("desk-fit"), document.getElementById("desk-scaler"));
+
+/* ---------- Fig. 3: what you could free, one scale ---------- */
+(function(){
+  var fbar = document.getElementById("fbar"), fkey = document.getElementById("fkey");
+  var colorOf = function(f){ return f.cat ? catBy(f.cat).top : "#b4bfd1"; };
+  var total = FINDS.reduce(function(s, f){ return s + f.gb; }, 0), W = 600, px = W / total, x = 0;
+  fbar.setAttribute("viewBox", "0 0 " + W + " 58");
+  var fd = svgEl("defs", {}, fbar);
+  ["files","appdata"].forEach(function(k){
+    var c = catBy(k).top, p = svgEl("pattern", {id:"fh-" + k, width:"5", height:"5", patternUnits:"userSpaceOnUse", patternTransform:"rotate(45)"}, fd);
+    svgEl("rect", {width:"5", height:"5", fill:c, "fill-opacity":".18"}, p);
+    svgEl("line", {x1:"0", y1:"0", x2:"0", y2:"5", stroke:c, "stroke-width":"1.4"}, p);
+    var g = svgEl("linearGradient", {id:"fg-" + k}, fd);
+    svgEl("stop", {offset:"0", "stop-color":catBy(k).deep}, g); svgEl("stop", {offset:"1", "stop-color":c}, g);
+  });
+  FINDS.forEach(function(f){
+    var w = f.gb * px, c = colorOf(f);
+    if (f.state === "safe") svgEl("rect", {x:x + 1.5, y:4, width:w - 3, height:34, rx:3, fill:"url(#fg-" + f.cat + ")"}, fbar);
+    else if (f.state === "review") svgEl("rect", {x:x + 2, y:4.5, width:w - 4, height:33, rx:3, fill:"url(#fh-" + f.cat + ")", stroke:c, "stroke-width":"1"}, fbar);
+    else svgEl("rect", {x:x + 2.1, y:5.1, width:w - 4.2, height:31.8, rx:3, fill:"none", stroke:c, "stroke-width":"1.2", "stroke-dasharray":"4 3"}, fbar);
+    x += w;
+  });
+  svgEl("line", {x1:0, y1:50, x2:W, y2:50, stroke:"#2a3a58", "stroke-width":"1"}, fbar);
+  for (var g = 0; g <= 25; g += 5) svgEl("line", {x1:g * px, y1:46, x2:g * px, y2:50, stroke:"#5b77a3", "stroke-width":"1"}, fbar);
+  FINDS.forEach(function(f){
+    var c = colorOf(f), sw;
+    if (f.state === "safe") sw = '<rect x="0" y="1" width="30" height="10" rx="2" fill="' + c + '"/>';
+    else if (f.state === "review") sw = '<rect x=".5" y="1.5" width="29" height="9" rx="2" fill="url(#fh-' + f.cat + ')" stroke="' + c + '"/>';
+    else sw = '<rect x=".6" y="1.6" width="28.8" height="8.8" rx="2" fill="none" stroke="' + c + '" stroke-width="1.2" stroke-dasharray="3 2.4"/>';
+    var li = document.createElement("li");
+    li.innerHTML = '<svg viewBox="0 0 30 12" aria-hidden="true">' + sw + '</svg><span>' + f.name + '<small>' + f.detail + '</small></span><span class="gb">' + gbs(f.gb) + '</span>';
+    fkey.appendChild(li);
+  });
+})();
+
+/* ---------- Fig. 4: the cut-out ---------- */
+(function(){
+  var cut = document.getElementById("cut"), cg = svgEl("g", {}, cut), CX = 500, CY = 370;
+  var ap = catBy("appdata"), lib = folderBy("Library"), files = catBy("files"), sys = catBy("system");
+  var g0 = lib.d0 + 14 * DEG, g1 = g0 + 6.4 * DEG, gi = gapDeg(2, 181), gf = gapDeg(2, 238);
+  [R.cat1 + 3.5, R.fold1 + 3.5].forEach(function(r){ var a = polar(CX, CY, r, ap.d0 - 8), b = polar(CX, CY, r, ap.d1 + 8); svgEl("path", {d:"M" + a.join(" ") + "A" + r + " " + r + " 0 0 1 " + b.join(" "), "class":"ring-hair"}, cg); });
+  var dim = svgEl("g", {opacity:".4", style:"filter:grayscale(1)"}, cg);
+  gradientArc(dim, CX, CY, R.cat0, R.cat1, files.d0 + gi, files.d1 - gi, files.top, files.deep);
+  gradientArc(dim, CX, CY, R.cat0, R.cat1, sys.d0 + gi, sys.d0 + 12, sys.top, sys.deep);
+  var span = ap.d1 - ap.d0;
+  function inner(a, b){ return [mixC(ap.top, ap.deep, (a - ap.d0) / span), mixC(ap.top, ap.deep, (b - ap.d0) / span)]; }
+  var c1 = inner(ap.d0, g0), c2 = inner(g1, ap.d1);
+  gradientArc(cg, CX, CY, R.cat0, R.cat1, ap.d0 + gi, g0 - gi, c1[0], c1[1]);
+  gradientArc(cg, CX, CY, R.cat0, R.cat1, g1 + gi, ap.d1 - gi, c2[0], c2[1]);
+  gradientArc(cg, CX, CY, R.fold0, R.fold1, lib.d0 + gf, g0 - gf, toGround(ap.top, .42), toGround(ap.deep, .42));
+  gradientArc(cg, CX, CY, R.fold0, R.fold1, g1 + gf, lib.d1 - gf, toGround(ap.top, .42), toGround(ap.deep, .42));
+  var cf = folderBy(".cache"); gradientArc(cg, CX, CY, R.fold0, R.fold1, cf.d0 + gf, cf.d1 - gf, toGround(ap.top, .42), toGround(ap.deep, .42));
+  svgEl("path", {d:sectorPath(CX, CY, R.cat0, R.fold1, g0, g1), fill:"none", stroke:"#eef1f6", "stroke-width":"1", "stroke-dasharray":"2 3"}, cg);
+  var gm = (g0 + g1) / 2, q0 = polar(CX, CY, R.fold1 + 6, gm), q1 = polar(CX, CY, R.fold1 + 46, gm);
+  svgEl("polyline", {points:q0.join(",") + " " + q1.join(",") + " " + (q1[0] + 22) + "," + q1[1], "class":"leader"}, cg);
+  var t1 = svgEl("text", {x:q1[0] + 28, y:q1[1] - 4, "class":"lbl-a"}, cg); t1.textContent = "6.4 GB freed";
+  var t2 = svgEl("text", {x:q1[0] + 28, y:q1[1] + 17, "class":"lbl-b"}, cg); t2.textContent = "Caches cleared";
+  var lp = polar(CX, CY, R.cat0 - 18, ap.mid + 4);
+  var t3 = svgEl("text", {x:lp[0], y:lp[1] - 4, "class":"lbl-a", "text-anchor":"end"}, cg); t3.textContent = "App data & caches";
+  var t4 = svgEl("text", {x:lp[0], y:lp[1] + 17, "class":"lbl-b", "text-anchor":"end"}, cg); t4.textContent = "37.3 GB left";
+  var bb = cg.getBBox(), pad = 10;
+  cut.setAttribute("viewBox", (bb.x - pad).toFixed(0) + " " + (bb.y - pad).toFixed(0) + " " + (bb.width + 2 * pad).toFixed(0) + " " + (bb.height + 2 * pad).toFixed(0));
+})();
+
+/* ---------- copy buttons ---------- */
+Array.prototype.forEach.call(document.querySelectorAll(".copy"), function(btn){
+  var code = document.getElementById(btn.dataset.copy), note = document.getElementById(btn.getAttribute("aria-describedby")), label = btn.querySelector("span"), original = note.innerHTML, timer;
+  function done(msg, ok){ label.textContent = ok ? "Copied" : "Copy"; note.textContent = msg; note.dataset.state = ok ? "ok" : ""; clearTimeout(timer); timer = setTimeout(function(){ label.textContent = "Copy"; note.innerHTML = original; note.dataset.state = ""; }, 3200); }
+  function fallback(){ var r = document.createRange(); r.selectNodeContents(code); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); done("Selected. Press ⌘C to copy.", false); }
+  btn.addEventListener("click", function(){
+    var text = code.textContent.replace(/\s+/g, " ").trim();
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function(){ done("Copied. Paste it into Terminal and press Return.", true); }, fallback); else fallback(); }
+    catch (e) { fallback(); }
+  });
+});
+
+})();
+</script>
+<script type="module">
+/* The drive, in 3/4 view, turns end-on until its platter is the figure above it. One moment, on load. */
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const H = window.__hero;
+async function run() {
+  if (!H || !H.go) return;
+  const stage = H.stage, canvas = document.getElementById('hdd');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.setClearColor(0x000000, 0);
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-260, 520, 340); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xa9c2ff, 0.55); rim.position.set(420, 180, -380); scene.add(rim);
+
+  const gltf = await new GLTFLoader().loadAsync('models/hdd.glb');
+  if (!stage.classList.contains('pending')) return; // too late: the figure already stands on its own
+  const drive = gltf.scene;
+  // dark machined aluminium, matte; the settled casing sits well below the arcs' luminance
+  const M = (c, metal, rough) => new THREE.MeshStandardMaterial({ color: c, metalness: metal, roughness: rough });
+  const mats = {
+    casing: M(0x4b525c, 0.6, 0.5), base: M(0x3a4049, 0.55, 0.55), actuator: M(0x565d67, 0.6, 0.48), arm: M(0x666d77, 0.6, 0.42),
+    flex: M(0x4a3f33, 0.15, 0.7), 'flex-tan': M(0x544a3e, 0.1, 0.75), 'flex-gold': M(0x5e4f33, 0.35, 0.55), pin: M(0x6a7079, 0.5, 0.5)
+  };
+  drive.traverse(o => { if (o.isMesh) { const n = (o.name || '').replace(/_\d+$/, ''); o.material = mats[n] || mats.casing; } });
+  scene.add(drive);
+
+  // the platter, rebuilt round: its top surface carries the ring figure from the same data
+  const PR = 143, PY = 5.2;
+  const tex = document.createElement('canvas'); tex.width = tex.height = 1024;
+  const ctx = tex.getContext('2d');
+  const map = new THREE.CanvasTexture(tex); map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 8;
+  const platter = new THREE.Group(); platter.rotation.y = -Math.PI / 2;
+  const top = new THREE.Mesh(new THREE.CircleGeometry(PR, 160), new THREE.MeshStandardMaterial({ map, metalness: 0.25, roughness: 0.6 }));
+  top.rotation.x = -Math.PI / 2; top.position.y = PY; platter.add(top);
+  const edge = new THREE.Mesh(new THREE.CylinderGeometry(PR, PR, 2.2, 160, 1, true), M(0x6c737d, 0.7, 0.35));
+  edge.position.y = PY - 1.1; platter.add(edge);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(50, 50, 2.4, 96), M(0x1a2130, 0.45, 0.5));
+  cap.position.y = 17.9; platter.add(cap);
+  scene.add(platter);
+
+  const camera = new THREE.PerspectiveCamera(22, 1, 5, 20000);
+  const T = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  let W = 1, Hh = 1, end = null;
+  function measure() {
+    const r = stage.getBoundingClientRect();
+    W = Math.max(1, r.width); Hh = Math.max(1, r.height);
+    renderer.setSize(W, Hh, false); camera.aspect = W / Hh;
+    // where the figure's platter sits on screen: centre and radius, read from the SVG itself
+    const m = H.svg.getScreenCTM(), p = H.svg.createSVGPoint();
+    p.x = H.CX; p.y = H.CY; const c = p.matrixTransform(m);
+    p.x = H.CX + H.R.platter; const e = p.matrixTransform(m);
+    const cx = c.x - r.left, cy = c.y - r.top, rp = Math.abs(e.x - c.x);
+    end = { cx, cy, dist: PR * (Hh / 2) / (T * rp) };
+  }
+  measure();
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const startTarget = new THREE.Vector3(-48, 0, 0), endTarget = new THREE.Vector3(0, PY, 0);
+  const X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0);
+  function pose(c) {
+    const az = THREE.MathUtils.degToRad(-58 + (-90 + 58) * c), el = THREE.MathUtils.degToRad(32 + (90 - 32) * c);
+    const startDist = 300 / T * (W / Hh < 1.2 ? 1.25 : 1);
+    const d = Math.exp(Math.log(startDist) + (Math.log(end.dist) - Math.log(startDist)) * c);
+    const target = startTarget.clone().lerp(endTarget, c);
+    camera.position.set(target.x + d * Math.cos(el) * Math.sin(az), target.y + d * Math.sin(el), target.z + d * Math.cos(el) * Math.cos(az));
+    camera.up.copy(Y.clone().lerp(X, smooth(55, 89.5, THREE.MathUtils.radToDeg(el))).normalize());
+    camera.lookAt(target);
+    // slide the principal point from the stage centre to the figure's centre
+    camera.setViewOffset(W, Hh, (W / 2 - end.cx) * c, (Hh / 2 - end.cy) * c, W, Hh);
+    camera.updateProjectionMatrix();
+  }
+  function light(k) { // 0: lit object; 1: lights down across the handoff, the data is the light
+    key.intensity = 1.6 - 1.2 * k; rim.intensity = 0.55 - 0.4 * k; scene.environmentIntensity = 1 - 0.75 * k;
+  }
+  const params = new URLSearchParams(location.search);
+  const frozen = params.has('hero-t') ? parseFloat(params.get('hero-t')) : null;
+  const DUR = 3400;
+  let t0 = null, painted = -1, handed = false, done = false;
+  function frame(now) {
+    if (t0 === null) t0 = now;
+    const t = frozen !== null ? frozen : now - t0;
+    pose(ease(Math.min(1, Math.max(0, (t - 250) / 2350))));
+    const p = Math.min(1, Math.max(0, (t - 1100) / 1400)), pe = 1 - Math.pow(1 - p, 3);
+    if (Math.abs(pe - painted) > .004 || painted < 0) { H.paintPlatter(ctx, 1024, pe, true); map.needsUpdate = true; painted = pe; }
+    light(smooth(2200, 3100, t));
+    renderer.render(scene, camera);
+    if (!handed && t >= 2700) { handed = true; stage.classList.add('handoff'); }
+    if (t >= DUR && !done) { done = true; H.paintPlatter(ctx, 1024, 0, false); map.needsUpdate = true; renderer.render(scene, camera); return; }
+    if (frozen === null || frozen < DUR) requestAnimationFrame(frame);
+  }
+  // first frame is ready: the drive takes the stage
+  H.paintPlatter(ctx, 1024, 0, true); map.needsUpdate = true; pose(0); light(0); renderer.render(scene, camera);
+  clearTimeout(window.__heroTimer);
+  stage.classList.add('is-3d'); stage.classList.remove('pending');
+  requestAnimationFrame(frame);
+  window.addEventListener('resize', () => { measure(); if (done) { pose(1); light(1); renderer.render(scene, camera); } });
+  if (frozen === null) setTimeout(() => { if (!stage.classList.contains('handoff')) stage.classList.add('handoff'); }, 6000);
+}
+run().catch(err => {
+  if (H) { H.reveal(); H.stage.classList.remove('is-3d'); }
+  console.warn('3D drive unavailable; showing the figure.', err && err.message);
+});
+
 </script>
 </body>
 </html>

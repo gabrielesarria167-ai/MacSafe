@@ -71,6 +71,8 @@ final class Store {
     var status: EngineStatus?
     var overview: Overview?
     var pane: Pane = .overview
+    /// The category focused on the Overview's figure (an engine breakdown key, or "free"); nil shows the whole disk.
+    var overviewSelection: String?
     var explorePath: String?
     var toast: Toast?
     var confirm: ConfirmRequest?
@@ -146,14 +148,25 @@ final class Store {
         }
     }
 
+    /// Dev aid (SM_OVERVIEW_JSON): a fixture stands in for the engine's status and overview, which are then left alone.
+    private(set) var usesFixture = false
+
+    func useFixture(overview o: Overview, status s: EngineStatus?) {
+        usesFixture = true
+        overview = o
+        if let s { status = s }
+    }
+
     func refreshStatus() async {
-        if let s: EngineStatus = try? await engine.get("status") {
+        guard !usesFixture else { return }
+        if let s: EngineStatus = try? await engine.get("status"), !usesFixture {
             if s != status { status = s }
         }
     }
 
     func loadOverview() async {
-        if let o: Overview = try? await engine.get("overview") { overview = o }
+        guard !usesFixture else { return }
+        if let o: Overview = try? await engine.get("overview"), !usesFixture { overview = o }
     }
 
     /// Something changed on disk: every view reloads (they key their `.task` on dataVersion).

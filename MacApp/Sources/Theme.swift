@@ -243,6 +243,8 @@ struct Card<Content: View, Accessory: View>: View {
     var subtitle: String?
     /// A figure at the right of the title row, such as a total.
     var trailing: String?
+    /// Something that belongs to the title, such as a filter token, shown right after it.
+    var titleAccessory: AnyView?
     @ViewBuilder var content: Content
     @ViewBuilder var accessory: Accessory
 
@@ -254,6 +256,7 @@ struct Card<Content: View, Accessory: View>: View {
                         Text(title).font(.headline)
                         if let subtitle { Text(subtitle).font(.caption).foregroundStyle(.secondary) }
                     }
+                    if let titleAccessory { titleAccessory }
                     Spacer(minLength: 8)
                     if let trailing { Text(trailing).font(.caption).foregroundStyle(.secondary).monospacedDigit() }
                     accessory
@@ -269,7 +272,9 @@ struct Card<Content: View, Accessory: View>: View {
 }
 
 extension Card where Accessory == EmptyView {
-    init(title: String? = nil, subtitle: String? = nil, trailing: String? = nil, @ViewBuilder content: () -> Content) {
-        self.init(title: title, subtitle: subtitle, trailing: trailing, content: content, accessory: { EmptyView() })
+    init(title: String? = nil, subtitle: String? = nil, trailing: String? = nil, titleAccessory: AnyView? = nil,
+         @ViewBuilder content: () -> Content) {
+        self.init(title: title, subtitle: subtitle, trailing: trailing, titleAccessory: titleAccessory,
+                  content: content, accessory: { EmptyView() })
     }
 }
